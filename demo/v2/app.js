@@ -109,9 +109,9 @@
   // Le parti dei moduli extra (CASSIERE, GESTIONALE, PROMOTER) nel piano base NON si vedono proprio (niente lucchetti).
   function inB(modo, pagina) {
     if (!PB) return true;
-    return modo === 'creator' || modo === 'amministrazione';
+    return modo === 'creator' || modo === 'cassiere' || modo === 'amministrazione';   // 6/11 Fabrice: CASSIERE (utilità di cassa) incluso nel piano base
   }
-  function modoInB(modo) { return !PB || modo === 'creator' || modo === 'amministrazione'; }
+  function modoInB(modo) { return !PB || modo === 'creator' || modo === 'cassiere' || modo === 'amministrazione'; }
   function nomePiano() { return PB ? 'piano base' : 'moduli extra'; }
   function riservato(modo) { return S.sistema.utente === 1 && !S.utenti[1].aree[modo]; }
 
@@ -519,7 +519,7 @@
     { id: 'bacheca', t: 'La tua Bacheca', ic: '📌', d: 'Post-it, Note Promemoria, Numeri Utili e Comunicazioni Ufficiali.' }
   ];
   function toolsHTML(r) {
-    var escl = PB;
+    var escl = false;   // 6/11 Fabrice: le Utilità Cassa sono nel piano base
     var h = '<section class="section" id="sec-tools"><h2 class="section-title">Utilità Cassa</h2>' + (escl && r.modo === 'cassiere' ? '' : '') + '<div class="tools-grid">';
     STRUMENTI.forEach(function (w) {
       h += '<button class="widget glass' + (escl ? ' escluso' : '') + '" type="button" data-act="' + (escl ? 'fuoriB' : 'widget') + '" data-w="' + w.id + '"><span class="w-ic">' + w.ic + '</span><h3>' + esc(w.t) + '</h3><p>' + esc(w.id === 'bacheca' && S.bacheca[0] ? '«' + S.bacheca[0].t + '»' : w.d) + '</p><span class="w-vai">Apri</span>' + (escl ? '<span class="fuori-b">MODULI EXTRA</span>' : '') + '</button>';
@@ -533,7 +533,7 @@
     if (!modoInB(r.modo)) h += bandaB(r.modo.toUpperCase());
     if (r.modo === 'cassiere') return h + toolsHTML(r);
     h += sezioni(r.modo).map(sezioneHTML).join('');
-    if (r.modo === 'creator' && !PB) h += toolsHTML(r);
+    if (r.modo === 'creator') h += toolsHTML(r);
     return h;
   }
 

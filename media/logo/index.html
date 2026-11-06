@@ -376,7 +376,7 @@ ul.fatto{margin:8px 0 0;padding-left:20px;color:var(--h-mut)} ul.fatto li{margin
   {id:'stile-10',nome:'Stile 10 · Stampa pop',descr:'Rosa e azzurro sfalsati, come una stampa pop.',v:st('10')},
   {id:'primo-restauro',nome:'Primo restauro',descr:'La prima versione restaurata del draghetto storico.',v:{colori:'storico/draghetto-storico-restaurato.svg',notte:'storico/draghetto-storico-bianco.svg',neg:'storico/draghetto-storico-bianco.svg',nero:'storico/draghetto-storico-mono-nero.svg'}}
  ];
- var SETS={L:LOGHI,I:ICONE},idx={L:0,I:0},aperto=false,KEY='om-logo-rebranding';
+ var SETS={L:LOGHI,I:ICONE},idx={L:Math.max(0,LOGHI.map(function(x){return x.id}).indexOf('storico-verticale')),I:0},aperto=false,KEY='om-logo-rebranding-v2';   /* 6/11 Fabrice: logo predefinito = draghetto storico in colonna */
 
  /* versione richiesta -> {src, piastra}: se manca la versione per fondi scuri/rossi si usa quella a colori su un tondo chiaro */
  function ver(p,k){
