@@ -350,3 +350,10 @@
   body.hud .pv-hw-griglia{gap:6px}
   body.hud .pv-enfasi{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
+
+/* 6/11 Fabrice: restauro e rebranding del marchio INCLUSO nel pacchetto base, senza costi aggiuntivi */
+.pv-omaggio{margin-top:14px;display:inline-flex;flex-wrap:wrap;align-items:center;gap:8px 10px;padding:10px 16px;background:#e9f3ea;border:1px solid #3d8b52;color:#1f5a30;font:600 14px var(--h-title);letter-spacing:.8px;text-transform:uppercase;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px))}
+.pv-omaggio b{background:#2f7a45;color:#fff;padding:3px 9px;letter-spacing:1.2px}
+.pv-omaggio span{color:#2f7a45;font-weight:800}
+.pv-incluso-tag{display:inline-block;margin-bottom:8px;padding:6px 12px;background:#2f7a45;color:#fff;font:700 13px var(--h-title);letter-spacing:1.2px;text-transform:uppercase;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px))}
+@media print{.pv-omaggio,.pv-incluso-tag{-webkit-print-color-adjust:exact;print-color-adjust:exact}}

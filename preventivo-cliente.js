@@ -150,6 +150,7 @@
        '<span class="pv-pieno">invece di <s class="mono">'+E(euro(pieno))+'</s> · <b class="pv-sconto-tag">−'+E(euro(risp))+' · −'+perc+'%</b> · '+E(P.iva)+'</span></div>'+
        '<div class="pv-tth"><span class="pv-k">Consegna</span><b class="mono">'+E(String(U.tempi).replace(/\s*settimane?/,''))+'</b><span>settimane</span></div>'+
        '<a class="hbtn pri solo-schermo" href="#cosa-ottiene">Guarda cosa ottieni ↓</a></div>'+
+     '<div class="pv-omaggio"><b>✓ Incluso</b> Restauro del logo e rebranding del marchio · <span>nessun costo aggiuntivo</span></div>'+
      '</div>'+
      '<dl class="pv-dati">'+
        '<div><dt>Per</dt><dd><b>Ottica Macrì</b> · Aldo Macrì<br>Via Poggi D’Oro 23 · 00179 Roma</dd></div>'+
@@ -213,7 +214,7 @@
     ['media/logo/storico/animazione/avvio.html','Animazione d’avvio']
   ];
   h+='<section class="pv-marchio glass hud-entra"><div class="pv-marchio-img">'+img('media/logo/marchi6/06-ovale/png/06-ovale-colori-1000.png',{alt:'Il marchio di Ottica Macrì',cls:'intera'})+'</div>'+
-     '<div><div class="pv-eti">// Il tuo marchio</div><h3>Il tuo marchio, dal draghetto storico</h3>'+
+     '<div><div class="pv-incluso-tag">✓ Incluso nel pacchetto base · nessun costo aggiuntivo</div><div class="pv-eti">// Restauro e rebranding</div><h3>Il tuo marchio, dal draghetto storico</h3>'+
      '<p>Il draghetto della vetrofania di Ottica Macrì, restaurato: da qui nascono marchio, icona per app e social, animazione d’avvio. Qui sotto trovi tutte le prove fatte finora.</p>'+
      '<p class="pv-rebrand">Stile grafico del rebranding da concordare con il cliente</p>'+
      '<div class="pv-vis-link">'+PROVE.map(function(p){return link(p[0],p[1]);}).join('')+'</div></div></section>';
