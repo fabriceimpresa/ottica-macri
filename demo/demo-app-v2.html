@@ -21,6 +21,17 @@
 <link rel="stylesheet" href="v2/stili.css">
 <link rel="stylesheet" href="v2/scuro.css">
 <script src="../tema-hud.js"></script>
+<style>/* 6/11 Fabrice: «Solo app» = senza barra demo, solo l'interfaccia STORE // CRAFT */
+#soloBtn{background:#b5462c!important;color:#fff!important;border-color:#8e3420!important}
+#soloEsci{display:none}
+html.solo #demobar,html.solo .om-perc{display:none!important}
+html.solo #app{min-height:100vh}
+html.solo #sidebar{top:0;height:100vh}
+html.solo #stage{height:100vh}
+html.solo #soloEsci{display:block;position:fixed;top:0;right:18px;z-index:9999;width:34px;height:16px;padding:0;border:0;border-radius:0 0 8px 8px;
+  background:rgba(31,78,121,.18);color:rgba(31,78,121,.6);font:700 11px/14px sans-serif;cursor:pointer;opacity:.35;transition:opacity .2s,height .2s}
+html.solo #soloEsci:hover{opacity:1;height:24px;background:#1f4e79;color:#fff}
+</style>
 </head>
 <body class="hud">
 <div id="demobar">
@@ -36,7 +47,9 @@
   <a class="demolink" href="../visita/vetrina-aumentata.html">🏬 VISITA NEGOZIO</a>
   <a class="demolink" href="../visita/negozio-3d.html">🧊 3D</a>
   <button type="button" class="demolink" id="tuttoBtn" aria-expanded="false">☰ TUTTO</button>
+  <button type="button" id="soloBtn" title="Nasconde questa barra: resta solo STORE // CRAFT come lo vede Aldo (Esc per riaverla)">⤢ Solo app</button>
 </div>
+<button type="button" id="soloEsci" title="Rimetti la barra della demo (Esc)">▾</button>
 <div id="stage"></div>
 <div id="app">
   <aside id="sidebar" aria-label="Menu"></aside>
@@ -72,5 +85,10 @@
 <script src="../media/logo/storico/animazione/draghetto-avvio.js" data-avvio="auto" data-tema="chiaro"></script>
 <!-- 6/11 percorso guidato: barra unica ‹ Indietro / Avanti › (copia: *.prima-percorso.*) -->
 <script src="../percorso.js"></script>
+<script>/* «Solo app»: nasconde la barra demo; Esc o la linguetta in alto la rimettono. ?solo=1 la apre già nascosta */
+(function(){var h=document.documentElement;function set(on){h.classList.toggle('solo',on);try{sessionStorage.setItem('om-demo-solo',on?'1':'0')}catch(e){}window.dispatchEvent(new Event('resize'))}
+var on=/[?&]solo=1/.test(location.search);try{if(sessionStorage.getItem('om-demo-solo')==='1')on=true}catch(e){}if(on&&!h.classList.contains('embed'))set(true);
+var b=document.getElementById('soloBtn'),x=document.getElementById('soloEsci');if(b)b.onclick=function(){set(true)};if(x)x.onclick=function(){set(false)};
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&h.classList.contains('solo')&&!document.querySelector('.modal.open,.dlg.open')){set(false)}});})();</script>
 </body>
 </html>
