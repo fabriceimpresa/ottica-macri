@@ -847,3 +847,21 @@ html[data-tema="scuro"] .sticker-provv{color:#f0a48c;background:linear-gradient(
 html[data-tema="scuro"] .sticker-provv::after{background:linear-gradient(315deg,transparent 50%,#5a4434 50%)}
 @media (max-width:640px){.sticker-provv{font-size:10px;letter-spacing:1.8px;padding:5px 9px 5px 8px}.pag-testa .sticker-provv.in-pagina{margin-left:0}}
 .dy .dy-marchio{display:block;height:46px;max-width:100%;width:auto} /* 6/11 marchio vero in nero */
+
+/* 6/11 Fabrice: Utilità Cassa = widget «logo del tool»: angolo blu con simbolo, nome grande, niente testi */
+.widget.tool-cassa{position:relative;min-height:150px;display:flex;align-items:flex-end;justify-content:flex-start;padding:22px 24px;overflow:hidden;
+  background:linear-gradient(135deg,#fffdf9 0%,#f3f6fa 100%);border-color:rgba(31,78,121,.35)}
+.widget.tool-cassa .tc-ang{position:absolute;top:0;right:0;width:92px;height:92px;background:#1f4e79;color:#fffdf9;
+  clip-path:polygon(0 0,100% 0,100% 100%);display:block;text-align:right;padding:12px 12px 0 0;box-sizing:border-box;
+  font:800 19px/1 var(--h-title,sans-serif);letter-spacing:.5px}
+.widget.tool-cassa .tc-nome{margin:0;max-width:78%;font:800 26px/1.05 var(--h-title,sans-serif);letter-spacing:1.4px;text-transform:uppercase;color:#1f4e79;text-align:left}
+.widget.tool-cassa::after{content:"";position:absolute;left:24px;bottom:14px;width:40px;height:3px;background:#b5462c}
+.widget.tool-cassa:hover .tc-ang{background:#163a5c}
+.widget.tool-cassa:hover .tc-nome{color:#163a5c}
+html.scuro .widget.tool-cassa,body.scuro .widget.tool-cassa{background:linear-gradient(135deg,#1c2430,#14202d)}
+html.scuro .widget.tool-cassa .tc-nome,body.scuro .widget.tool-cassa .tc-nome{color:#cfe0f2}
+/* correzione impaginazione widget cassa */
+.widget.tool-cassa{display:flex!important;flex-direction:column!important;justify-content:flex-end!important;align-items:flex-start!important;text-align:left!important;padding:20px 22px 26px!important}
+.widget.tool-cassa .tc-ang{width:74px;height:74px;font-size:17px;padding:10px 10px 0 0}
+.widget.tool-cassa .tc-nome{max-width:calc(100% - 40px)!important;margin:0!important;padding:0!important;font-size:24px!important;text-align:left!important;align-self:flex-start!important}
+@media (max-width:700px){.widget.tool-cassa{min-height:110px!important}.widget.tool-cassa .tc-nome{font-size:21px!important}}

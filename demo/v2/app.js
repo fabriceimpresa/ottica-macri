@@ -511,18 +511,19 @@
 
   /* ---------- Utilità Cassa (assets/js/cassa.js) ---------- */
   var STRUMENTI = [
-    { id: 'sconto', t: 'Calcola Sconto', ic: '％', d: 'Prezzo pieno e sconto: il prezzo finale e il risparmio.' },
-    { id: 'aliquota', t: 'Calcola Aliquota Sconto', ic: '⇄', d: 'Dal prezzo pieno e dal finale, lo sconto in percentuale.' },
-    { id: 'valuta', t: 'Cambio Valuta', ic: '💱', d: 'Euro, dollari, sterline, franchi: per il turista al banco.' },
-    { id: 'iva', t: 'Calcola IVA', ic: '🧮', d: 'Imponibile, IVA e totale con l\'aliquota scelta.' },
-    { id: 'qr', t: 'Generatore QR Code', ic: '▦', d: 'Un QR da stampare: pagina Facebook, telefono, recensioni.' },
-    { id: 'bacheca', t: 'La tua Bacheca', ic: '📌', d: 'Post-it, Note Promemoria, Numeri Utili e Comunicazioni Ufficiali.' }
+    { id: 'sconto', sim: '%', t: 'Calcola Sconto', ic: '％', d: 'Prezzo pieno e sconto: il prezzo finale e il risparmio.' },
+    { id: 'aliquota', sim: '⇄%', t: 'Calcola Aliquota Sconto', ic: '⇄', d: 'Dal prezzo pieno e dal finale, lo sconto in percentuale.' },
+    { id: 'valuta', sim: '€$', t: 'Cambio Valuta', ic: '💱', d: 'Euro, dollari, sterline, franchi: per il turista al banco.' },
+    { id: 'iva', sim: 'IVA', t: 'Calcola IVA', ic: '🧮', d: 'Imponibile, IVA e totale con l\'aliquota scelta.' },
+    { id: 'qr', sim: 'QR', t: 'Generatore QR Code', ic: '▦', d: 'Un QR da stampare: pagina Facebook, telefono, recensioni.' },
+    { id: 'bacheca', sim: '✎', t: 'La tua Bacheca', ic: '📌', d: 'Post-it, Note Promemoria, Numeri Utili e Comunicazioni Ufficiali.' }
   ];
   function toolsHTML(r) {
     var escl = false;   // 6/11 Fabrice: le Utilità Cassa sono nel piano base
     var h = '<section class="section" id="sec-tools"><h2 class="section-title">Utilità Cassa</h2>' + (escl && r.modo === 'cassiere' ? '' : '') + '<div class="tools-grid">';
     STRUMENTI.forEach(function (w) {
-      h += '<button class="widget glass' + (escl ? ' escluso' : '') + '" type="button" data-act="' + (escl ? 'fuoriB' : 'widget') + '" data-w="' + w.id + '"><span class="w-ic">' + w.ic + '</span><h3>' + esc(w.t) + '</h3><p>' + esc(w.id === 'bacheca' && S.bacheca[0] ? '«' + S.bacheca[0].t + '»' : w.d) + '</p><span class="w-vai">Apri</span>' + (escl ? '<span class="fuori-b">MODULI EXTRA</span>' : '') + '</button>';
+      /* 6/11 Fabrice: widget delle Utilità Cassa diversi dagli altri: angolo blu con simbolo, solo il nome grande (come il logo del tool) */
+      h += '<button class="widget glass tool-cassa" type="button" data-act="widget" data-w="' + w.id + '" title="' + esc(w.d) + '"><span class="tc-ang" aria-hidden="true">' + esc(w.sim || w.ic) + '</span><h3 class="tc-nome">' + esc(w.t) + '</h3></button>';
     });
     return h + '</div></section>';
   }
