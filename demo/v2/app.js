@@ -518,12 +518,24 @@
     { id: 'qr', sim: 'QR', t: 'Generatore QR Code', ic: '▦', d: 'Un QR da stampare: pagina Facebook, telefono, recensioni.' },
     { id: 'bacheca', sim: '✎', t: 'La tua Bacheca', ic: '📌', d: 'Post-it, Note Promemoria, Numeri Utili e Comunicazioni Ufficiali.' }
   ];
+  /* 6/11 Fabrice: titoli dei tool come loghi (due righe) e icone disegnate negli angoli blu */
+  var TC_LOGO = { sconto: ['Calcola', 'Sconto'], aliquota: ['Aliquota', 'Sconto'], valuta: ['Cambio', 'Valuta'], iva: ['Calcola', 'IVA'], qr: ['Codice', 'QR'], bacheca: ['La tua', 'Bacheca'] };
+  var TC_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">';
+  var TC_ICO = {
+    sconto: TC_SVG + '<path d="M3 12V4.5A1.5 1.5 0 0 1 4.5 3H12l9 9-9 9z"/><circle cx="8" cy="8" r="1.4"/><path d="M10.5 16.5l5-5"/><circle cx="11" cy="12" r=".9"/><circle cx="15" cy="16" r=".9"/></svg>',
+    aliquota: TC_SVG + '<path d="M19 5L5 19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/><path d="M14 3h7v7"/></svg>',
+    valuta: TC_SVG + '<path d="M3.5 9A8.5 8.5 0 0 1 18 5.5L20 7.5"/><path d="M20 3v4.5h-4.5"/><path d="M20.5 15A8.5 8.5 0 0 1 6 18.5L4 16.5"/><path d="M4 21v-4.5h4.5"/><path d="M14 9.3a3 3 0 1 0 0 5.4"/><path d="M9.5 11.2h3.5M9.5 12.8h3.5"/></svg>',
+    iva: TC_SVG + '<rect x="5" y="2.5" width="14" height="19" rx="2"/><rect x="8" y="5.5" width="8" height="4" rx=".6"/><path d="M8.5 13h.01M12 13h.01M15.5 13h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>',
+    qr: TC_SVG + '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M6 6.5h.01M17.5 6.5h.01M6 17.5h.01M14 14h3v3M21 14v.01M14 21h3M20 17v4h-1"/></svg>',
+    bacheca: TC_SVG + '<path d="M9 3h6l-1 6 3 3H7l3-3z"/><path d="M12 12v9"/></svg>'
+  };
   function toolsHTML(r) {
     var escl = false;   // 6/11 Fabrice: le Utilità Cassa sono nel piano base
     var h = '<section class="section" id="sec-tools"><h2 class="section-title">Utilità Cassa</h2>' + (escl && r.modo === 'cassiere' ? '' : '') + '<div class="tools-grid">';
     STRUMENTI.forEach(function (w) {
       /* 6/11 Fabrice: widget delle Utilità Cassa diversi dagli altri: angolo blu con simbolo, solo il nome grande (come il logo del tool) */
-      h += '<button class="widget glass tool-cassa" type="button" data-act="widget" data-w="' + w.id + '" title="' + esc(w.d) + '"><span class="tc-ang" aria-hidden="true">' + esc(w.sim || w.ic) + '</span><h3 class="tc-nome">' + esc(w.t) + '</h3></button>';
+      var L = TC_LOGO[w.id] || [w.t, ''];
+      h += '<button class="widget glass tool-cassa" type="button" data-act="widget" data-w="' + w.id + '" title="' + esc(w.d) + '"><span class="tc-ang" aria-hidden="true">' + (TC_ICO[w.id] || esc(w.sim || w.ic)) + '</span><h3 class="tc-nome"><span class="tc-r1">' + esc(L[0]) + '</span><span class="tc-r2">' + esc(L[1]) + '</span></h3></button>';
     });
     return h + '</div></section>';
   }

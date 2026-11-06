@@ -865,3 +865,13 @@ html.scuro .widget.tool-cassa .tc-nome,body.scuro .widget.tool-cassa .tc-nome{co
 .widget.tool-cassa .tc-ang{width:74px;height:74px;font-size:17px;padding:10px 10px 0 0}
 .widget.tool-cassa .tc-nome{max-width:calc(100% - 40px)!important;margin:0!important;padding:0!important;font-size:24px!important;text-align:left!important;align-self:flex-start!important}
 @media (max-width:700px){.widget.tool-cassa{min-height:110px!important}.widget.tool-cassa .tc-nome{font-size:21px!important}}
+/* 6/11 Fabrice: titoli dei tool come loghi / copertine (due righe grandi) + icone disegnate nell'angolo */
+.widget.tool-cassa .tc-nome{display:flex!important;flex-direction:column;gap:3px;font-family:"Chakra Petch",var(--h-title,sans-serif)!important;text-transform:uppercase;line-height:.92!important;letter-spacing:0!important}
+.widget.tool-cassa .tc-r1{font-weight:600;font-size:19px;letter-spacing:6px;color:#b5462c}
+.widget.tool-cassa .tc-r2{font-weight:700;font-size:48px;letter-spacing:1px;color:#1f4e79;text-shadow:0 2px 0 rgba(31,78,121,.12)}
+.widget.tool-cassa:hover .tc-r2{color:#163a5c}
+.widget.tool-cassa .tc-ang{width:84px!important;height:84px!important;padding:0!important}
+.widget.tool-cassa .tc-ang svg{position:absolute;top:11px;right:11px;width:30px;height:30px;color:#fffdf9;filter:drop-shadow(0 1px 1px rgba(0,0,0,.25))}
+.widget.tool-cassa:hover .tc-ang svg{transform:scale(1.08);transition:transform .2s}
+html.scuro .widget.tool-cassa .tc-r2,body.scuro .widget.tool-cassa .tc-r2{color:#cfe0f2}
+@media (max-width:700px){.widget.tool-cassa .tc-r1{font-size:15px;letter-spacing:4px}.widget.tool-cassa .tc-r2{font-size:38px}.widget.tool-cassa .tc-ang{width:70px!important;height:70px!important}.widget.tool-cassa .tc-ang svg{width:24px;height:24px;top:9px;right:9px}}
