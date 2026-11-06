@@ -193,7 +193,7 @@ window.MATERIALI = {
       percorso: 'presentazione/riepilogo.html', tipo: 'pagina', miniatura: null, perAldo: false, stato: 'pronto' },
     { gruppo: 'pdf', titolo: 'Preventivo · bozza di lavoro', descr: 'Preventivo scalare da compilare (tariffa, difficoltà, IVA).',
       percorso: 'preventivo.html', tipo: 'pagina', miniatura: null, perAldo: false, stato: 'pronto' },
-    { gruppo: 'pdf', titolo: 'Prezzi per il cliente (prezzi.js)', descr: 'Unico file dei prezzi. 6/11: preventivo unico (PREZZI.unico 2.500 / 1.500 decisi da Fabrice) + moduli extra; ancora da confermare.',
+    { gruppo: 'pdf', titolo: 'Prezzi per il cliente (prezzi.js)', descr: 'Unico file dei prezzi. 6/11: preventivo unico (PREZZI.unico 2.500 / 1.800 decisi da Fabrice) + moduli extra; ancora da confermare.',
       percorso: 'prezzi.js', tipo: 'documento', miniatura: null, perAldo: false, stato: 'pronto' },
 
     /* ------------------------------------------------ RICERCHE E DOCUMENTI DI LAVORO */

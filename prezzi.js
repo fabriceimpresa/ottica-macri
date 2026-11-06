@@ -11,7 +11,7 @@
    (preventivo-a.html ora rimanda lì). In fondo al preventivo le ESTENSIONI come MODULI EXTRA singoli = PREZZI.moduliExtra,
    con le SOLE cifre già presenti nei blocchi del pianoA (nessuna cifra nuova). L'Amministrazione di base è INCLUSA nel pacchetto
    (decisione Fabrice): «Amministrazione completa» resta come extra con prezzo DA DEFINIRE (null).
-   Totali del pacchetto 2.500 € pieno / 1.500 € scontato DECISI DA FABRICE il 6/11 (cifre esplicite, non calcolate dallo sconto %).
+   Totali del pacchetto 2.500 € pieno / 1.800 € scontato DECISI DA FABRICE il 6/11 (prima 1.500, alzato su sua richiesta; copia prezzi.prima-1800.js) (cifre esplicite, non calcolate dallo sconto %).
    Ripartizione dei 3 blocchi DECISA DA FABRICE 6/11: Base grafica 1.175 · Video vetrina 1.025 · Archivio clienti 300 (somma 2.500)
    (prima proposta di Claude 1.050/900/550, corretta da Fabrice). Totali 2.500/1.500 decisi da Fabrice. Tempi di consegna del pacchetto: 3–4 settimane (Fabrice).
    confermati resta FALSE: li conferma Fabrice alla fine. PDF riepilogo NON rigenerato. Copia di prima: prezzi.prima-unico.js.
@@ -57,7 +57,7 @@ window.PREZZI = {
     slogan: 'Tutto quello che serve al negozio ogni giorno, in un pacchetto solo: stampe, video in vetrina e archivio clienti. Il resto si aggiunge quando vuoi, un modulo alla volta.',
     tempi: '3–4 settimane',
     totalePieno: 2500,            // deciso da Fabrice 6/11
-    totaleScontato: 1500,         // deciso da Fabrice 6/11 (sconto risultante: −1.000 € · −40%)
+    totaleScontato: 1800,         // deciso da Fabrice 6/11 sera (sconto risultante: −700 € · −28%)
     blocchi: [                    // ripartizione decisa da Fabrice 6/11 (somma 2.500)
       { id: 'base',    nome: 'STAMPE · Grafica STORE // CRAFT', cosa: 'Cartelli in vari formati, cartellini, etichette adesive DYMO e set di stampe pronte per il punto vendita: promozioni e operazioni in pochi clic, Lista di stampa e Cronologia, utilità di Cassa.', prezzo: 1175 },
       { id: 'vetrina', nome: 'VIDEO VETRINA', cosa: 'Grafiche animate, loop e video in vetrina su cornice digitale o tablet.', prezzo: 1025 },
