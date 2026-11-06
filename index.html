@@ -197,9 +197,9 @@ window.HUD_AVVIO={
         <a class="hbtn" href="demo/demo-app-v2.html" data-mirino="AVVIA · DEMO">Prova l'app</a>
       </div>
       <div class="stats">
-        <div class="stat"><b data-conta="7">7</b><em>Cose da vedere</em></div>
+        <div class="stat"><b data-conta="6">6</b><em>Fasi del percorso</em></div>
         <div class="stat"><b data-conta="3">3</b><em>Visite del negozio</em></div>
-        <div class="stat"><b data-conta="1">1</b><em>Riepilogo PDF</em></div>
+        <div class="stat"><b data-conta="1">1</b><em>Marchio restaurato</em></div>
         <div class="stat oro"><b data-conta="1">1</b><em>Preventivo · tutto incluso</em></div>
       </div>
     </div>
@@ -223,65 +223,59 @@ window.HUD_AVVIO={
 
   <section class="sez" id="sez-aldo" data-sez="aldo" aria-label="Per Aldo">
   <button type="button" class="sez-testa glass" aria-expanded="false" aria-controls="sez-aldo-corpo">
-    <span class="hud-sect">Per Aldo <span class="cod">· 07 sezioni</span></span>
+    <span class="hud-sect">Per Aldo <span class="cod">· 6 fasi</span></span>
     <span class="sez-sotto">Tocca per aprire</span>
     <span class="sez-angolo" aria-hidden="true"><span class="sez-freccia">▾</span></span>
   </button>
   <div class="sez-corpo" id="sez-aldo-corpo"><div class="sez-dentro">
-  <!-- 6/11 FASE 1: sezioni per Aldo nell'ordine dell'esperienza (prima: index.prima-fase1.html) -->
+  <!-- 6/11 PERCORSO: le 6 fasi per Aldo nell'ordine del percorso guidato (percorso.js · prima: index.prima-percorso.html).
+       Tolta dal percorso la card «Scarica il riepilogo» (PDF vecchio: resta in materiali.js con perAldo:false) -->
   <div class="hud-griglia">
-    <a class="hud-card largo glass hud-entra" href="visita/index.html" data-mirino="01 · LE TRE VISITE">
+    <a class="hud-card largo glass hud-entra" href="visita/index.html" data-mirino="FASE 1 · LE TRE VISITE">
       <span class="testa"><span class="ico"><svg viewBox="0 0 24 24"><path d="M3 9.5 4.6 4h14.8L21 9.5M3 9.5h18M3 9.5a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0M5 12.5V20h14v-7.5M10 20v-5h4v5"/></svg></span><span class="nn">01</span></span>
-      <span class="tag-sopra">Foto vere · 3D · Street View</span>
+      <span class="tag-sopra">Fase 1 · Foto vere · 3D · Street View</span>
       <h3>Visita del tuo negozio</h3>
       <p>Il menu con <b>le tre visite</b>: <b>1 · Il tuo negozio oggi</b> (foto e video veri · leggera, va ovunque) — <b>2 · Negozio in 3D</b> (ci si muove dove si vuole) — <b>3 · Vetrina aumentata</b> (Street View di Google · serve internet).</p>
       <span class="piede"><span class="vai">Entra</span></span>
     </a>
-    <a class="hud-card glass hud-entra" href="demo/demo-app-v2.html" data-mirino="02 · DEMO DELL'APP">
-      <span class="testa"><span class="ico"><svg viewBox="0 0 24 24"><rect x="2.5" y="4" width="19" height="14" rx="1"/><path d="M2.5 8h19M7 4v14M9.5 11h9M9.5 14h6M9 21h6"/></svg></span><span class="nn">02</span></span>
-      <span class="tag-sopra">Da provare · come il vero StoreCraft</span>
+    <a class="hud-card glass hud-entra" href="media/logo/index.html" data-mirino="FASE 2 · IL MARCHIO">
+      <span class="testa"><span class="ico"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="9.5" ry="7"/><circle cx="9" cy="12" r="2.2"/><circle cx="15" cy="12" r="2.2"/><path d="M11.2 11.6h1.6"/></svg></span><span class="nn">02</span></span>
+      <span class="card-mini" aria-hidden="true"><img src="media/logo/marchi6/06-ovale/06-ovale-colori.svg" alt=""></span>
+      <span class="tag-sopra" style="color:#1f4e79">Fase 2 · Il marchio Ottica Macrì</span>
+      <h3>Restauro logo e rebranding marchio</h3>
+      <p>Sul tavolo dei lavori varie proposte di restauro del marchio originale: il caro draghetto, animazione del logo aziendale, formati ed inquadrature.</p>
+      <span class="piede"><span class="vai">Guarda</span></span>
+    </a>
+    <div class="hud-card glass hud-entra" data-mirino="FASE 3 · VETRINE BLACK FRIDAY">
+      <span class="testa"><span class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="11"/><rect x="13" y="3" width="8" height="7"/><rect x="13" y="12" width="8" height="9"/><path d="M3 17h8M3 21h8"/></svg></span><span class="nn">03</span></span>
+      <span class="tag-sopra">Fase 3 · Black Friday · da stampare e a schermo</span>
+      <h3>Le vetrine del Black Friday</h3>
+      <p>Esempi di prodotti stampati tramite il software per allestimento Store. Le grafiche sono esclusivamente a scopo illustrativo (segnaposti) e sono da concordare con il cliente.</p>
+      <span class="piede card-pdf">
+        <a class="hbtn" href="media/blackfriday/vetrine/anteprima.html">I cartelli delle vetrine</a>
+        <a class="hbtn" href="media/blackfriday/loop/anteprima.html">▶ Il loop del tablet</a>
+      </span>
+    </div>
+    <a class="hud-card glass hud-entra" href="demo/demo-app-v2.html" data-mirino="FASE 4 · LA DEMO">
+      <span class="testa"><span class="ico"><svg viewBox="0 0 24 24"><rect x="2.5" y="4" width="19" height="14" rx="1"/><path d="M2.5 8h19M7 4v14M9.5 11h9M9.5 14h6M9 21h6"/></svg></span><span class="nn">04</span></span>
+      <span class="tag-sopra">Fase 4 · Da provare · come il vero StoreCraft</span>
       <h3>La demo dell'app</h3>
       <p>L'app STORE // CRAFT fatta per Ottica Macrì: vetrina digitale, cartelli, etichette, magazzino, clienti e social.</p>
       <span class="piede"><span class="vai">Prova</span></span>
     </a>
     <!-- 6/11: UN SOLO preventivo (prima due card Piano A / Piano B: index.prima-unico.html) -->
-    <a class="hud-card oro pv-unico-card glass hud-entra" href="preventivo-b.html" data-mirino="03 · IL PREVENTIVO" data-mirino-oro>
-      <span class="testa"><span class="ico"><svg viewBox="0 0 24 24"><path d="M6 2.5h9l4 4v15H6z"/><path d="M15 2.5v4h4M14.6 11.2a3 3 0 1 0 0 5.2M9.6 13.1h4.2M9.6 14.6h4.2"/></svg></span><span class="nn">03</span></span>
-      <span class="tag-sopra">STORE // CRAFT Essenziale · un pacchetto solo</span>
+    <a class="hud-card oro pv-unico-card glass hud-entra" href="preventivo-b.html" data-mirino="FASE 5 · IL PREVENTIVO" data-mirino-oro>
+      <span class="testa"><span class="ico"><svg viewBox="0 0 24 24"><path d="M6 2.5h9l4 4v15H6z"/><path d="M15 2.5v4h4M14.6 11.2a3 3 0 1 0 0 5.2M9.6 13.1h4.2M9.6 14.6h4.2"/></svg></span><span class="nn">05</span></span>
+      <span class="tag-sopra">Fase 5 · STORE // CRAFT Essenziale · un pacchetto solo</span>
       <h3>Preventivo · STORE // CRAFT + Archivio Clienti</h3>
       <p>Stampe (cartelli, cartellini, etichette DYMO), video in vetrina e archivio clienti in un unico pacchetto. In fondo i moduli extra, da aggiungere quando vuoi.</p>
       <span class="pv-card-inclusi" aria-hidden="true"><i>Stampe</i><i>Video vetrina</i><i>Archivio clienti</i><i class="x">+ moduli extra</i></span>
       <span class="pv-card-strip" aria-hidden="true"><img src="media/miniature/media__preventivo-v2__home-b-pc.jpg" alt=""><img src="media/blackfriday/loop/02-wayfarer-chiaro.png" alt=""><img src="media/miniature/media__preventivo-v2__clienti-b-pc.jpg" alt=""></span>
       <span class="piede"><span class="vai">Leggi</span></span>
     </a>
-    <a class="hud-card glass hud-entra" href="media/logo/index.html" data-mirino="04 · IL MARCHIO">
-      <span class="testa"><span class="ico"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="9.5" ry="7"/><circle cx="9" cy="12" r="2.2"/><circle cx="15" cy="12" r="2.2"/><path d="M11.2 11.6h1.6"/></svg></span><span class="nn">04</span></span>
-      <span class="card-mini" aria-hidden="true"><img src="media/logo/marchi6/06-ovale/06-ovale-colori.svg" alt=""></span>
-      <span class="tag-sopra">Il marchio definitivo</span>
-      <h3>Il marchio Ottica Macrì</h3>
-      <p>L'ovale da bottega con il draghetto di sempre e l'icona OM: su insegna, biglietto, cartelli e app.</p>
-      <span class="piede"><span class="vai">Guarda</span></span>
-    </a>
-    <div class="hud-card glass hud-entra" data-mirino="05 · VETRINE BLACK FRIDAY">
-      <span class="testa"><span class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="11"/><rect x="13" y="3" width="8" height="7"/><rect x="13" y="12" width="8" height="9"/><path d="M3 17h8M3 21h8"/></svg></span><span class="nn">05</span></span>
-      <span class="tag-sopra">Black Friday · da stampare e a schermo</span>
-      <h3>Le vetrine Black Friday</h3>
-      <p>I cartelli alle misure vere dei porta-prezzi (offerte, brand, poster grande, totem d'ingresso) e il loop del tablet in vetrina, come lo vedranno i passanti.</p>
-      <span class="piede card-pdf">
-        <a class="hbtn" href="media/blackfriday/vetrine/anteprima.html">I cartelli delle vetrine</a>
-        <a class="hbtn" href="media/blackfriday/loop/anteprima.html">▶ Il loop del tablet</a>
-      </span>
-    </div>
-    <a class="hud-card oro glass hud-entra" href="presentazione/Ottica%20Macri%20-%20Riepilogo.pdf" download data-mirino="06 · RIEPILOGO" data-mirino-oro>
-      <span class="testa"><span class="ico"><svg viewBox="0 0 24 24"><path d="M4 20.5l1.3-3.9A8.3 8.3 0 1 1 8.2 19.3z"/><path d="M12 7.5v6.2M9.4 11.2l2.6 2.6 2.6-2.6"/></svg></span><span class="nn">06</span></span>
-      <span class="tag-sopra">PDF · per il telefono</span>
-      <h3>Scarica il riepilogo</h3>
-      <p>Un PDF leggero con tutto in breve, da tenere sul telefono o mandare su WhatsApp.</p>
-      <span class="piede"><span class="vai">Scarica</span></span>
-    </a>
-    <a class="hud-card glass hud-entra" href="finale/stretta-di-mano.html" data-mirino="07 · LA STRETTA DI MANO">
-      <span class="testa"><span class="ico"><svg viewBox="0 0 24 24"><path d="M2.5 11.5 6 8l4 1.5 2.5-1.5 4 1 5 2.5M2.5 11.5l5 5.5c.8.8 2 .8 2.8 0l5.7-5.7M8.5 13.5l2 2M11 11.5l2.5 2.5"/></svg></span><span class="nn">07</span></span>
-      <span class="tag-sopra">Il finale</span>
+    <a class="hud-card glass hud-entra" href="finale/stretta-di-mano.html" data-mirino="FASE 6 · LA STRETTA DI MANO">
+      <span class="testa"><span class="ico"><svg viewBox="0 0 24 24"><path d="M2.5 11.5 6 8l4 1.5 2.5-1.5 4 1 5 2.5M2.5 11.5l5 5.5c.8.8 2 .8 2.8 0l5.7-5.7M8.5 13.5l2 2M11 11.5l2.5 2.5"/></svg></span><span class="nn">06</span></span>
+      <span class="tag-sopra">Fase 6 · Il finale</span>
       <h3>La stretta di mano</h3>
       <p>Tu e Fabrice dietro al bancone, come su uno schermo dell'app: inclina il telefono e l'immagine prende profondità.</p>
       <span class="piede"><span class="vai">Guarda</span></span>

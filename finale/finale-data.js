@@ -1,2 +1,2 @@
-/* versione online di prova: foto di Aldo NON pubblicata */
+/* versione online: volti sfocati (regola privacy) */
 window.FINALE_DATA = null;

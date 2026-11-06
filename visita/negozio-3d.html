@@ -995,5 +995,7 @@ requestAnimationFrame(t=>{ciclo(t);if(!window.__AVVIO)setTimeout(()=>$('#load').
 <!-- AVVIO 5/11: compila gli shader UNA volta sola e in parallelo, poi toglie la schermata d'avvio (dopo resa.js) -->
 <script src="negozio3d/avvio.js"></script>
 <script>/* 6/11 header: orologio di Roma */(function(){var e=document.getElementById('hdrOra');if(!e)return;function o(){try{e.textContent='ROMA '+new Intl.DateTimeFormat('it-IT',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Rome'}).format(new Date())}catch(x){}}o();setInterval(o,15000)})();</script>
+<!-- 6/11 percorso guidato: barra unica ‹ Indietro / Avanti › (copia: *.prima-percorso.*) -->
+<script src="../percorso.js" data-pos="alto-dx" data-alto="84" data-pos-tel="alto-sx" data-alto-tel="104"></script>
 </body>
 </html>

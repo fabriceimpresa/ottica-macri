@@ -221,8 +221,8 @@
   /* --- TUTTO INCLUSO NEL PACCHETTO: schede di materiali.js (solo perAldo), senza visite e finale (tutto fino alla stretta di mano) --- */
   if(MAT&&window.MaterialiVista){
     var voci=MAT.voci.filter(function(v){return v.perAldo&&!/^preventivo(-[ab])?\.html$/.test(v.percorso)&&v.tipo!=='pdf';});
-    var fino=-1;voci.forEach(function(v,i){if(v.percorso==='finale/stretta-di-mano.html')fino=i;});
-    voci=voci.slice(fino+1).filter(function(v){return !/^demo\/demo-app-v2\.html\?piano=b/.test(v.percorso);}).map(function(v){
+    /* 6/11 percorso: materiali.js è nell'ordine delle fasi -> si tolgono per gruppo visite e finale (prima: slice dopo la stretta di mano) */
+    voci=voci.filter(function(v){return v.gruppo!=='visite'&&v.gruppo!=='finale';}).filter(function(v){return !/^demo\/demo-app-v2\.html\?piano=b/.test(v.percorso);}).map(function(v){
       if(v.percorso!=='demo/demo-app-v2.html')return v;
       var c={};for(var k in v)c[k]=v[k];
       c.titolo='App · versione STORE // CRAFT';   // il widget STORE // CRAFT: versione vera, senza la parola «demo»
