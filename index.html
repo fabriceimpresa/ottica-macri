@@ -138,6 +138,14 @@ body.mat-aperto{overflow:hidden}
 .piede-firma .chi{font:600 16px var(--h-title);letter-spacing:2px;text-transform:uppercase;color:var(--h-mut)}
 .piede-firma .chi b{color:var(--h-gold);font-family:var(--h-mono);font-weight:700}
 @media (max-width:1100px){.hud-card.largo2{grid-column:span 2}}
+.hud-card.pv-unico-card{grid-column:span 2} /* 6/11 preventivo unico: card larga */
+@media (max-width:1100px){.hud-card.pv-unico-card{grid-column:auto}}
+.pv-card-inclusi{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 2px}
+.pv-card-inclusi i{font:600 12.5px var(--h-title);font-style:normal;letter-spacing:1.2px;text-transform:uppercase;padding:3px 9px;color:var(--h-blu);border:1px solid rgba(31,78,121,.35);background:rgba(255,253,249,.8)}
+.pv-card-inclusi i.x{color:var(--h-mat);border-color:rgba(158,59,37,.45)}
+.pv-card-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:6px 0 4px}
+.pv-card-strip img{display:block;width:100%;height:110px;object-fit:cover;object-position:top left;border:1px solid var(--h-line);background:#fffdf9}
+@media (max-width:700px){.pv-card-strip img{height:70px}}
 @media (max-width:900px){.hero{grid-template-columns:1fr;padding:32px 26px}.lente-hero{width:min(300px,80%);order:-1;margin:-10px 0 -10px}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:700px){.hud-card.largo2{grid-column:auto}.hero{padding:26px 20px 24px;margin-top:14px}.lente-hero{width:62%}.dev-lista{grid-template-columns:1fr}.stat b{font-size:28px}}
 </style>
@@ -189,10 +197,10 @@ window.HUD_AVVIO={
         <a class="hbtn" href="demo/demo-app-v2.html" data-mirino="AVVIA · DEMO">Prova l'app</a>
       </div>
       <div class="stats">
-        <div class="stat"><b data-conta="8">8</b><em>Cose da vedere</em></div>
+        <div class="stat"><b data-conta="7">7</b><em>Cose da vedere</em></div>
         <div class="stat"><b data-conta="3">3</b><em>Visite del negozio</em></div>
         <div class="stat"><b data-conta="1">1</b><em>Riepilogo PDF</em></div>
-        <div class="stat oro"><b data-conta="2">2</b><em>Piani a scelta</em></div>
+        <div class="stat oro"><b data-conta="1">1</b><em>Preventivo · tutto incluso</em></div>
       </div>
     </div>
     <div class="lente-hero" aria-hidden="true">
@@ -215,7 +223,7 @@ window.HUD_AVVIO={
 
   <section class="sez" id="sez-aldo" data-sez="aldo" aria-label="Per Aldo">
   <button type="button" class="sez-testa glass" aria-expanded="false" aria-controls="sez-aldo-corpo">
-    <span class="hud-sect">Per Aldo <span class="cod">· 08 sezioni</span></span>
+    <span class="hud-sect">Per Aldo <span class="cod">· 07 sezioni</span></span>
     <span class="sez-sotto">Tocca per aprire</span>
     <span class="sez-angolo" aria-hidden="true"><span class="sez-freccia">▾</span></span>
   </button>
@@ -236,30 +244,26 @@ window.HUD_AVVIO={
       <p>L'app STORE // CRAFT fatta per Ottica Macrì: vetrina digitale, cartelli, etichette, magazzino, clienti e social.</p>
       <span class="piede"><span class="vai">Prova</span></span>
     </a>
-    <a class="hud-card oro glass hud-entra" href="preventivo-a.html" data-mirino="03 · PREVENTIVO A" data-mirino-oro>
+    <!-- 6/11: UN SOLO preventivo (prima due card Piano A / Piano B: index.prima-unico.html) -->
+    <a class="hud-card oro pv-unico-card glass hud-entra" href="preventivo-b.html" data-mirino="03 · IL PREVENTIVO" data-mirino-oro>
       <span class="testa"><span class="ico"><svg viewBox="0 0 24 24"><path d="M6 2.5h9l4 4v15H6z"/><path d="M15 2.5v4h4M14.6 11.2a3 3 0 1 0 0 5.2M9.6 13.1h4.2M9.6 14.6h4.2"/></svg></span><span class="nn">03</span></span>
-      <span class="tag-sopra">Completo</span>
-      <h3>Preventivo Piano A</h3>
-      <p>Tutto il negozio in un'unica app: grafica, magazzino, clienti, social e vetrina digitale.</p>
+      <span class="tag-sopra">STORE // CRAFT Essenziale · un pacchetto solo</span>
+      <h3>Preventivo · STORE // CRAFT + Archivio Clienti</h3>
+      <p>Stampe (cartelli, cartellini, etichette DYMO), video in vetrina e archivio clienti in un unico pacchetto. In fondo i moduli extra, da aggiungere quando vuoi.</p>
+      <span class="pv-card-inclusi" aria-hidden="true"><i>Stampe</i><i>Video vetrina</i><i>Archivio clienti</i><i class="x">+ moduli extra</i></span>
+      <span class="pv-card-strip" aria-hidden="true"><img src="media/miniature/media__preventivo-v2__home-b-pc.jpg" alt=""><img src="media/blackfriday/loop/02-wayfarer-chiaro.png" alt=""><img src="media/miniature/media__preventivo-v2__clienti-b-pc.jpg" alt=""></span>
       <span class="piede"><span class="vai">Leggi</span></span>
     </a>
-    <a class="hud-card oro glass hud-entra" href="preventivo-b.html" data-mirino="04 · PREVENTIVO B" data-mirino-oro>
-      <span class="testa"><span class="ico"><svg viewBox="0 0 24 24"><path d="M6 2.5h9l4 4v15H6z"/><path d="M15 2.5v4h4M12.5 10v6.5M10 14l2.5 2.5L15 14"/></svg></span><span class="nn">04</span></span>
-      <span class="tag-sopra">Essenziale · spende meno</span>
-      <h3>Preventivo Piano B</h3>
-      <p>Poca spesa, niente complicazioni: si comincia subito e si cresce quando vuole.</p>
-      <span class="piede"><span class="vai">Leggi</span></span>
-    </a>
-    <a class="hud-card glass hud-entra" href="media/logo/index.html" data-mirino="05 · IL MARCHIO">
-      <span class="testa"><span class="ico"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="9.5" ry="7"/><circle cx="9" cy="12" r="2.2"/><circle cx="15" cy="12" r="2.2"/><path d="M11.2 11.6h1.6"/></svg></span><span class="nn">05</span></span>
+    <a class="hud-card glass hud-entra" href="media/logo/index.html" data-mirino="04 · IL MARCHIO">
+      <span class="testa"><span class="ico"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="9.5" ry="7"/><circle cx="9" cy="12" r="2.2"/><circle cx="15" cy="12" r="2.2"/><path d="M11.2 11.6h1.6"/></svg></span><span class="nn">04</span></span>
       <span class="card-mini" aria-hidden="true"><img src="media/logo/marchi6/06-ovale/06-ovale-colori.svg" alt=""></span>
       <span class="tag-sopra">Il marchio definitivo</span>
       <h3>Il marchio Ottica Macrì</h3>
       <p>L'ovale da bottega con il draghetto di sempre e l'icona OM: su insegna, biglietto, cartelli e app.</p>
       <span class="piede"><span class="vai">Guarda</span></span>
     </a>
-    <div class="hud-card glass hud-entra" data-mirino="06 · VETRINE BLACK FRIDAY">
-      <span class="testa"><span class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="11"/><rect x="13" y="3" width="8" height="7"/><rect x="13" y="12" width="8" height="9"/><path d="M3 17h8M3 21h8"/></svg></span><span class="nn">06</span></span>
+    <div class="hud-card glass hud-entra" data-mirino="05 · VETRINE BLACK FRIDAY">
+      <span class="testa"><span class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="11"/><rect x="13" y="3" width="8" height="7"/><rect x="13" y="12" width="8" height="9"/><path d="M3 17h8M3 21h8"/></svg></span><span class="nn">05</span></span>
       <span class="tag-sopra">Black Friday · da stampare e a schermo</span>
       <h3>Le vetrine Black Friday</h3>
       <p>I cartelli alle misure vere dei porta-prezzi (offerte, brand, poster grande, totem d'ingresso) e il loop del tablet in vetrina, come lo vedranno i passanti.</p>
@@ -268,15 +272,15 @@ window.HUD_AVVIO={
         <a class="hbtn" href="media/blackfriday/loop/anteprima.html">▶ Il loop del tablet</a>
       </span>
     </div>
-    <a class="hud-card oro glass hud-entra" href="presentazione/Ottica%20Macri%20-%20Riepilogo.pdf" download data-mirino="07 · RIEPILOGO" data-mirino-oro>
-      <span class="testa"><span class="ico"><svg viewBox="0 0 24 24"><path d="M4 20.5l1.3-3.9A8.3 8.3 0 1 1 8.2 19.3z"/><path d="M12 7.5v6.2M9.4 11.2l2.6 2.6 2.6-2.6"/></svg></span><span class="nn">07</span></span>
+    <a class="hud-card oro glass hud-entra" href="presentazione/Ottica%20Macri%20-%20Riepilogo.pdf" download data-mirino="06 · RIEPILOGO" data-mirino-oro>
+      <span class="testa"><span class="ico"><svg viewBox="0 0 24 24"><path d="M4 20.5l1.3-3.9A8.3 8.3 0 1 1 8.2 19.3z"/><path d="M12 7.5v6.2M9.4 11.2l2.6 2.6 2.6-2.6"/></svg></span><span class="nn">06</span></span>
       <span class="tag-sopra">PDF · per il telefono</span>
       <h3>Scarica il riepilogo</h3>
-      <p>Un PDF leggero con tutto in breve e i due preventivi, da tenere sul telefono o mandare su WhatsApp.</p>
+      <p>Un PDF leggero con tutto in breve, da tenere sul telefono o mandare su WhatsApp.</p>
       <span class="piede"><span class="vai">Scarica</span></span>
     </a>
-    <a class="hud-card largo2 glass hud-entra" href="finale/stretta-di-mano.html" data-mirino="08 · LA STRETTA DI MANO">
-      <span class="testa"><span class="ico"><svg viewBox="0 0 24 24"><path d="M2.5 11.5 6 8l4 1.5 2.5-1.5 4 1 5 2.5M2.5 11.5l5 5.5c.8.8 2 .8 2.8 0l5.7-5.7M8.5 13.5l2 2M11 11.5l2.5 2.5"/></svg></span><span class="nn">08</span></span>
+    <a class="hud-card glass hud-entra" href="finale/stretta-di-mano.html" data-mirino="07 · LA STRETTA DI MANO">
+      <span class="testa"><span class="ico"><svg viewBox="0 0 24 24"><path d="M2.5 11.5 6 8l4 1.5 2.5-1.5 4 1 5 2.5M2.5 11.5l5 5.5c.8.8 2 .8 2.8 0l5.7-5.7M8.5 13.5l2 2M11 11.5l2.5 2.5"/></svg></span><span class="nn">07</span></span>
       <span class="tag-sopra">Il finale</span>
       <h3>La stretta di mano</h3>
       <p>Tu e Fabrice dietro al bancone, come su uno schermo dell'app: inclina il telefono e l'immagine prende profondità.</p>
@@ -323,7 +327,7 @@ window.HUD_AVVIO={
       <a href="presentazione/presentazione-aldo.html"><span class="k">S1</span><span class="t">Sorgente presentazione A · archivio</span><span class="d">Pagina HTML da cui nasce il PDF del Piano A (superato)</span></a>
       <a href="presentazione/presentazione-piano-b.html"><span class="k">S2</span><span class="t">Sorgente presentazione B · archivio</span><span class="d">Pagina HTML da cui nasce il PDF del Piano B (superato)</span></a>
       <a href="ricerca/display-vetrina.md"><span class="k">R3</span><span class="t">Ricerca · display e cornici</span><span class="d">Plexiglass 10×15, 13×18, A5, A4 e cornici in legno: prezzi rilevati online</span></a>
-      <a href="presentazione/riepilogo.html"><span class="k">S3</span><span class="t">Sorgente riepilogo WhatsApp</span><span class="d">Pagina HTML da cui nasce il PDF riepilogo con i due preventivi</span></a>
+      <a href="presentazione/riepilogo.html"><span class="k">S3</span><span class="t">Sorgente riepilogo WhatsApp</span><span class="d">Pagina HTML da cui nasce il PDF riepilogo (ancora coi due piani A/B: da rigenerare quando decide Fabrice)</span></a>
       <a href="media/blackfriday/"><span class="k">G1</span><span class="t">Grafiche Black Friday</span><span class="d">Cartelli, cartellini e slide per il tablet in vetrina (cartella)</span></a>
       <a href="media/storecraft/"><span class="k">G2</span><span class="t">Immagini STORE // CRAFT</span><span class="d">Cartelli, cartellino ed etichetta DYMO fatti con StoreCraft (cartella)</span></a>
       <a href="demo/screenshot/"><span class="k">G3</span><span class="t">Foto della demo</span><span class="d">Schermate dell'app su desktop, tablet e telefono (cartella)</span></a>

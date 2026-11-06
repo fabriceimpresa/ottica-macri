@@ -1,7 +1,7 @@
 /* =====================================================================
    OTTICA MACRÌ · ELENCO UNICO DI TUTTO IL MATERIALE (5/11/2026)
    Lo leggono: index.html (sezione «TUTTO IL MATERIALE», #materiali)
-               preventivo-a.html e preventivo-b.html (galleria «Cosa abbiamo già preparato per lei»).
+               preventivo-b.html = preventivo unico (galleria «Tutto incluso nel pacchetto», dal 6/11).
    Un materiale nuovo si aggiunge SOLO qui: compare da solo nel portale e nei preventivi.
 
    COME AGGIUNGERE UNA VOCE
@@ -173,15 +173,16 @@ window.MATERIALI = {
       percorso: 'visita/visita-reale/giro.mp4', tipo: 'video', miniatura: 'visita/visita-reale/giro-poster.jpg', perAldo: false, stato: 'pronto' },
 
     /* ------------------------------------------------ PDF E PREVENTIVI */
-    { gruppo: 'pdf', titolo: 'Preventivo Piano A', descr: 'Tutto il negozio in un’unica app: grafica, magazzino, clienti, social e vetrina digitale.',
-      percorso: 'preventivo-a.html', tipo: 'pagina', miniatura: 'media/preventivo-v2/base-pc.jpg', perAldo: true, stato: 'pronto' },
-    { gruppo: 'pdf', titolo: 'Preventivo Piano B', descr: 'Poca spesa, niente complicazioni: si comincia subito e si cresce quando vuole.',
-      percorso: 'preventivo-b.html', tipo: 'pagina', miniatura: 'media/preventivo-v2/clienti-b-pc.jpg', perAldo: true, stato: 'pronto' },
+    /* 6/11: UN SOLO preventivo (prima: Preventivo Piano A + Preventivo Piano B, vedi materiali.prima-unico.js) */
+    { gruppo: 'pdf', titolo: 'Preventivo · STORE // CRAFT + Archivio Clienti', descr: 'STORE // CRAFT Essenziale: stampe, video in vetrina e archivio clienti in un pacchetto solo. In fondo i moduli extra, da aggiungere quando vuoi.',
+      percorso: 'preventivo-b.html', tipo: 'pagina', miniatura: 'media/preventivo-v2/home-b-pc.jpg', perAldo: true, stato: 'pronto' },
+    { gruppo: 'pdf', titolo: 'Preventivo Piano A · vecchio link', descr: 'Dal 6/11 rimanda al preventivo unico (le parti del Piano A sono i moduli extra).',
+      percorso: 'preventivo-a.html', tipo: 'pagina', miniatura: null, perAldo: false, stato: 'pronto' },
     { gruppo: 'pdf', titolo: 'Presentazione Piano A · PDF (archivio)', descr: 'Diapositive con la vecchia demo e i prezzi vecchi: solo archivio dal 6/11.',
       percorso: 'presentazione/Ottica Macri - Presentazione STORE CRAFT.pdf', tipo: 'pdf', miniatura: null, perAldo: false, stato: 'pronto' },
     { gruppo: 'pdf', titolo: 'Presentazione Piano B · PDF (archivio)', descr: 'Diapositive con la vecchia demo e i prezzi vecchi: solo archivio dal 6/11.',
       percorso: 'presentazione/Ottica Macri - Piano B.pdf', tipo: 'pdf', miniatura: null, perAldo: false, stato: 'pronto' },
-    { gruppo: 'pdf', titolo: 'Riepilogo per WhatsApp (PDF)', descr: 'Un PDF leggero con tutto in breve e i due preventivi, da tenere sul telefono.',
+    { gruppo: 'pdf', titolo: 'Riepilogo per WhatsApp (PDF)', descr: 'Un PDF leggero con tutto in breve, da tenere sul telefono.',
       percorso: 'presentazione/Ottica Macri - Riepilogo.pdf', tipo: 'pdf', miniatura: null, perAldo: true, stato: 'pronto',
       copre: ['media/riepilogo/', 'media/riepilogo.prima-fase1/'] },
     { gruppo: 'pdf', titolo: 'Sorgente presentazione A (archivio)', descr: 'Pagina da cui nasce il PDF del Piano A (crea_pdf.py), superato.',
@@ -192,7 +193,7 @@ window.MATERIALI = {
       percorso: 'presentazione/riepilogo.html', tipo: 'pagina', miniatura: null, perAldo: false, stato: 'pronto' },
     { gruppo: 'pdf', titolo: 'Preventivo · bozza di lavoro', descr: 'Preventivo scalare da compilare (tariffa, difficoltà, IVA).',
       percorso: 'preventivo.html', tipo: 'pagina', miniatura: null, perAldo: false, stato: 'pronto' },
-    { gruppo: 'pdf', titolo: 'Prezzi per il cliente (prezzi.js)', descr: 'Unico file dei prezzi: CONFERMATI da Fabrice il 6/11 (A 7.600 / 6.850 · B 2.300 / 2.050).',
+    { gruppo: 'pdf', titolo: 'Prezzi per il cliente (prezzi.js)', descr: 'Unico file dei prezzi. 6/11: preventivo unico (PREZZI.unico 2.500 / 1.500 decisi da Fabrice) + moduli extra; ancora da confermare.',
       percorso: 'prezzi.js', tipo: 'documento', miniatura: null, perAldo: false, stato: 'pronto' },
 
     /* ------------------------------------------------ RICERCHE E DOCUMENTI DI LAVORO */

@@ -315,7 +315,7 @@
       (grande ? '<div class="campo"><span>Foglio</span><div class="chips"><button type="button" class="chipb' + (d.foglio === 'A4' ? ' on' : '') + '" data-act="setf" data-f="foglio" data-val="A4" data-rr>A4 · stampante del negozio (fogli da unire)</button><button type="button" class="chipb' + (d.foglio === 'A3' ? ' on' : '') + '" data-act="setf" data-f="foglio" data-val="A3" data-rr>A3 · copisteria</button></div></div>' : '') +
       API.campo('Quanti ' + (s.facce ? 'inserti (facce del cubo)' : 'inserti') + '?', 'copie', nCopie, 'number', ' data-rr min="1"') +
       '<div class="pulsantiera"><button class="btn pri xl" type="button" data-act="cvStampa">🖨 Stampa ' + nFogli + (nFogli === 1 ? ' foglio ' : ' fogli ') + d.foglio + '</button>' +
-      '<a class="btn" href="#creator/allestimento">✦ Allestimento vetrine Black Friday</a></div>' +
+      '</div>' + // 6/11: tolto il collegamento all'allestimento vetrine
       '<p class="piccolo muto">Nella finestra di stampa scegli <b>Dimensioni effettive / 100%</b>, non «Adatta». Sul foglio c\'è un righello: deve misurare 5 cm.' + (s.tipo === 'vetrofania' ? ' La vetrofania vera si fa stampare su vinile adesivo: questa è la prova su carta.' : '') + '</p></div></div>';
     return {
       html: API.testa('Cartello ' + titolo, base.promo ? 'Promo stagionali · sul supporto vero' : 'Crea cartelli · sul supporto vero') + '<div class="strumento cv-strum">' + p + API.tavolo(s.nome + ' · ' + misura(s), ant(), 'anteprima in scala') + '</div>',
@@ -508,12 +508,13 @@
     try {
       var b = bfDati(), i = -1;
       s.forEach(function (x, k) { if (x.id === 'sec-promo') i = k; });
-      var schede = [{ t: 'Tutte le vetrine ✦', h: 'creator/allestimento', tipo: 'BLACK FRIDAY', dorata: true, badge: 'SUPPORTI VERI', thumb: '<div class="thumb cv-thumb cv-thumb-neg">' + schemaNegozio('', true) + '</div>' }].concat(RIP.map(function (R) {
+      var schede = false && [{ t: 'Tutte le vetrine ✦', h: 'creator/allestimento', tipo: 'BLACK FRIDAY', dorata: true, badge: 'SUPPORTI VERI', thumb: '<div class="thumb cv-thumb cv-thumb-neg">' + schemaNegozio('', true) + '</div>' }].concat(RIP.map(function (R) {
         var L = inserti(R, b).filter(function (x) { return !x.video; }), x = L[0];
         if (x && x.img) return { t: R.t.replace(' · ', ' '), h: 'creator/allestimento/' + R.id, tipo: x.s.stampa[0] + '×' + x.s.stampa[1] + ' MM', dorata: true, thumb: thumbIns(htmlVoce(x, false), x.s.stampa[0], x.s.stampa[1]) };
         return { t: R.t.replace(' · ', ' '), h: 'creator/allestimento/' + R.id, tipo: (x ? x.s.stampa[0] + '×' + x.s.stampa[1] + ' MM' : 'RIPIANO'), dorata: true, thumb: x ? schedaThumb(x.s, x.d) : '' };
       }));
-      s.splice(i >= 0 ? i + 1 : s.length, 0, { id: 'sec-allestimento', titolo: 'Allestimento Vetrine', coda: ' // Black Friday · ripiano per ripiano', nuovo: true, schede: schede });
+      // 6/11/2026 (Fabrice): la zona ALLESTIMENTO VETRINE è tolta dal corpo della home (la pagina resta nel file, non raggiungibile)
+      void schede; void i;
       s.forEach(function (x) {
         if (x.id !== 'sec-cartellini') return;
         Object.keys(STANGHE).forEach(function (k) { var ss = sup(STANGHE[k]); var r0 = righeDef()[0], dim = dimStanga(ss); x.schede.push({ t: 'Stanghetta · ' + k, h: 'creator/stanghetta/' + k, tipo: ss.stampa[0] + '×' + ss.stampa[1] + ' MM', thumb: '<div class="thumb cv-thumb cv-thumb-sg">' + supSVG(ss, 70) + '<div class="cv-tb" style="aspect-ratio:' + dim[0] + '/' + dim[1] + ';height:auto;width:' + (k === 'bandierina' ? 90 : 50) + '%"><div class="scala" data-w="' + (dim[0] * MM).toFixed(3) + '">' + stanga(ss, r0, { sconto: 30, evento: 'BLACK FRIDAY' }) + '</div></div></div>' }); });
@@ -529,7 +530,8 @@
     try {
       var v = function (t, h, extra) { var o = { t: t, h: h }; for (var k in extra) o[k] = extra[k]; return o; };
       var i = -1; G.forEach(function (g, k) { if (g.id === 'cartelli') i = k; });
-      G.splice(i >= 0 ? i + 1 : G.length, 0, { id: 'allestimento', t: 'Allestimento Vetrine', nuovo: true, voci: [v('Tutte le vetrine', 'creator/allestimento', { stella: true })].concat(RIP.map(function (R) { return v(R.t, 'creator/allestimento/' + R.id); })) });
+      // 6/11/2026 (Fabrice): ALLESTIMENTO VETRINE tolto anche dal menu di sinistra
+      void i;
       G.forEach(function (g) { if (g.id === 'cartellini') Object.keys(STANGHE).forEach(function (k) { g.voci.push(v('Stanghetta · ' + k, 'creator/stanghetta/' + k)); }); });
     } catch (e) { if (window.console) console.warn('cartelli: gruppi', e); }
     return G;

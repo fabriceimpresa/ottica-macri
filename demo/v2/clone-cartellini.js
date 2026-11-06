@@ -145,25 +145,28 @@
   var ALIAS = { doppioprezzo: 'doppio', outlet: 'doppio', finalprice: 'finale', final: 'finale', lastchance: 'ultimi', promo: 'ultimi', luxury: 'label', promo50: 'paio', tagliedoppiacifra: 'calibro', taglie: 'calibro' };
   function dyDef(tpl) {
     var a = (API && API.S().art || [])[tpl === 'calibro' ? 4 : 0] || {};
-    return { tpl: tpl, brand: a.marca || 'Ray-Ban', logo: '', orig: '159,00', sconto: '30', scontato: '79,50', fin: tpl === 'calibro' ? '111,30' : tpl === 'paio' ? '238,50' : '111,30', testo: tpl === 'finale' ? 'PREZZO FINALE' : 'OCCHIALE DA SOLE • ' + (a.cal ? a.cal + '□' + a.ponte : 'PROMO'), cal: a.cal || 54, ponte: a.ponte || 20, asta: 145, n: 1, art: '' };
+    // 6/11/2026: prezzi d'esempio decisi da Fabrice · Ottica Macrì Label 199,00 · Ultimi Pezzi 129,00
+    return { tpl: tpl, brand: a.marca || 'Ray-Ban', logo: '', orig: '159,00', sconto: '30', scontato: '79,50', fin: tpl === 'label' ? '199,00' : tpl === 'ultimi' ? '129,00' : tpl === 'paio' ? '238,50' : '111,30', testo: tpl === 'finale' ? 'PREZZO FINALE' : 'OCCHIALE DA SOLE • ' + (a.cal ? a.cal + '□' + a.ponte : 'PROMO'), cal: a.cal || 54, ponte: a.ponte || 20, asta: 145, n: 1, art: '' };
   }
   function euroCol(lab, v, fs, peso) { return '<span class="sc-dy-eu"><small>Euro</small><b style="font-size:' + fs + 'pt;font-weight:' + (peso || 400) + '">' + esc(u.norm(v)) + '</b></span>'; }
   function qrNeg() { var n = (API.S().negozio || {}).facebook || 'facebook.com/OtticaMacri'; return C.qr('https://' + n.replace(/^https?:\/\//, ''), 300); }
   function etichetta(d) {
     var t = d.tpl, h = '<div class="sc-dymo ' + C.stileCls() + '" data-modello="dymo-' + t + '"><div class="sc-dyw"><div class="sc-dy sc-dy-' + t + '">';
-    var br = '<div class="sc-dy-br">' + C.pezzi.marchio({ brand: d.brand, logo: d.logo }, '', 0.34, 'sc-nero') + '</div>';
+    // marchio VERO in nero (window.MARCHI_DYMO, data URI) se c'è; altrimenti la scritta del brand o il logo personale
+    var MV = window.MARCHI_DYMO || {}, vero = !d.logo && MV[d.brand];
+    var br = '<div class="sc-dy-br' + (vero ? ' vero' : '') + '">' + (vero ? '<img class="sc-dy-ml" src="' + vero + '" alt="' + esc(d.brand) + '">' : C.pezzi.marchio({ brand: d.brand, logo: d.logo }, '', 0.34, 'sc-nero')) + '</div>';
     if (t === 'doppio' || t === 'finale') {
       h += '<div class="sc-dy-alto">' + br + '<img class="sc-dy-qr" src="' + qrNeg() + '" alt=""></div><div class="sc-dy-basso">';
-      if (t === 'doppio') h += euroCol('', d.orig, 13) + '<span class="sc-dy-sc">' + esc(pc(d.sconto)) + '</span>' + euroCol('', d.fin, 17, 700);
-      else h += '<span class="sc-dy-tx">' + esc(d.testo) + '</span>' + euroCol('', d.fin, 18, 800);
+      if (t === 'doppio') h += euroCol('', d.orig, 11) + '<span class="sc-dy-sc">' + esc(pc(d.sconto)) + '</span>' + euroCol('', d.fin, 17, 800);
+      else h += '<span class="sc-dy-tx">' + esc(d.testo) + '</span>' + euroCol('', d.fin, 17, 800);
       h += '</div>';
     } else if (t === 'ultimi' || t === 'label') {
-      h += '<div class="sc-dy-logo">' + (t === 'ultimi' ? '<span class="sc-dy-lc"><b>ULTIMI</b><b>PEZZI</b></span>' : '<img src="' + LOGO + '" alt="Ottica Macrì">') + '</div>' + euroCol('', d.fin, 19, 800);
+      h += '<div class="sc-dy-logo">' + (t === 'ultimi' ? '<span class="sc-dy-lc"><b>ULTIMI</b><b>PEZZI</b></span>' : '<img class="sc-dy-om" src="' + ((window.MARCHI_DYMO || {})['Ottica Macrì'] || LOGO) + '" alt="Ottica Macrì">') + '</div>' + euroCol('', d.fin, t === 'label' ? 19 : 18, 800);
     } else if (t === 'paio') {
-      h += '<div class="sc-dy-p-alto">' + euroCol('', d.orig, 13.5) + '<span class="sc-dy-sc" style="font-size:13.5pt;font-weight:400">-50%</span>' + euroCol('', d.scontato, 13.5) + '</div>' +
-        '<div class="sc-dy-banda"><div class="sc-dy-bsx"><small>PROMOZIONE</small><small class="g">2° PAIO</small><b>-50%</b></div>' + euroCol('', d.fin, 23, 800) + '</div>';
+      h += '<div class="sc-dy-p-alto">' + euroCol('', d.orig, 11) + '<span class="sc-dy-sc" style="font-size:11pt;font-weight:700">2° −50%</span>' + euroCol('', d.scontato, 11) + '</div>' +
+        '<div class="sc-dy-banda"><div class="sc-dy-bsx"><small>PROMOZIONE</small><small class="g">2° PAIO</small><b>-50%</b></div>' + euroCol('', d.fin, 18, 800) + '</div>';
     } else {
-      var fin = prezzo(d.fin), L = fin.length, fs = L <= 7 ? 25 : L === 8 ? 22 : L === 9 ? 19.5 : L === 10 ? 17 : 14.5;
+      var fin = prezzo(d.fin), L = fin.length, fs = L <= 7 ? 20 : L === 8 ? 18 : L === 9 ? 16 : L === 10 ? 14.5 : 12.5; // 6/11: misure che stanno nei 57 mm
       h += '<div class="sc-dy-mis"><small>MISURE</small><div class="sc-dy-box"><i>CAL</i><b>' + esc(d.cal) + '</b><i>PON</i><b>' + esc(d.ponte) + '</b><i>ASTA</i><b>' + esc(d.asta) + '</b></div></div>' +
         '<div class="sc-dy-dx"><div class="sc-dy-r1"><span>' + esc(prezzo(d.orig)) + '</span><b>' + esc(pc(d.sconto)) + '</b></div><div class="sc-dy-fin" style="font-size:' + fs + 'pt">' + esc(fin) + '</div><div class="sc-dy-ft" data-fit="5">' + esc(d.testo) + '</div></div>';
     }

@@ -2,45 +2,17 @@
 <html lang="it">
 <head>
 <meta charset="utf-8">
-<link rel="icon" type="image/svg+xml" href="media/logo/marchi6/04-monocolo/04-monocolo-icona-colori.svg">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Ottica Macrì · Preventivo Piano A</title>
-<meta name="color-scheme" content="light">
-<link rel="stylesheet" href="tema-hud.css">
-<link rel="stylesheet" href="materiali.css">
-<link rel="stylesheet" href="preventivo-esperienza.css">
-<link rel="stylesheet" href="finale/finale.css">
-<script src="tema-hud.js"></script>
+<!-- 6/11/2026: il Piano A non esiste più come preventivo a parte. C'è UN SOLO preventivo, «STORE // CRAFT + Archivio Clienti»
+     (preventivo-b.html); le parti del vecchio Piano A sono diventate i MODULI EXTRA in fondo a quel preventivo.
+     Questa pagina resta solo perché i vecchi link non si rompano. Copia di prima: preventivo-a.prima-unico.html -->
+<meta http-equiv="refresh" content="0; url=preventivo-b.html">
+<link rel="icon" type="image/svg+xml" href="media/logo/marchi6/04-monocolo/04-monocolo-icona-colori.svg">
+<title>Ottica Macrì · Preventivo</title>
+<script>location.replace('preventivo-b.html'+location.hash);</script>
+<style>body{font:17px/1.5 system-ui,sans-serif;background:#efe6d8;color:#2a1d12;display:grid;place-items:center;min-height:90vh;margin:0;padding:16px;text-align:center}a{color:#9e3b25}</style>
 </head>
-<body class="hud" data-piano="A">
-<!-- Preventivo per il cliente: le cifre arrivano SOLO da prezzi.js, il contenuto lo disegna preventivo-cliente.js (immagini: materiali.js + dispositivi.js; stile: preventivo-esperienza.css) -->
-<div class="hud-pag">
-  <header class="hud-top glass hud-entra">
-    <a class="hud-brand" href="index.html" aria-label="Torna al portale Ottica Macrì">
-      <span class="hud-logo">
-        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#1f4e79" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="6.5" cy="13.5" r="4"/><circle cx="17.5" cy="13.5" r="4"/><path d="M10.4 12.6c1-.9 2.2-.9 3.2 0M2.6 12.4 1.6 8.6M21.4 12.4l1-3.8"/></svg>
-        <svg class="rings" viewBox="0 0 100 100" aria-hidden="true">
-          <g class="r1"><circle cx="50" cy="50" r="44" fill="none" stroke="rgba(31,78,121,.8)" stroke-width="1.2" stroke-dasharray="46 8 12 8 70 12 20 100"/></g>
-          <g class="r2"><circle cx="50" cy="50" r="39.5" fill="none" stroke="#b5462c" stroke-width="2.4" stroke-dasharray="22 6 6 6 40 30 10 200" opacity=".9"/></g>
-        </svg>
-      </span>
-      <span><h1>OTTICA <span>MACRÌ</span></h1><small><span class="solo-schermo">‹ Portale · </span>Preventivo Piano A</small></span>
-    </a>
-    <div class="hud-vitals">
-      <div class="vital gold"><b>STORE // CRAFT</b><em>Fabrice</em></div>
-      <div class="vital clock"><b data-ora>--:--</b><em data-data>&nbsp;</em></div>
-    </div>
-  </header>
-  <main id="pv"></main>
-  <div class="hud-nastro" aria-hidden="true"><span>OM-04 · PREVENTIVO PIANO A</span><span>Fabrice · STORE // CRAFT</span><span data-data></span></div>
-</div>
-<script src="prezzi.js"></script>
-<script src="dispositivi.js"></script>
-<script src="materiali.js"></script>
-<script src="materiali-vista.js"></script>
-<script src="finale/finale-data.js"></script>
-<script src="preventivo-cliente.js"></script>
-<script src="finale/finale.js"></script>
-<script src="media/logo/storico/animazione/draghetto-avvio.js" data-avvio="auto" data-tema="chiaro"></script>
+<body>
+<p>Il preventivo ora è uno solo: <b>STORE // CRAFT + Archivio Clienti</b>.<br><a href="preventivo-b.html">Apri il preventivo ›</a></p>
 </body>
 </html>

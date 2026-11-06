@@ -208,39 +208,48 @@
 .sc-off{opacity:.15;filter:grayscale(1)}
 
 /* ---------- ETICHETTA DYMO 57 × 32 mm ---------- */
-.sc-dymo{width:57mm;height:32mm;background:#fff;color:#000;padding:1.5mm 2.5mm;display:flex;align-items:center;justify-content:center;font-family:Arial,sans-serif;overflow:hidden}
-.sc-dyw{width:100%;height:29mm;transform:translateY(-1mm) scale(1.08);display:flex}
-.sc-dy{width:100%;height:100%;display:flex;flex-direction:column;justify-content:space-between}
-.sc-dy-alto{height:16mm;display:flex;justify-content:space-between;align-items:flex-start}
-.sc-dy-br{width:35.6mm;height:14mm;margin:1mm 0 0 1.25mm;display:flex;align-items:center;justify-content:flex-start;overflow:hidden}
+/* 6/11/2026 · DYMO rifatte: misura vera 57 × 32 mm (rotolo 11354), margine di stampa 2 mm, niente ingrandimenti che tagliano,
+   SOLO NERO (la LabelWriter è termica monocromatica), marchi veri in vettoriale. Vecchia versione: clone.prima-base.css */
+.sc-dymo{width:57mm;height:32mm;background:#fff;color:#000;padding:2mm 2.6mm 2.2mm;display:flex;font-family:Arial,"Helvetica Neue",sans-serif;overflow:hidden;-webkit-font-smoothing:antialiased}
+.sc-dyw{width:100%;height:100%;display:flex}
+.sc-dy{width:100%;height:100%;display:flex;flex-direction:column;justify-content:space-between;min-width:0}
+.sc-dy-alto{height:13mm;display:flex;justify-content:space-between;align-items:flex-start;gap:2mm}
+.sc-dy-br{flex:1;min-width:0;height:12.5mm;display:flex;align-items:center;justify-content:flex-start;overflow:hidden}
 .sc-dy-br .sc-lp{max-width:100%;max-height:100%}
 .sc-dy-br .sc-wm,.sc-dy-br .sc-wm-om{color:#000;font-family:Arial,sans-serif;letter-spacing:.04em}
-.sc-dy-qr{width:12mm;height:12mm;margin:1mm 1mm 0 0;image-rendering:pixelated}
-.sc-dy-basso{height:13mm;padding-bottom:2.5mm;display:flex;align-items:flex-end;justify-content:space-between;padding-left:1mm;padding-right:1mm}
+.sc-dy-qr{flex:none;width:11.5mm;height:11.5mm;image-rendering:pixelated}
+.sc-dy-basso{height:11.5mm;display:flex;align-items:flex-end;justify-content:space-between;gap:2mm;border-top:.25mm solid #000;padding-top:1mm}
 .sc-dy-eu{display:inline-grid;justify-items:end;line-height:1}
-.sc-dy-eu small{font-size:7.5pt}
-.sc-dy-eu b{line-height:1;white-space:nowrap}
-.sc-dy-sc{font-size:13pt;font-weight:700;line-height:1}
-.sc-dy-tx{font-size:12pt;text-transform:uppercase;letter-spacing:-.3px;line-height:1;align-self:flex-end;white-space:nowrap;max-width:60%;overflow:hidden}
-.sc-dy-ultimi,.sc-dy-label{flex-direction:row;align-items:center;padding:0 .5mm}
-.sc-dy-logo{width:28mm;height:23.5mm;display:flex;align-items:center;justify-content:center}
+.sc-dy-eu small{font-size:6.5pt;letter-spacing:.06em;text-transform:uppercase;margin-bottom:.4mm}
+.sc-dy-eu b{line-height:.92;white-space:nowrap;letter-spacing:-.02em}
+.sc-dy-doppio .sc-dy-basso>.sc-dy-eu:first-child b{text-decoration:line-through;text-decoration-thickness:.3mm}
+.sc-dy-sc{font-size:12pt;font-weight:700;line-height:1;padding:.5mm 1.2mm;background:#000;color:#fff;border-radius:.8mm;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.sc-dy-tx{flex:1;min-width:0;font-size:8pt;font-weight:700;text-transform:uppercase;letter-spacing:.08em;line-height:1.1;align-self:flex-end;white-space:normal;overflow:hidden;max-height:2.3em;padding-bottom:.5mm}
+.sc-dy-ultimi,.sc-dy-label{flex-direction:row;align-items:center;justify-content:space-between;gap:2mm}
+.sc-dy-logo{flex:none;width:24mm;height:27.6mm;display:flex;align-items:center;justify-content:center}
 .sc-dy-logo img{max-width:100%;max-height:100%;filter:brightness(0)}
-.sc-dy-lc{display:grid;transform:rotate(-8deg) skewX(-8deg);font:400 30px/.9 var(--sc-anton);letter-spacing:.02em}
+.sc-dy-ultimi .sc-dy-logo{width:25mm}
+.sc-dy-lc{display:grid;justify-items:start;gap:.8mm;font:400 21pt/.86 var(--sc-anton,Impact,"Arial Narrow",sans-serif);letter-spacing:.02em;text-transform:uppercase}
+.sc-dy-lc b{font-weight:400}
+.sc-dy-lc b:first-child{background:#000;color:#fff;padding:.9mm 1.4mm .5mm;border-radius:.8mm;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.sc-dy-lc b:last-child{padding-left:1.4mm}
 .sc-dy-ultimi .sc-dy-eu,.sc-dy-label .sc-dy-eu{margin-left:auto}
-.sc-dy-p-alto{height:9.8mm;padding:.3mm 1mm .8mm;display:flex;align-items:flex-end;justify-content:space-between}
-.sc-dy-banda{height:18.2mm;border-radius:1.8mm;padding:1.2mm 1.8mm;background:#000;color:#fff;display:flex;align-items:flex-end;justify-content:space-between;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-.sc-dy-bsx{display:grid;line-height:1.05}.sc-dy-bsx small{font-size:8pt;font-weight:800}.sc-dy-bsx small.g{font-size:9.5pt}.sc-dy-bsx b{font-size:23pt;font-weight:800;line-height:1}
-.sc-dy-banda .sc-dy-eu small{font-size:8.5pt}
-.sc-dy-calibro{flex-direction:row;padding:0 1mm;transform:translateY(.75mm)}
-.sc-dy-mis{width:15mm;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.8mm}
-.sc-dy-mis>small{font-size:7pt;letter-spacing:.02em}
-.sc-dy-box{display:grid;grid-template-columns:7mm 7mm;gap:.8mm}
-.sc-dy-box i,.sc-dy-box b{width:7mm;height:7mm;border:.5mm solid #000;display:flex;align-items:center;justify-content:center;font-size:7.5pt;line-height:1;font-weight:400;font-style:normal}
-.sc-dy-box i{font-size:5.2pt;border-color:#000;background:#000;color:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-.sc-dy-dx{flex:1;padding-left:2mm;padding-bottom:1.5mm;display:flex;flex-direction:column;align-items:flex-end;justify-content:space-between;min-width:0}
-.sc-dy-r1{display:flex;align-items:baseline;gap:2mm;white-space:nowrap;font-size:12.5pt}.sc-dy-r1 b{font-family:var(--sc-black);font-weight:900}
-.sc-dy-fin{font-family:var(--sc-black);font-weight:900;line-height:.85;letter-spacing:-.5pt;white-space:nowrap}
-.sc-dy-ft{font-size:8.5pt;text-transform:uppercase;text-align:right;white-space:nowrap;max-width:100%;overflow:hidden}
+.sc-dy-label .sc-dy-logo{width:22mm}
+.sc-dy-p-alto{height:8.4mm;padding:0 .6mm .6mm;display:flex;align-items:flex-end;justify-content:space-between}
+.sc-dy-p-alto .sc-dy-sc{background:none;color:#000;padding:0}
+.sc-dy-banda{height:17.6mm;border-radius:1.6mm;padding:1.4mm 2mm 1.6mm;background:#000;color:#fff;display:flex;align-items:flex-end;justify-content:space-between;gap:2mm;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.sc-dy-bsx{display:grid;line-height:1.05}.sc-dy-bsx small{font-size:6.5pt;font-weight:700;letter-spacing:.08em}.sc-dy-bsx small.g{font-size:8.5pt;font-weight:800}.sc-dy-bsx b{font-size:17pt;font-weight:800;line-height:1;margin-top:.4mm}
+.sc-dy-banda .sc-dy-eu small{font-size:6.5pt}
+.sc-dy-calibro{flex-direction:row;gap:2mm}
+.sc-dy-mis{flex:none;width:13.4mm;display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:.8mm}
+.sc-dy-mis>small{font-size:6pt;font-weight:700;letter-spacing:.1em;text-align:center}
+.sc-dy-box{display:grid;grid-template-columns:6.2mm 6.2mm;gap:.6mm .6mm}
+.sc-dy-box i,.sc-dy-box b{width:6.2mm;height:6.2mm;border:.35mm solid #000;display:flex;align-items:center;justify-content:center;font-size:7.5pt;line-height:1;font-weight:700;font-style:normal}
+.sc-dy-box i{font-size:4.6pt;letter-spacing:.04em;background:#000;color:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.sc-dy-dx{flex:1;display:flex;flex-direction:column;align-items:flex-end;justify-content:space-between;min-width:0;border-left:.25mm solid #000;padding-left:2mm}
+.sc-dy-r1{display:flex;align-items:baseline;gap:1.6mm;white-space:nowrap;font-size:10pt}.sc-dy-r1 span{text-decoration:line-through;text-decoration-thickness:.25mm}.sc-dy-r1 b{font-family:var(--sc-black);font-weight:900}
+.sc-dy-fin{font-family:var(--sc-black);font-weight:900;line-height:.9;letter-spacing:-.03em;white-space:nowrap;max-width:100%}
+.sc-dy-ft{font-size:6.5pt;font-weight:700;letter-spacing:.06em;text-transform:uppercase;text-align:right;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
 /* QR stampato */
 .sc-qrpag{width:210mm;height:297mm;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:40mm;gap:8mm;font-family:Arial,sans-serif}
 .sc-qrpag img{image-rendering:pixelated}.sc-qrpag p{font-size:14pt;word-break:break-all;max-width:160mm;text-align:center}
@@ -379,3 +388,7 @@ html[data-tema="scuro"] .sc-tab button,html[data-tema="scuro"] .sc-cr-t b,html[d
 html[data-tema="scuro"] .sc-cr-piede{background:#221b16}
 html[data-tema="scuro"] .sc-affix>i{background:rgba(230,200,160,.08);border-color:rgba(230,200,160,.3);color:#efe6d8}
 html[data-tema="scuro"] .sc-tabs-art button.on{background:#2c6aa0;color:#fff}
+/* 6/11/2026 · marchi VERI in nero sulle etichette DYMO (window.MARCHI_DYMO) */
+.sc-dy-br.vero{justify-content:flex-start;align-items:center}
+.sc-dy-ml{display:block;max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain}
+.sc-dy-logo img.sc-dy-om{filter:none}

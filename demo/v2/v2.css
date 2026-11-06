@@ -831,3 +831,19 @@ html.vivo-pausa *,html.vivo-pausa *::before,html.vivo-pausa *::after{animation-p
 .riserva-usb .ic{font-size:22px}
 .riserva-usb>div{flex:1 1 200px}
 @media (max-width:640px){.strade-scelta{grid-template-columns:1fr}.strada{min-height:0}.riserva-usb{flex-wrap:wrap}}
+
+/* ===== STICKER «PROVVISORIO» (6/11/2026): adesivo di carta con bordo tratteggiato rosso mattone, un filo storto ===== */
+.sticker-provv{position:relative;flex:none;display:inline-flex;align-items:center;gap:7px;margin-left:4px;padding:6px 13px 6px 11px;
+  font:700 11.5px/1 var(--h-mono);letter-spacing:2.6px;text-transform:uppercase;color:var(--h-mat2);
+  background:linear-gradient(135deg,#fffaf0 0%,#fbf0dc 100%);border:1.5px dashed rgba(181,70,44,.75);border-radius:3px;
+  outline:3px solid #fffaf0;outline-offset:-1px;
+  transform:rotate(-3.5deg);box-shadow:0 1px 0 rgba(255,255,255,.9) inset,0 2px 0 rgba(158,59,37,.12),0 8px 16px -8px rgba(92,48,24,.45);
+  clip-path:polygon(0 0,100% 0,100% calc(100% - 9px),calc(100% - 9px) 100%,0 100%)}
+.sticker-provv::after{content:"";position:absolute;right:0;bottom:0;width:9px;height:9px;background:linear-gradient(315deg,transparent 50%,#e9d6b6 50%);box-shadow:-1px -1px 2px rgba(92,48,24,.2)}
+.sticker-provv i{width:7px;height:7px;border-radius:50%;background:var(--h-mat2);box-shadow:0 0 0 2px rgba(181,70,44,.18)}
+.section-title .sticker-provv{order:0}
+.pag-testa .sticker-provv.in-pagina{order:9;margin-left:auto;font-size:12.5px;padding:8px 15px 8px 12px}
+html[data-tema="scuro"] .sticker-provv{color:#f0a48c;background:linear-gradient(135deg,#3a2a20,#2e221a);border-color:rgba(240,164,140,.7);outline-color:#3a2a20}
+html[data-tema="scuro"] .sticker-provv::after{background:linear-gradient(315deg,transparent 50%,#5a4434 50%)}
+@media (max-width:640px){.sticker-provv{font-size:10px;letter-spacing:1.8px;padding:5px 9px 5px 8px}.pag-testa .sticker-provv.in-pagina{margin-left:0}}
+.dy .dy-marchio{display:block;height:46px;max-width:100%;width:auto} /* 6/11 marchio vero in nero */

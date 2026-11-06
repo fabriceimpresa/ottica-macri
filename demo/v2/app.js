@@ -24,7 +24,10 @@
   'use strict';
   var Q = new URLSearchParams(location.search);
   var EMBED = Q.has('embed');
-  var PB = Q.get('piano') === 'b';
+  // 6/11/2026 · pacchetto unico «STORE // CRAFT + Archivio Clienti»: PIANO BASE (predefinito) / MODULI EXTRA.
+  // ?piano=extra (anche piano=a, piano=completo) = moduli extra; nessun parametro o ?piano=b / base = piano base.
+  var PIANO_Q = String(Q.get('piano') || '').toLowerCase();
+  var PB = !/^(extra|a|completo|moduli)$/.test(PIANO_Q); // PB = PIANO BASE
   if (EMBED) document.documentElement.classList.add('embed');
   if (PB) document.documentElement.classList.add('pianob');
   var D = window.DATI;
@@ -102,19 +105,24 @@
     { id: 'creator', nome: 'Creator' }, { id: 'cassiere', nome: 'Cassiere' }, { id: 'gestionale', nome: 'Gestionale' },
     { id: 'amministrazione', nome: 'Amministrazione' }, { id: 'promoter', nome: 'Promoter' }
   ];
-  // Piano B: solo CREATOR (con VETRINA DIGITALE) e l'archivio clienti semplice
+  // Piano base: CREATOR (con VETRINA DIGITALE) + AMMINISTRAZIONE completa (archivio clienti, privacy, negozio, utenti).
+  // Le parti dei moduli extra (CASSIERE, GESTIONALE, PROMOTER) nel piano base NON si vedono proprio (niente lucchetti).
   function inB(modo, pagina) {
     if (!PB) return true;
-    if (modo === 'creator') return true;
-    if (modo === 'amministrazione') return !pagina || pagina === 'clienti' || pagina === 'cliente';
-    return false;
+    return modo === 'creator' || modo === 'amministrazione';
   }
   function modoInB(modo) { return !PB || modo === 'creator' || modo === 'amministrazione'; }
+  function nomePiano() { return PB ? 'piano base' : 'moduli extra'; }
   function riservato(modo) { return S.sistema.utente === 1 && !S.utenti[1].aree[modo]; }
 
   function rotta() {
     var p = (location.hash || '#creator').slice(1).split('/');
     var modo = MODI.some(function (m) { return m.id === p[0]; }) ? p[0] : 'creator';
+    // piano base: le modalità dei moduli extra e l'allestimento vetrine (tolto il 6/11) portano alla home del Creator
+    if (!modoInB(modo) || (modo === 'creator' && p[1] === 'allestimento')) {
+      modo = 'creator'; p = ['creator'];
+      try { history.replaceState(null, '', location.pathname + location.search + '#creator'); } catch (e) {}
+    }
     return { modo: modo, pagina: p[1] || '', v: decodeURIComponent(p[2] || ''), chiave: modo + '/' + (p[1] || '') + '/' + (p[2] || '') };
   }
   function vai(h) { if (location.hash === '#' + h) render(); else location.hash = h; }
@@ -195,7 +203,7 @@
     else if (tpl === 'paio') h += '<div class="riga1"><span class="tag">2° PAIO</span><b>-' + cifra(sc, 0) + '%</b></div>';
     else if (tpl === 'ultimi') h += '<div class="riga1"><span class="tag">ULTIMI PEZZI</span></div>';
     else if (tpl === 'label') h += '<div class="riga1"><span class="marca-om">OTTICA MACRÌ · ROMA</span></div>';
-    else h += '<div class="riga1" style="font-size:18px">' + esc(d.marca || '') + '</div>';
+    else h += '<div class="riga1" style="font-size:18px">' + ((window.MARCHI_DYMO || {})[d.marca] ? '<img class="dy-marchio" src="' + window.MARCHI_DYMO[d.marca] + '" alt="' + esc(d.marca) + '">' : esc(d.marca || '')) + '</div>';
     h += '<div class="finale">' + eur(tpl === 'paio' ? pieno : fin) + '</div>';
     h += '<div class="nome">' + esc(d.nome) + '</div>';
     h += '<div style="display:grid;justify-items:end;gap:2px">' + barre(d.ean) + '<span class="ean">' + esc(d.ean) + '</span></div>';
@@ -265,11 +273,11 @@
     'set-natale': ['Set Natale ✦', null, '2 cartelli · 12 quadrati'], 'set-school': ['Set Back to School ✦', null, '2 cartelli · 8 cartellini']
   };
   var VETRINA = {
-    'vetrina-slide': { titolo: 'Slide Promo', tipo: 'TABLET 16:10' },
-    'vetrina-vert': { titolo: 'Slide Verticale', tipo: 'SCHERMO 9:16' },
+    'vetrina-slide': { titolo: 'Slide Promo', tipo: 'TABLET 13" · 16:10' },
+    'vetrina-vert': { titolo: 'Slide Verticale', tipo: 'SCHERMO 21,5" · 9:16' },
     'vetrina-bf': { titolo: 'Black Friday ✦', tipo: 'LOOP PRONTO' },
     'vetrina-playlist': { titolo: 'Playlist Vetrina', tipo: 'PLAYLIST' },
-    'vetrina-avviso': { titolo: 'Avvisi & Orari', tipo: 'TABLET 16:10' }
+    'vetrina-avviso': { titolo: 'Avvisi & Orari', tipo: 'TABLET 13" · 16:10' }
   };
 
   function thumbCt(d) { return '<div class="thumb"><div class="scala" data-w="595">' + cartelloHTML(d) + '</div></div>'; }
@@ -375,12 +383,12 @@
       { id: 'lista', t: 'Lista di Stampa e Cronologia', voci: [v('Lista di Stampa', 'creator/lista'), v('Cronologia di Stampa', 'creator/cronologia')] }
     ]));
     if (modo === 'cassiere') return [{ id: 'cassa', t: 'Utilità Cassa', voci: STRUMENTI.map(function (w) { return w.id === 'bacheca' ? v(w.t, 'cassiere/bacheca') : v(w.t, 'cassiere', { widget: w.id }); }) }];
-    return sezioni(modo).map(function (sz) { return { id: sz.id, t: sz.titolo, voci: sz.schede.map(function (sk) { return v(sk.t.replace(' ✦', ''), sk.h, { lock: PB && !sk.inB }); }) }; });
+    return sezioni(modo).map(function (sz) { return { id: sz.id, t: sz.titolo, voci: sz.schede.filter(function (sk) { return !PB || inBdaHash(sk.h); }).map(function (sk) { return v(sk.t.replace(' ✦', ''), sk.h); }) }; }).filter(function (g) { return g.voci.length; });
   }
   function sidebarHTML(r) {
     var G = gruppi(r.modo), qui = r.modo + (r.pagina ? '/' + r.pagina : '') + (r.v ? '/' + r.v : '');
     var h = '<div class="sb-head"><button class="marchio" type="button" data-act="home">STORE <i>//</i> CRAFT</button><button class="sb-chiudi" type="button" data-act="menu" aria-label="Chiudi menu">✕</button></div>';
-    h += '<div class="sb-modo">// modalità ' + esc(r.modo) + (PB ? ' · piano B' : '') + '</div><div class="sb-scorri">';
+    h += '<div class="sb-modo">// modalità ' + esc(r.modo) + ' · ' + nomePiano() + '</div><div class="sb-scorri">';
     G.forEach(function (g) {
       var dentro = g.voci.concat(g.sub ? g.sub.voci : []).some(function (x) { return !x.scorri && !x.widget && x.h === qui; });
       var aperto = S.sb[r.modo + g.id] !== undefined ? S.sb[r.modo + g.id] : dentro;
@@ -410,8 +418,8 @@
       '<div class="banner" aria-hidden="true">' + BANNER.map(function (b, i) { return '<span class="' + (i ? 'sotto' : '') + '">' + esc(b) + '</span>'; }).join('') + '</div>' +
       '<div class="mode-switcher" role="group" aria-label="Modalità">';
     MODI.forEach(function (m) {
-      var fuori = !modoInB(m.id);
-      h += '<button class="mode-btn' + (m.id === r.modo ? ' active' : '') + (fuori ? ' fuori' : '') + '" type="button" data-act="modo" data-m="' + m.id + '" aria-pressed="' + (m.id === r.modo) + '"' + (fuori ? ' title="Non incluso nel Piano B"' : '') + '>' + m.nome + (fuori ? '<span class="lucchetto">🔒</span>' : '') + '</button>';
+      if (!modoInB(m.id)) return; // piano base: le modalità dei moduli extra non compaiono
+      h += '<button class="mode-btn' + (m.id === r.modo ? ' active' : '') + '" type="button" data-act="modo" data-m="' + m.id + '" aria-pressed="' + (m.id === r.modo) + '">' + m.nome + '</button>';
     });
     return h + '</div></header>';
   }
@@ -425,7 +433,7 @@
   var FISCALE = {
     cassiere: 'Lo <b>scontrino fiscale</b> resta sul registratore telematico (RT) di sempre: questi sono solo strumenti di calcolo.',
     gestionale: 'Non è un registratore di cassa: <b>scontrino (RT), Tessera Sanitaria e fatture</b> restano alla cassa e al commercialista come oggi. Qui si tiene solo il conto della merce.',
-    amministrazione: '<b>Niente dati della vista</b> (prescrizioni, gradazioni) in questa versione: solo contatti, acquisti, note e consensi.'
+    amministrazione: '' // 6/11: tolta la nota sui dati della vista (Fabrice)
   };
   function nota(id, html, cls) {
     if (S.noteNascoste[id]) return '';
@@ -437,7 +445,7 @@
       '<div class="modo-chip"><span class="k">modalità</span><span class="v">' + esc(r.modo) + '</span></div></section>';
   }
   function bandaB(cosa) {
-    return '<div class="banda-b"><span class="ico">🔒</span><div><b>' + esc(cosa) + ' · non incluso nel Piano B</b><p>Il Piano B comprende STORE // CRAFT (Creator), la Vetrina Digitale e l\'archivio clienti semplice. Questa parte si può aggiungere quando vuoi: qui la vedi com\'è, ma spenta.</p></div></div>';
+    return '<div class="banda-b"><span class="ico">＋</span><div><b>' + esc(cosa) + ' · fa parte dei moduli extra</b><p>Il piano base comprende STORE // CRAFT (Creator), la Vetrina Digitale e l\'Amministrazione con l\'archivio clienti. Questa parte si aggiunge quando vuoi.</p></div></div>';
   }
   function schedaHTML(sk, i, sz) {
     var esclusa = PB && !inBdaHash(sk.h);
@@ -449,18 +457,22 @@
     return h + '</a>';
   }
   function inBdaHash(hh) { var p = hh.split('/'); return inB(p[0], p[1] || ''); }
+  // sticker «PROVVISORIO» (6/11/2026, Fabrice): sulle sezioni Crea Cartelli e Cartellini e nelle loro pagine
+  var PROVV_SEZ = { 'sec-cartelli': 1, 'sec-cartellini': 1 };
+  var PROVV_PAG = { cartello: 1, promo: 1, 'promo-bf': 1, cartellini: 1, stanghetta: 1, supporto: 1 };
+  function stickerProvv(cls) { return '<span class="sticker-provv' + (cls ? ' ' + cls : '') + '" title="Sezione provvisoria: grafiche e modelli ancora da confermare"><i aria-hidden="true"></i>Provvisorio</span>'; }
   function sezioneHTML(sz) {
     var cls = 'carousel' + (sz.righe === 2 ? ' two-rows' : '') + (sz.cols === 3 ? ' cols3' : '');
-    var h = '<section class="section" id="' + sz.id + '"><h2 class="section-title">' + esc(sz.titolo) + (sz.coda ? '<span class="coda">' + esc(sz.coda) + '</span>' : '') + (sz.stella ? ' <span class="stella">✦</span>' : '') + (sz.nuovo ? ' <span class="nuovo">NUOVO</span>' : '') + '</h2>';
+    var h = '<section class="section" id="' + sz.id + '"><h2 class="section-title">' + esc(sz.titolo) + (sz.coda ? '<span class="coda">' + esc(sz.coda) + '</span>' : '') + (sz.stella ? ' <span class="stella">✦</span>' : '') + (sz.nuovo ? ' <span class="nuovo">NUOVO</span>' : '') + (PROVV_SEZ[sz.id] ? stickerProvv() : '') + '</h2>';
     if (sz.vetrina) h += inOndaHTML();
     h += '<div class="carousel-wrapper"><button class="carousel-arrow prev" type="button" data-act="car" data-d="-1" aria-label="Scorri a sinistra">‹</button><div class="' + cls + '">' +
-      sz.schede.map(function (sk, i) { return schedaHTML(sk, i, sz); }).join('') +
+      sz.schede.filter(function (sk) { return !PB || inBdaHash(sk.h); }).map(function (sk, i) { return schedaHTML(sk, i, sz); }).join('') +
       '</div><button class="carousel-arrow next" type="button" data-act="car" data-d="1" aria-label="Scorri a destra">›</button></div></section>';
     return h;
   }
   function inOndaHTML() {
     var V = S.vetrina, prima = V.playlist[0];
-    return '<div class="in-onda glass"><span class="led' + (V.inOnda ? '' : ' spento') + '"></span><div><b>' + (V.inOnda ? 'In onda in vetrina' : 'Vetrina spenta') + '</b><div class="piccolo muto">' + esc(V.titolo) + ' · ' + V.playlist.length + ' slide · tablet in vetrina</div></div>' +
+    return '<div class="in-onda glass"><span class="led' + (V.inOnda ? '' : ' spento') + '"></span><div><b>' + (V.inOnda ? 'In onda in vetrina' : 'Vetrina spenta') + '</b><div class="piccolo muto">' + esc(V.titolo) + ' · ' + V.playlist.length + ' slide · schermo in vetrina</div></div>' +
       '<div class="mini" data-mini>' + (prima ? (prima.k === 'img' ? '<img src="' + imgSrc(prima.src) + '" alt="">' : slideScalata(prima)) : '') + '</div><span class="sp"></span>' +
       '<a class="btn sm" href="#creator/vetrina-playlist">Playlist</a><button class="btn sm ' + (V.inOnda ? '' : 'pri') + '" type="button" data-act="vetrinaOnOff">' + (V.inOnda ? '⏸ Spegni' : '▶ Accendi') + '</button></div>';
   }
@@ -510,14 +522,13 @@
     var escl = PB;
     var h = '<section class="section" id="sec-tools"><h2 class="section-title">Utilità Cassa</h2>' + (escl && r.modo === 'cassiere' ? '' : '') + '<div class="tools-grid">';
     STRUMENTI.forEach(function (w) {
-      h += '<button class="widget glass' + (escl ? ' escluso' : '') + '" type="button" data-act="' + (escl ? 'fuoriB' : 'widget') + '" data-w="' + w.id + '"><span class="w-ic">' + w.ic + '</span><h3>' + esc(w.t) + '</h3><p>' + esc(w.id === 'bacheca' && S.bacheca[0] ? '«' + S.bacheca[0].t + '»' : w.d) + '</p><span class="w-vai">Apri</span>' + (escl ? '<span class="fuori-b">NON INCLUSO NEL PIANO B</span>' : '') + '</button>';
+      h += '<button class="widget glass' + (escl ? ' escluso' : '') + '" type="button" data-act="' + (escl ? 'fuoriB' : 'widget') + '" data-w="' + w.id + '"><span class="w-ic">' + w.ic + '</span><h3>' + esc(w.t) + '</h3><p>' + esc(w.id === 'bacheca' && S.bacheca[0] ? '«' + S.bacheca[0].t + '»' : w.d) + '</p><span class="w-vai">Apri</span>' + (escl ? '<span class="fuori-b">MODULI EXTRA</span>' : '') + '</button>';
     });
     return h + '</div></section>';
   }
 
   function dashboardHTML(r) {
-    var h = heroHTML(r) + nota('d-' + r.modo, DESCR[r.modo]);
-    if (FISCALE[r.modo]) h += '<div class="fiscale"><span>' + FISCALE[r.modo] + '</span></div>';
+    var h = heroHTML(r); // 6/11 (Fabrice): niente note di spiegazione né riquadri fiscali nelle home delle modalità
     if (riservato(r.modo)) return h + '<div class="banda-b"><span class="ico">🔑</span><div><b>Riservato al titolare</b><p>Con il profilo «Collaboratrice» questa parte è chiusa. Si cambia da MENU // IMPOSTAZIONI › PROFILO UTENTE.</p></div></div>';
     if (!modoInB(r.modo)) h += bandaB(r.modo.toUpperCase());
     if (r.modo === 'cassiere') return h + toolsHTML(r);
@@ -698,7 +709,7 @@
       campo('Quanto resta sullo schermo', 'dur', opzioni([[5, '5 secondi'], [8, '8 secondi'], [12, '12 secondi']], d.dur), 'select') + '</div>';
     p += '<div class="blocco"><p class="blocco-t">3 · In vetrina</p><div class="pulsantiera"><button class="btn" type="button" data-act="slidePlaylist">＋ Aggiungi alla playlist</button><button class="btn pri xl" type="button" data-act="slideOnda">📡 Manda in vetrina ora</button></div></div></div>';
     function ant() { return '<div class="cornice-tablet' + (vert ? ' v' : '') + '">' + foglio(vert ? 'slidev' : 'slide', vert ? 540 : 960, slideHTML(slide(), vert)) + '</div>'; }
-    return { html: testa(vert ? 'Slide verticale' : 'Slide promo', 'Vetrina digitale · ' + (vert ? 'tablet in piedi 9:16' : 'tablet 12,4"–13" · 16:10 · 2560×1600')) + inOndaHTML() + '<div class="strumento">' + p + tavolo('Come la vedono dalla strada', ant(), vert ? '9:16' : '16:9') + '</div>',
+    return { html: testa(vert ? 'Slide verticale' : 'Slide promo', 'Vetrina digitale · ' + (vert ? 'schermo verticale 21,5" · 9:16 · 1080×1920' : 'tablet 12,4"–13" · 16:10 · 2560×1600')) + inOndaHTML() + '<div class="strumento">' + p + tavolo('Come la vedono dalla strada', ant(), vert ? '9:16' : '16:9') + '</div>',
       ant: ant, slide: function () { var s = slide(); s.dur = +d.dur; return s; } };
   }
   PAG['creator/vetrina-slide'] = function () { return paginaSlide(false); };
@@ -857,11 +868,11 @@
     var d = ed({ cerca: '' });
     if (r.v === 'nuovo' && !d.aperto) { d.aperto = true; setTimeout(function () { finestraCliente(); }, 50); }
     var lista = S.clienti.filter(function (c) { return !d.cerca || (c.nome + ' ' + c.tel + ' ' + c.email).toLowerCase().indexOf(d.cerca.toLowerCase()) >= 0; });
-    var h = testa('Archivio clienti', 'Amministrazione' + (PB ? ' · versione semplice (Piano B)' : '')) + '<div class="fiscale"><span>' + FISCALE.amministrazione + '</span></div>' +
+    var h = testa('Archivio clienti', 'Amministrazione') +
       '<div class="card glass" style="margin-top:16px"><div class="cerca"><input class="inp" type="search" data-f="cerca" data-rr value="' + esc(d.cerca) + '" placeholder="Cerchi nome, telefono o e-mail…"><button class="btn pri" type="button" data-act="nuovoCliente">＋ Nuovo cliente</button></div><div class="lista-righe">' +
       lista.map(function (c) { var acq = S.acquisti[c.id] || [];
         return '<a class="cliente-riga" href="#amministrazione/cliente/' + c.id + '"><span class="avatar">' + iniziali(c.nome) + '</span><span class="t"><b>' + esc(c.nome) + '</b><span>' + esc(c.tel) + (c.email ? ' · ' + esc(c.email) : '') + '</span></span>' +
-          (acq[0] ? '<span class="piccolo muto" style="text-align:right">ultimo acquisto<br><b>' + acq[0][0] + '</b></span>' : '') + (!PB ? '<span class="stato ' + (c.mkt ? 'ok' : 'att') + '">' + (c.mkt ? 'novità sì' : 'novità no') + '</span>' : '') + '</a>'; }).join('') + '</div>' + (lista.length ? '' : '<div class="vuoto">Nessun cliente trovato.</div>') + '</div>';
+          (acq[0] ? '<span class="piccolo muto" style="text-align:right">ultimo acquisto<br><b>' + acq[0][0] + '</b></span>' : '') + (true ? '<span class="stato ' + (c.mkt ? 'ok' : 'att') + '">' + (c.mkt ? 'novità sì' : 'novità no') + '</span>' : '') + '</a>'; }).join('') + '</div>' + (lista.length ? '' : '<div class="vuoto">Nessun cliente trovato.</div>') + '</div>';
     return { html: h };
   };
   PAG['amministrazione/cliente'] = function (r) {
@@ -872,7 +883,7 @@
     var sx = '<div class="pannello glass"><div style="display:flex;gap:14px;align-items:center"><span class="avatar" style="width:64px;height:64px;font-size:24px">' + iniziali(c.nome) + '</span><div><h2>' + esc(c.nome) + '</h2><span class="muto">cliente ' + esc(c.cliente) + '</span></div></div>' +
       '<div class="blocco" style="margin-top:12px"><p class="blocco-t">Contatti</p><p style="margin:4px 0">📞 ' + esc(c.tel) + '</p>' + (c.email ? '<p style="margin:4px 0">✉️ ' + esc(c.email) + '</p>' : '') + '<p style="margin:4px 0">🎂 ' + esc(c.comp) + '</p>' +
       '<div class="riga-btn" style="margin-top:10px"><a class="btn sm" href="tel:' + esc(c.tel.replace(/\s/g, '')) + '">📞 Chiama</a><button class="btn sm pri" type="button" data-act="msgPronti" data-id="' + c.id + '">💬 Occhiali pronti</button></div></div>';
-    if (!PB) sx += '<div class="blocco"><p class="blocco-t">Privacy</p><p style="margin:4px 0"><span class="stato ok">✓ informativa firmata</span> il ' + esc(c.privacy) + '</p>' +
+    sx += '<div class="blocco"><p class="blocco-t">Privacy</p><p style="margin:4px 0"><span class="stato ok">✓ informativa firmata</span> il ' + esc(c.privacy) + '</p>' +
       '<label class="interruttore"><span>Vuole ricevere le novità<br><span class="piccolo muto">newsletter e promozioni</span></span><input type="checkbox" data-act="mkt" data-id="' + c.id + '"' + (c.mkt ? ' checked' : '') + '></label></div>';
     sx += '<p class="piccolo muto">' + FISCALE.amministrazione.replace(/<[^>]+>/g, '') + '</p></div>';
     var dx = '<div class="pila"><div class="card glass"><h2>Acquisti · ' + eur0(tot) + '</h2>' + (acq.length ? '<div class="storico">' + acq.map(function (a) { return '<div><span class="d">' + a[0] + '</span><span>' + esc(a[1]) + '</span><span class="mono">' + eur(a[2]) + '</span></div>'; }).join('') + '</div>' : '<div class="vuoto">Nessun acquisto registrato.</div>') + '</div>' +
@@ -1006,6 +1017,7 @@
     if (!r.pagina) corpo = dashboardHTML(r);
     else if (!inB(r.modo, r.pagina) || riservato(r.modo)) { corrente = nonIncluso(r); corpo = riservato(r.modo) ? testa('Riservato', r.modo) + dashboardHTML(r) : corrente.html; }
     else { var f = PAG[r.modo + '/' + r.pagina]; corrente = f ? f(r) : { html: testa('Pagina', r.modo) + '<div class="vuoto">Pagina non trovata.</div>' }; corpo = corrente.html; }
+    if (r.modo === 'creator' && PROVV_PAG[r.pagina]) corpo = corpo.replace('<div class="pag-testa">', '<div class="pag-testa">' + stickerProvv('in-pagina'));
     $('#main').innerHTML = testataHTML(r) + corpo + footerHTML();
     orologio(); banner(); adatta(); frecce();
     if (window.CLONE_SC) { try { window.CLONE_SC.dopo(); } catch (e) { if (window.console) console.warn('clone dopo', e); } }
@@ -1164,7 +1176,7 @@
   }
   function finestraCliente() {
     finestra('<h2>Nuovo cliente</h2><label class="campo"><span>Nome e cognome</span><input class="inp" id="nc1"></label><label class="campo"><span>Telefono</span><input class="inp" id="nc2" inputmode="tel"></label><label class="campo"><span>E-mail (facoltativa)</span><input class="inp" id="nc3" inputmode="email"></label>' +
-      (PB ? '' : '<label class="interruttore"><span>Ha firmato l\'informativa privacy</span><input type="checkbox" id="nc4" checked></label><label class="interruttore"><span>Vuole ricevere le novità</span><input type="checkbox" id="nc5"></label>') +
+      ('<label class="interruttore"><span>Ha firmato l\'informativa privacy</span><input type="checkbox" id="nc4" checked></label><label class="interruttore"><span>Vuole ricevere le novità</span><input type="checkbox" id="nc5"></label>') +
       '<div class="pulsantiera"><button class="btn pri xl" type="button" data-act="salvaCliente">💾 Salva cliente</button></div>');
     setTimeout(function () { var e = $('#nc1'); if (e) e.focus(); }, 30);
   }
@@ -1226,7 +1238,7 @@
     su: function () { window.scrollTo({ top: 0, behavior: 'smooth' }); },
     nascondi: function (el) { S.noteNascoste[el.dataset.n] = 1; el.parentElement.remove(); },
     car: function (el) { var c = $('.carousel', el.parentElement); c.scrollBy({ left: +el.dataset.d * c.clientWidth * 0.9, behavior: 'smooth' }); },
-    fuoriB: function (el, ev) { ev.preventDefault(); toast('Non incluso nel Piano B: si aggiunge quando vuoi'); },
+    fuoriB: function (el, ev) { ev.preventDefault(); toast('Fa parte dei moduli extra: si aggiunge quando vuoi'); },
     widget: function (el) { widget(el.dataset.w); menu(false); },
     wset: function (el) { var i = $('#' + el.dataset.id); i.value = el.dataset.val; i.dispatchEvent(new Event('input')); },
     stampaQr: function () { stampaSim('Codice QR', 1, 'stampante dell\'ufficio'); },
@@ -1248,15 +1260,15 @@
     togliLogo: function (el) { S.loghi.splice(+el.dataset.i, 1); render(); },
     slidePlaylist: function () { if (!corrente || !corrente.slide) return; S.vetrina.playlist.push(corrente.slide()); toast('Aggiunta alla playlist (' + S.vetrina.playlist.length + ' slide)'); render(); },
     slideOnda: function () { if (!corrente || !corrente.slide) return; var s = corrente.slide(); S.vetrina.playlist.unshift(s);
-      lavora('Mando in vetrina', ['Preparo la slide…', 'Invio al tablet in vetrina…', 'Il tablet conferma…'], ['In vetrina!', 'La slide «' + esc(s.nome || '') + '» è in onda adesso e poi riparte il giro.'], function () { S.vetrina.inOnda = true; S.vetrina.titolo = 'Playlist di Aldo'; setTimeout(render, 50); }); },
+      lavora('Mando in vetrina', ['Preparo la slide…', 'Invio allo schermo in vetrina…', 'Lo schermo conferma…'], ['In vetrina!', 'La slide «' + esc(s.nome || '') + '» è in onda adesso e poi riparte il giro.'], function () { S.vetrina.inOnda = true; S.vetrina.titolo = 'Playlist di Aldo'; setTimeout(render, 50); }); },
     usaLoop: function () { var l = corrente.loop(); S.vetrina.playlist = l.slice(); S.vetrina.titolo = 'Loop Black Friday';
-      lavora('Mando in vetrina', ['Carico ' + l.length + ' slide…', 'Invio al tablet in vetrina…', 'Avvio il giro…'], ['Loop in onda', l.length + ' slide Black Friday in vetrina, a giro continuo.'], function () { S.vetrina.inOnda = true; setTimeout(render, 50); }); },
+      lavora('Mando in vetrina', ['Carico ' + l.length + ' slide…', 'Invio allo schermo in vetrina…', 'Avvio il giro…'], ['Loop in onda', l.length + ' slide Black Friday in vetrina, a giro continuo.'], function () { S.vetrina.inOnda = true; setTimeout(render, 50); }); },
     strada: function (el) { S.vetrina.strada = el.dataset.val === 'app' ? 'app' : 'sc'; render(); },
     esportaMp4: function (el) { var n = S.vetrina.playlist.length, usb = el && el.dataset.usb;
       lavora('Esporto il video', ['Preparo ' + n + ' slide…', 'Monto il video (' + (n * 8) + ' secondi)…', 'Salvo il file MP4…'], ['Video pronto', 'loop-vetrina.mp4 · ' + n + ' slide.<br>' + (usb ? 'Copialo sulla chiavetta USB e infilala nello schermo.' : 'Ora caricalo nell\'app dello schermo.') + '<br><span class="piccolo">(demo: nessun file scaricato)</span>']); },
     scaricaSlide: function () { var n = S.vetrina.playlist.length;
       lavora('Preparo le slide', ['Salvo ' + n + ' immagini…', 'Le metto in una cartella…'], ['Slide pronte', n + ' immagini nella cartella «vetrina».<br>Caricale nell\'app dello schermo.<br><span class="piccolo">(demo: nessun file scaricato)</span>']); },
-    mandaPlaylist: function () { lavora('Mando in vetrina', ['Preparo ' + S.vetrina.playlist.length + ' slide…', 'Invio al tablet in vetrina…'], ['Playlist in onda', 'Lo schermo in vetrina si aggiorna da solo.'], function () { var o = new Date(); S.vetrina.agg = 'oggi, ' + o.getHours() + ':' + ('0' + o.getMinutes()).slice(-2); S.vetrina.inOnda = true; S.vetrina.titolo = 'Playlist di Aldo'; setTimeout(render, 50); }); },
+    mandaPlaylist: function () { lavora('Mando in vetrina', ['Preparo ' + S.vetrina.playlist.length + ' slide…', 'Invio allo schermo in vetrina…'], ['Playlist in onda', 'Lo schermo in vetrina si aggiorna da solo.'], function () { var o = new Date(); S.vetrina.agg = 'oggi, ' + o.getHours() + ':' + ('0' + o.getMinutes()).slice(-2); S.vetrina.inOnda = true; S.vetrina.titolo = 'Playlist di Aldo'; setTimeout(render, 50); }); },
     plSu: function (el) { var i = +el.dataset.i, p = S.vetrina.playlist; if (i > 0) { p.splice(i - 1, 0, p.splice(i, 1)[0]); render(); } },
     plGiu: function (el) { var i = +el.dataset.i, p = S.vetrina.playlist; if (i < p.length - 1) { p.splice(i + 1, 0, p.splice(i, 1)[0]); render(); } },
     plVia: function (el) { S.vetrina.playlist.splice(+el.dataset.i, 1); render(); },
@@ -1380,7 +1392,7 @@
   });
 
   /* =====================================================================
-     BARRA DEMO: viste desktop / tablet / telefono e Piano A / B (come la v1)
+     BARRA DEMO: viste desktop / tablet / telefono e Piano base / Moduli extra
      ===================================================================== */
   VISTA = 'desktop'; var ORIZ = false;
   function setVista(v) {
@@ -1390,7 +1402,7 @@
     document.body.classList.toggle('devmode', v !== 'desktop');
     if (v === 'desktop') { $('#stage').innerHTML = ''; S = caricaStato() || S; render(); return; }
     var w = v === 'phone' ? 390 : (ORIZ ? 1180 : 820), h = v === 'phone' ? 844 : (ORIZ ? 820 : 1180);
-    $('#stage').innerHTML = '<div class="devwrap"><div class="device ' + (v === 'phone' ? 'phone' : 'tablet') + '"><iframe id="devframe" title="Anteprima app" width="' + w + '" height="' + h + '" src="demo-app-v2.html?embed' + (PB ? '&piano=b' : '') + (location.hash || '#creator') + '"></iframe></div><div class="devlabel">' + (v === 'phone' ? 'TELEFONO · 390×844' : 'TABLET · ' + w + '×' + h) + '</div></div>';
+    $('#stage').innerHTML = '<div class="devwrap"><div class="device ' + (v === 'phone' ? 'phone' : 'tablet') + '"><iframe id="devframe" title="Anteprima app" width="' + w + '" height="' + h + '" src="demo-app-v2.html?embed' + (PB ? '' : '&piano=extra') + (location.hash || '#creator') + '"></iframe></div><div class="devlabel">' + (v === 'phone' ? 'TELEFONO · 390×844' : 'TABLET · ' + w + '×' + h) + '</div></div>';
     fitDevice();
   }
   function fitDevice() {
@@ -1411,9 +1423,9 @@
     $$('#demobar [data-v]').forEach(function (b) { b.onclick = function () { setVista(b.dataset.v); }; });
     $('#ruota').onclick = function () { ORIZ = !ORIZ; setVista('tablet'); };
     $$('#demobar [data-p]').forEach(function (b) {
-      b.classList.toggle('on', (b.dataset.p === 'b') === PB);
+      b.classList.toggle('on', (b.dataset.p === 'base') === PB);
       b.onclick = function () {
-        var u = new URLSearchParams(); if (b.dataset.p === 'b') u.set('piano', 'b');
+        var u = new URLSearchParams(); if (b.dataset.p === 'extra') u.set('piano', 'extra');
         if (VISTA !== 'desktop') u.set('vista', VISTA === 'phone' ? 'telefono' : 'tablet'); if (VISTA === 'tablet' && ORIZ) u.set('orizzontale', '1');
         var qs = u.toString(); location.href = location.pathname + (qs ? '?' + qs : '') + (location.hash || '');
       };

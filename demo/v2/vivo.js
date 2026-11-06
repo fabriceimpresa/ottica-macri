@@ -130,7 +130,7 @@
   }
   function saluto(d) { var h = d.getHours(); return h < 5 ? 'Buonasera' : h < 13 ? 'Buongiorno' : h < 18 ? 'Buon pomeriggio' : 'Buonasera'; }
   var CONSIGLI = {
-    creator: ['Tocca un riquadro: scrivi il testo e l\'anteprima si aggiorna da sola.', 'Con «＋ Aggiungi a lista stampa» prepari più fogli e li stampi tutti insieme.', 'La vetrina digitale gira da sola: scegli le slide e il tablet le manda in onda.', 'Le promo stagionali sono già pronte: basta cambiare il prezzo.'],
+    creator: ['Tocca un riquadro: scrivi il testo e l\'anteprima si aggiorna da sola.', 'Con «＋ Aggiungi a lista stampa» prepari più fogli e li stampi tutti insieme.', 'La vetrina digitale gira da sola: scegli le slide e lo schermo le manda in onda.', 'Le promo stagionali sono già pronte: basta cambiare il prezzo.'],
     cassiere: ['Calcola Sconto: scrivi il prezzo pieno e tocca 20%. Al resto pensa l\'app.', 'Il QR della pagina Facebook si stampa e si lascia sul banco.', 'La bacheca è il foglietto per chi è al banco: si legge appena si apre.'],
     gestionale: ['Col lettore di codici basta un «bip» per caricare un paio.', 'Gli articoli in rosso sono da riordinare: l\'app se lo ricorda per te.', 'Le etichette DYMO escono già col prezzo giusto dal magazzino.'],
     amministrazione: ['Per un cliente nuovo bastano nome e telefono.', 'Il consenso alle novità serve per la newsletter: l\'app lo tiene in ordine.', 'Il profilo «Collaboratrice» vede solo le parti del banco.'],
@@ -144,7 +144,7 @@
     var ng = negozioOra(d), V = S && S.vetrina, it = [];
     if (V) it.push('<a class="vb-st ' + (V.inOnda ? 'onda' : 'spento') + '" href="#creator/vetrina-playlist"><i class="pall"></i><b>Vetrina</b><span>' + (V.inOnda ? 'in onda · ' + V.playlist.length + ' slide' : 'spenta') + '</span></a>');
     it.push('<span class="vb-st ok"><i class="pall"></i><b>Stampante</b><span>pronta · A4</span></span>');
-    if (!PB) it.push('<span class="vb-st ok"><i class="pall"></i><b>DYMO 450</b><span>pronta</span></span>');
+    it.push('<span class="vb-st ok"><i class="pall"></i><b>DYMO 450</b><span>pronta</span></span>');
     if (S && !PB) {
       var ss = S.art.filter(function (a) { return a.giac <= a.min && a.cat !== 'lenti'; }).length;
       it.push('<a class="vb-st ' + (ss ? 'warn' : 'ok') + '" href="#gestionale/magazzino/scorta"><i class="pall"></i><b>Magazzino</b><span>' + (ss ? ss + ' da riordinare' : 'tutto in ordine') + '</span></a>');
@@ -253,7 +253,7 @@
     [/pubblicat/i, 'Fra qualche ora guarda come va nel Calendario del Promoter.'],
     [/programmat/i, 'Esce da solo all\'ora giusta: puoi chiudere l\'app tranquillo.'],
     [/newsletter/i, 'Le aperture arrivano da sole in «Storico invii».'],
-    [/vetrina|in onda/i, 'Il tablet in vetrina lo mostra già: puoi guardarlo dal marciapiede.'],
+    [/vetrina|in onda/i, 'Lo schermo in vetrina lo mostra già: puoi guardarlo dal marciapiede.'],
     [/vendita/i, 'Il magazzino si è aggiornato da solo: un pezzo in meno.'],
     [/inventario/i, 'Le differenze sono salvate: il magazzino adesso è giusto.'],
     [/proposte|grafica/i, 'Scegline una: si può sempre cambiare il testo dopo.']
