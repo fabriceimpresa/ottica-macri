@@ -1,0 +1,229 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Marchi Ottica Macrì</title>
+<link rel="icon" href="../../../macri.ico">
+<style>
+:root{--carta:#F4EEE3;--fondo:#efe6d6;--card:#fffaf2;--linea:#d8c9b3;--testo:#2a1d12;--tenue:#6b5a48;--rosso:#C63D2F;--mattone:#b5462c;--blu:#1f4e79;--nero:#161413}
+*{box-sizing:border-box}
+body{background:var(--fondo);margin:0;font-family:system-ui,'Segoe UI',sans-serif;color:var(--testo)}
+header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:18px 22px;flex-wrap:wrap}
+header h1{margin:0;font-size:24px;letter-spacing:2px;text-transform:uppercase}
+header p{margin:6px 0 0;color:var(--tenue);max-width:820px;line-height:1.45}
+header nav{display:flex;gap:8px;flex-wrap:wrap}
+header a{color:var(--mattone);font-weight:700;text-decoration:none;border:1px solid var(--mattone);padding:8px 14px;background:var(--card)}
+.nota{margin:0 22px 16px;padding:12px 16px;background:var(--card);border-left:4px solid var(--blu);line-height:1.5;max-width:1100px}
+.nota ul{margin:6px 0 0;padding-left:20px}
+.indice{display:flex;gap:8px;flex-wrap:wrap;margin:0 22px 20px}
+.indice a{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--linea);padding:6px 12px 6px 6px;color:var(--testo);text-decoration:none;font-weight:600;font-size:14px}
+.indice img{width:32px;height:32px}
+.indice a.cons{border-color:var(--rosso)}
+.tav{margin:0 22px 28px;background:var(--card);border:1px solid var(--linea);box-shadow:0 12px 28px -20px rgba(60,40,20,.55)}
+.tav>h2{margin:0;padding:16px 20px;font-size:20px;letter-spacing:.5px;border-bottom:1px solid var(--linea);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.tav>h2 .num{color:var(--rosso);font:700 13px/1 system-ui,sans-serif;letter-spacing:2px}
+.tav>h2 .badge{background:var(--rosso);color:#fff;font:700 11px/1 system-ui,sans-serif;letter-spacing:1.5px;padding:6px 9px;text-transform:uppercase}
+.su{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:0}
+.princ{background:var(--carta);display:flex;align-items:center;justify-content:center;padding:42px;min-height:340px;border-right:1px solid var(--linea)}
+.princ img{max-width:100%;max-height:380px}
+.princ.largo img{width:92%}
+.testo{padding:18px 20px;line-height:1.5;font-size:15px}
+.testo h3{margin:14px 0 4px;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--tenue)}
+.testo h3:first-child{margin-top:0}
+.testo p{margin:0}
+.sw{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--tenue)}
+.sw i{display:inline-block;width:18px;height:18px;border:1px solid rgba(0,0,0,.15);vertical-align:middle;margin-right:4px}
+.icone{display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap}
+.icone figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;color:var(--tenue)}
+.icone .q{background:#fff;border:1px solid #e3d6c2;padding:8px;display:flex;align-items:center;justify-content:center}
+.icone .q.sc{background:var(--rosso);border-color:var(--rosso)}
+.icone .q.tab{background:#fff;border-radius:6px;padding:4px 10px 4px 6px;gap:6px;font-size:12px;color:#333;border:1px solid #ccc}
+.sez{padding:14px 20px 4px;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--tenue);border-top:1px solid var(--linea)}
+.var{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;padding:8px 20px 18px}
+.var figure{margin:0}
+.var .q{aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;padding:14px;border:1px solid #e3d6c2}
+.var .q img{max-width:100%;max-height:100%}
+.var figcaption{font-size:12px;color:var(--tenue);margin-top:5px}
+.app{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:16px;padding:8px 20px 20px;align-items:start}
+.notte{background:radial-gradient(ellipse at 50% 0%,#2b2421 0%,#120f0e 70%);padding:26px 22px 0;border-radius:2px;overflow:hidden}
+.fascia{background:linear-gradient(#141110,#0b0909);border:1px solid #2c2522;border-width:6px 0;height:150px;display:flex;align-items:center;justify-content:center;box-shadow:0 18px 30px -12px rgba(0,0,0,.9)}
+.fascia img{max-height:84%;max-width:86%;filter:drop-shadow(0 0 3px rgba(255,140,110,.55)) drop-shadow(0 0 16px rgba(198,61,47,.45))}
+.muro{display:flex;gap:12px;align-items:flex-start;margin-top:14px}
+.vetrina{flex:1;height:120px;background:linear-gradient(180deg,rgba(255,214,150,.30),rgba(255,190,120,.10) 60%,rgba(0,0,0,.2));border:6px solid #1d1817;border-bottom:0;position:relative}
+.vetrina:after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 31%,#1d1817 31% 32.5%)}
+.bandiera{width:150px;height:150px;border-radius:50%;background:#0d0b0a;border:5px solid #2c2522;display:flex;align-items:center;justify-content:center;box-shadow:0 14px 26px -10px rgba(0,0,0,.9);flex:0 0 auto;margin-top:-6px}
+.bandiera img{width:86%;filter:drop-shadow(0 0 3px rgba(255,140,110,.55)) drop-shadow(0 0 12px rgba(198,61,47,.45))}
+.braccio{height:6px;background:#2c2522;width:34px;margin-top:62px;flex:0 0 auto}
+.cap{font-size:12px;color:var(--tenue);margin-top:6px}
+.biglietti{display:flex;flex-direction:column;gap:12px}
+.bv{width:100%;max-width:360px;aspect-ratio:85/55;box-shadow:0 10px 22px -12px rgba(40,25,10,.6);display:flex;align-items:center;justify-content:center;position:relative}
+.bv.f{background:var(--carta)}
+.bv.f img{max-width:72%;max-height:62%}
+.bv.r{background:var(--rosso);color:#fff;align-items:flex-start;justify-content:flex-start;flex-direction:column;padding:7% 8%;gap:3px}
+.bv.r img{position:absolute;right:7%;top:12%;width:19%}
+.bv.r .n{font-size:20px;letter-spacing:1px}
+.bv.r .m{font-size:12px;letter-spacing:2.5px;text-transform:uppercase;opacity:.92;margin-bottom:auto}
+.bv.r .d{font-size:12px;line-height:1.5;letter-spacing:.3px}
+.file{padding:0 20px 18px;font-size:13px;color:var(--tenue);line-height:1.7}
+.file a{color:var(--blu)}
+@media(max-width:860px){.su{grid-template-columns:1fr}.princ{border-right:0;border-bottom:1px solid var(--linea);padding:24px}.app{grid-template-columns:1fr}.var{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:420px){header{padding:16px}.tav,.nota,.indice{margin-left:12px;margin-right:12px}}
+</style></head><body>
+<header><div><h1>Il marchio · 6 concetti</h1>
+<p>Sei proposte curate come in uno studio, fatte solo con ciò che si può rendere impeccabile: il draghetto vero (restauro B) trasformato con operazioni esatte, geometria costruita e caratteri scelti con cura. Nessun personaggio disegnato a mano.</p></div>
+<nav><a href="../index.html">← Pagina del logo</a><a href="../../../index.html">☰ Menu</a></nav></header>
+<div class="nota"><b>Come sono fatti (uso interno, per Fabrice).</b>
+<ul>
+<li><b>Equilibrio simbolo/scritta:</b> la scritta è larga quanto o più del simbolo, il simbolo è il punto d'ingresso; un solo carattere per marchio (al massimo due pesi).</li>
+<li><b>Pesi coerenti:</b> il tratto del draghetto è ingrossato per stare con la scritta; i fili sottili (lente, filetti, stanghetta) hanno lo stesso spessore.</li>
+<li><b>Spazio di rispetto:</b> intorno al marchio almeno l'altezza della M di MACRÌ. Gli SVG hanno già un piccolo margine.</li>
+<li><b>Crenatura:</b> coppie del carattere + correzioni ottiche a mano (TT, CA, MA); le scritte sono convertite in tracciati, quindi gli SVG non dipendono dai font installati.</li>
+<li><b>Colori:</b> rosso #C63D2F e nero #161413 del draghetto storico, carta #F4EEE3. Ogni concetto ha 2 colori, 1 colore (rosso o nero), negativo su rosso e versione per il buio.</li>
+<li><b>Consigliati:</b> <a href="#06-ovale">06 Ovale da bottega</a> (il draghetto vero, più calore e «bottega») e <a href="#04-monocolo">04 Monocolo OM</a> (il più pulito e moderno, icona perfetta). Si possono usare insieme: l'ovale per insegna e carta, la lente OM per icone e app.</li>
+</ul></div>
+<nav class="indice"><a href="#01-tratto-pieno"><img src="01-tratto-pieno/01-tratto-pieno-icona-colori.svg" alt="">01 · Il draghetto a tratto pieno</a><a href="#02-negativo"><img src="02-negativo/02-negativo-icona-colori.svg" alt="">02 · Il draghetto in negativo</a><a href="#03-sigillo"><img src="03-sigillo/03-sigillo-icona-colori.svg" alt="">03 · Sigillo di bottega</a><a href="#04-monocolo" class="cons"><img src="04-monocolo/04-monocolo-icona-colori.svg" alt="">04 · Monocolo OM ★</a><a href="#05-scritta-occhiale"><img src="05-scritta-occhiale/05-scritta-occhiale-icona-colori.svg" alt="">05 · Scritta-occhiale</a><a href="#06-ovale" class="cons"><img src="06-ovale/06-ovale-icona-colori.svg" alt="">06 · Ovale da bottega ★</a></nav>
+
+<section class="tav" id="01-tratto-pieno">
+<h2><span class="num">CONCETTO 01</span>Il draghetto a tratto pieno</h2>
+<div class="su">
+  <div class="princ"><img src="01-tratto-pieno/01-tratto-pieno-colori.svg" alt="Il draghetto a tratto pieno — versione principale"></div>
+  <div class="testo">
+    <h3>L'idea</h3><p>Il disegno vero del draghetto (restauro B), con il tratto ingrossato in modo esatto (+4 per lato) e un filetto di stacco tra occhiali e corpo. Sotto, la scritta in Bodoni: MACRÌ grande, OTTICA spaziata.</p>
+    <h3>Perché funziona</h3><p>Tiene il segno che i clienti conoscono da anni, ma pulito e più robusto. Il nero degli occhiali torna nella scritta: due colori, un solo sistema. Per le icone c&#x27;è un taglio apposta, con il tratto ancora più pieno.</p>
+    <h3>Caratteri e colori</h3><p>Bodoni MT (MACRÌ spaziatura 0,04 em · OTTICA 0,50 em)</p>
+    <p class="sw" style="margin-top:6px"><span><i style="background:#C63D2F"></i>rosso #C63D2F</span><span><i style="background:#161413"></i>nero #161413</span><span><i style="background:#F4EEE3"></i>carta #F4EEE3</span></p>
+    <h3>Icona: prova a misura vera</h3>
+    <div class="icone">
+      <figure><div class="q"><img src="01-tratto-pieno/01-tratto-pieno-icona-colori.svg" width="48" height="48" alt=""></div>48 px</figure>
+      <figure><div class="q"><img src="01-tratto-pieno/01-tratto-pieno-icona-colori.svg" width="24" height="24" alt=""></div>24 px</figure>
+      <figure><div class="q sc"><img src="01-tratto-pieno/01-tratto-pieno-icona-negativo.svg" width="48" height="48" alt=""></div>negativo</figure>
+      <figure><div class="q tab"><img src="01-tratto-pieno/01-tratto-pieno-icona-colori.svg" width="16" height="16" alt="">Ottica Macrì</div>scheda del browser</figure>
+    </div>
+  </div>
+</div>
+<div class="sez">Positivo e negativo · 1 e 2 colori</div>
+<div class="var"><figure><div class="q" style="background:var(--carta)"><img src="01-tratto-pieno/01-tratto-pieno-colori.svg" alt="2 colori"></div><figcaption>2 colori</figcaption></figure><figure><div class="q" style="background:#fff"><img src="01-tratto-pieno/01-tratto-pieno-rosso.svg" alt="1 colore rosso"></div><figcaption>1 colore rosso</figcaption></figure><figure><div class="q" style="background:#fff"><img src="01-tratto-pieno/01-tratto-pieno-nero.svg" alt="1 colore nero"></div><figcaption>1 colore nero</figcaption></figure><figure><div class="q" style="background:#C63D2F"><img src="01-tratto-pieno/01-tratto-pieno-negativo.svg" alt="negativo su rosso"></div><figcaption>negativo su rosso</figcaption></figure><figure><div class="q" style="background:#161413"><img src="01-tratto-pieno/01-tratto-pieno-notte.svg" alt="2 colori su scuro"></div><figcaption>2 colori su scuro</figcaption></figure></div>
+<div class="sez">Applicazioni</div>
+<div class="app"><div><div class="notte"><div class="fascia"><img src="01-tratto-pieno/01-tratto-pieno-notte.svg" alt=""></div><div class="muro"><div class="vetrina"></div></div></div><div class="cap">Insegna in fascia sopra la vetrina, di notte (lettere retroilluminate).</div></div><div class="biglietti"><div class="bv f"><img src="01-tratto-pieno/01-tratto-pieno-colori.svg" alt=""></div><div class="bv r" style="font-family:'Bodoni MT','Bodoni 72',Didot,serif"><span class="n">Aldo Macrì</span><span class="m">Ottica Macrì</span><span class="d">Via Poggi d’Oro 23 · 00179 Roma<br>06 7834 6705</span><img src="01-tratto-pieno/01-tratto-pieno-icona-negativo.svg" alt=""></div><div class="cap">Biglietto da visita 85 × 55 mm: fronte e retro.</div></div></div>
+<div class="file">File: <a href="01-tratto-pieno/01-tratto-pieno-colori.svg">colori</a> · <a href="01-tratto-pieno/01-tratto-pieno-rosso.svg">rosso</a> · <a href="01-tratto-pieno/01-tratto-pieno-nero.svg">nero</a> · <a href="01-tratto-pieno/01-tratto-pieno-negativo.svg">negativo</a> · <a href="01-tratto-pieno/01-tratto-pieno-notte.svg">notte</a> · icona: <a href="01-tratto-pieno/01-tratto-pieno-icona-colori.svg">svg</a>, <a href="01-tratto-pieno/png/01-tratto-pieno-icona-colori-512.png">png 512</a> · PNG 1000/2000 trasparenti nella cartella <a href="01-tratto-pieno/png/">01-tratto-pieno/png/</a></div>
+</section>
+<section class="tav" id="02-negativo">
+<h2><span class="num">CONCETTO 02</span>Il draghetto in negativo</h2>
+<div class="su">
+  <div class="princ largo"><img src="02-negativo/02-negativo-colori.svg" alt="Il draghetto in negativo — versione principale"></div>
+  <div class="testo">
+    <h3>L'idea</h3><p>La sagoma piena del draghetto meno il disegno: le linee diventano tagli e gli occhiali diventano lenti scure. Accanto, Gill Sans: MACRÌ neretto, OTTICA giustificata alla stessa larghezza.</p>
+    <h3>Perché funziona</h3><p>Una forma piena si riconosce da lontano e regge su adesivi, stoffa, sacchetti, ricamo. È il draghetto vero (nessun tratto inventato), solo «stampato al contrario» come una xilografia.</p>
+    <h3>Caratteri e colori</h3><p>Gill Sans MT neretto e normale</p>
+    <p class="sw" style="margin-top:6px"><span><i style="background:#C63D2F"></i>rosso #C63D2F</span><span><i style="background:#161413"></i>nero #161413</span><span><i style="background:#F4EEE3"></i>carta #F4EEE3</span></p>
+    <h3>Icona: prova a misura vera</h3>
+    <div class="icone">
+      <figure><div class="q"><img src="02-negativo/02-negativo-icona-colori.svg" width="48" height="48" alt=""></div>48 px</figure>
+      <figure><div class="q"><img src="02-negativo/02-negativo-icona-colori.svg" width="24" height="24" alt=""></div>24 px</figure>
+      <figure><div class="q sc"><img src="02-negativo/02-negativo-icona-negativo.svg" width="48" height="48" alt=""></div>negativo</figure>
+      <figure><div class="q tab"><img src="02-negativo/02-negativo-icona-colori.svg" width="16" height="16" alt="">Ottica Macrì</div>scheda del browser</figure>
+    </div>
+  </div>
+</div>
+<div class="sez">Positivo e negativo · 1 e 2 colori</div>
+<div class="var"><figure><div class="q" style="background:var(--carta)"><img src="02-negativo/02-negativo-colori.svg" alt="2 colori"></div><figcaption>2 colori</figcaption></figure><figure><div class="q" style="background:#fff"><img src="02-negativo/02-negativo-rosso.svg" alt="1 colore rosso"></div><figcaption>1 colore rosso</figcaption></figure><figure><div class="q" style="background:#fff"><img src="02-negativo/02-negativo-nero.svg" alt="1 colore nero"></div><figcaption>1 colore nero</figcaption></figure><figure><div class="q" style="background:#C63D2F"><img src="02-negativo/02-negativo-negativo.svg" alt="negativo su rosso"></div><figcaption>negativo su rosso</figcaption></figure><figure><div class="q" style="background:#161413"><img src="02-negativo/02-negativo-notte.svg" alt="2 colori su scuro"></div><figcaption>2 colori su scuro</figcaption></figure></div>
+<div class="sez">Applicazioni</div>
+<div class="app"><div><div class="notte"><div class="fascia"><img src="02-negativo/02-negativo-notte.svg" alt=""></div><div class="muro"><div class="vetrina"></div></div></div><div class="cap">Insegna in fascia sopra la vetrina, di notte (lettere retroilluminate).</div></div><div class="biglietti"><div class="bv f"><img src="02-negativo/02-negativo-colori.svg" alt=""></div><div class="bv r" style="font-family:'Gill Sans MT','Gill Sans',Calibri,sans-serif"><span class="n">Aldo Macrì</span><span class="m">Ottica Macrì</span><span class="d">Via Poggi d’Oro 23 · 00179 Roma<br>06 7834 6705</span><img src="02-negativo/02-negativo-icona-negativo.svg" alt=""></div><div class="cap">Biglietto da visita 85 × 55 mm: fronte e retro.</div></div></div>
+<div class="file">File: <a href="02-negativo/02-negativo-colori.svg">colori</a> · <a href="02-negativo/02-negativo-rosso.svg">rosso</a> · <a href="02-negativo/02-negativo-nero.svg">nero</a> · <a href="02-negativo/02-negativo-negativo.svg">negativo</a> · <a href="02-negativo/02-negativo-notte.svg">notte</a> · icona: <a href="02-negativo/02-negativo-icona-colori.svg">svg</a>, <a href="02-negativo/png/02-negativo-icona-colori-512.png">png 512</a> · PNG 1000/2000 trasparenti nella cartella <a href="02-negativo/png/">02-negativo/png/</a></div>
+</section>
+<section class="tav" id="03-sigillo">
+<h2><span class="num">CONCETTO 03</span>Sigillo di bottega</h2>
+<div class="su">
+  <div class="princ"><img src="03-sigillo/03-sigillo-colori.svg" alt="Sigillo di bottega — versione principale"></div>
+  <div class="testo">
+    <h3>L'idea</h3><p>Sigillo tondo: anello pieno e filo sottile, OTTICA MACRÌ e ROMA in Gill Sans neretto lungo il cerchio, rombi a ore 3 e 9, il draghetto a tratto pieno al centro.</p>
+    <h3>Perché funziona</h3><p>Il formato del timbro e del bollino: perfetto per buste, sacchetti, astucci, vetrofania tonda sulla porta e profilo social. Ordinato e simmetrico, si stampa bene anche a un colore.</p>
+    <h3>Caratteri e colori</h3><p>Gill Sans MT neretto su cerchio (0,16 em sopra · 0,30 em sotto)</p>
+    <p class="sw" style="margin-top:6px"><span><i style="background:#C63D2F"></i>rosso #C63D2F</span><span><i style="background:#161413"></i>nero #161413</span><span><i style="background:#F4EEE3"></i>carta #F4EEE3</span></p>
+    <h3>Icona: prova a misura vera</h3>
+    <div class="icone">
+      <figure><div class="q"><img src="03-sigillo/03-sigillo-icona-colori.svg" width="48" height="48" alt=""></div>48 px</figure>
+      <figure><div class="q"><img src="03-sigillo/03-sigillo-icona-colori.svg" width="24" height="24" alt=""></div>24 px</figure>
+      <figure><div class="q sc"><img src="03-sigillo/03-sigillo-icona-negativo.svg" width="48" height="48" alt=""></div>negativo</figure>
+      <figure><div class="q tab"><img src="03-sigillo/03-sigillo-icona-colori.svg" width="16" height="16" alt="">Ottica Macrì</div>scheda del browser</figure>
+    </div>
+  </div>
+</div>
+<div class="sez">Positivo e negativo · 1 e 2 colori</div>
+<div class="var"><figure><div class="q" style="background:var(--carta)"><img src="03-sigillo/03-sigillo-colori.svg" alt="2 colori"></div><figcaption>2 colori</figcaption></figure><figure><div class="q" style="background:#fff"><img src="03-sigillo/03-sigillo-rosso.svg" alt="1 colore rosso"></div><figcaption>1 colore rosso</figcaption></figure><figure><div class="q" style="background:#fff"><img src="03-sigillo/03-sigillo-nero.svg" alt="1 colore nero"></div><figcaption>1 colore nero</figcaption></figure><figure><div class="q" style="background:#C63D2F"><img src="03-sigillo/03-sigillo-negativo.svg" alt="negativo su rosso"></div><figcaption>negativo su rosso</figcaption></figure><figure><div class="q" style="background:#161413"><img src="03-sigillo/03-sigillo-notte.svg" alt="2 colori su scuro"></div><figcaption>2 colori su scuro</figcaption></figure></div>
+<div class="sez">Applicazioni</div>
+<div class="app"><div><div class="notte"><div class="muro"><div class="vetrina"></div><div class="braccio"></div><div class="bandiera"><img src="03-sigillo/03-sigillo-notte.svg" alt=""></div></div></div><div class="cap">Insegna a bandiera tonda, di notte (retroilluminata), sopra la vetrina.</div></div><div class="biglietti"><div class="bv f"><img src="03-sigillo/03-sigillo-colori.svg" alt=""></div><div class="bv r" style="font-family:'Gill Sans MT','Gill Sans',Calibri,sans-serif"><span class="n">Aldo Macrì</span><span class="m">Ottica Macrì</span><span class="d">Via Poggi d’Oro 23 · 00179 Roma<br>06 7834 6705</span><img src="03-sigillo/03-sigillo-icona-negativo.svg" alt=""></div><div class="cap">Biglietto da visita 85 × 55 mm: fronte e retro.</div></div></div>
+<div class="file">File: <a href="03-sigillo/03-sigillo-colori.svg">colori</a> · <a href="03-sigillo/03-sigillo-rosso.svg">rosso</a> · <a href="03-sigillo/03-sigillo-nero.svg">nero</a> · <a href="03-sigillo/03-sigillo-negativo.svg">negativo</a> · <a href="03-sigillo/03-sigillo-notte.svg">notte</a> · icona: <a href="03-sigillo/03-sigillo-icona-colori.svg">svg</a>, <a href="03-sigillo/png/03-sigillo-icona-colori-512.png">png 512</a> · PNG 1000/2000 trasparenti nella cartella <a href="03-sigillo/png/">03-sigillo/png/</a></div>
+</section>
+<section class="tav" id="04-monocolo">
+<h2><span class="num">CONCETTO 04</span>Monocolo OM<span class="badge">consigliato</span></h2>
+<div class="su">
+  <div class="princ largo"><img src="04-monocolo/04-monocolo-colori.svg" alt="Monocolo OM — versione principale"></div>
+  <div class="testo">
+    <h3>L'idea</h3><p>Solo geometria e tipografia. La O è una lente con il chiaroscuro del Bodoni (spessa ai lati, sottile sopra e sotto) e contiene la M: «OM». La stanghetta esce dalla lente, fa da filetto sopra la scritta e finisce con la curva dell&#x27;orecchio.</p>
+    <h3>Perché funziona</h3><p>Il segno più «da studio»: elegante, senza tempo, nitido a ogni misura. La lente con la M è un&#x27;icona perfetta a 24 px (app, favicon, profilo). Il draghetto può restare come mascotte per vetrina e social.</p>
+    <h3>Caratteri e colori</h3><p>Bodoni MT (MACRÌ 0,07 em · OTTICA giustificata alla larghezza di MACRÌ)</p>
+    <p class="sw" style="margin-top:6px"><span><i style="background:#C63D2F"></i>rosso #C63D2F</span><span><i style="background:#161413"></i>nero #161413</span><span><i style="background:#F4EEE3"></i>carta #F4EEE3</span></p>
+    <h3>Icona: prova a misura vera</h3>
+    <div class="icone">
+      <figure><div class="q"><img src="04-monocolo/04-monocolo-icona-colori.svg" width="48" height="48" alt=""></div>48 px</figure>
+      <figure><div class="q"><img src="04-monocolo/04-monocolo-icona-colori.svg" width="24" height="24" alt=""></div>24 px</figure>
+      <figure><div class="q sc"><img src="04-monocolo/04-monocolo-icona-negativo.svg" width="48" height="48" alt=""></div>negativo</figure>
+      <figure><div class="q tab"><img src="04-monocolo/04-monocolo-icona-colori.svg" width="16" height="16" alt="">Ottica Macrì</div>scheda del browser</figure>
+    </div>
+  </div>
+</div>
+<div class="sez">Positivo e negativo · 1 e 2 colori</div>
+<div class="var"><figure><div class="q" style="background:var(--carta)"><img src="04-monocolo/04-monocolo-colori.svg" alt="2 colori"></div><figcaption>2 colori</figcaption></figure><figure><div class="q" style="background:#fff"><img src="04-monocolo/04-monocolo-rosso.svg" alt="1 colore rosso"></div><figcaption>1 colore rosso</figcaption></figure><figure><div class="q" style="background:#fff"><img src="04-monocolo/04-monocolo-nero.svg" alt="1 colore nero"></div><figcaption>1 colore nero</figcaption></figure><figure><div class="q" style="background:#C63D2F"><img src="04-monocolo/04-monocolo-negativo.svg" alt="negativo su rosso"></div><figcaption>negativo su rosso</figcaption></figure><figure><div class="q" style="background:#161413"><img src="04-monocolo/04-monocolo-notte.svg" alt="2 colori su scuro"></div><figcaption>2 colori su scuro</figcaption></figure></div>
+<div class="sez">Applicazioni</div>
+<div class="app"><div><div class="notte"><div class="fascia"><img src="04-monocolo/04-monocolo-notte.svg" alt=""></div><div class="muro"><div class="vetrina"></div></div></div><div class="cap">Insegna in fascia sopra la vetrina, di notte (lettere retroilluminate).</div></div><div class="biglietti"><div class="bv f"><img src="04-monocolo/04-monocolo-colori.svg" alt=""></div><div class="bv r" style="font-family:'Bodoni MT','Bodoni 72',Didot,serif"><span class="n">Aldo Macrì</span><span class="m">Ottica Macrì</span><span class="d">Via Poggi d’Oro 23 · 00179 Roma<br>06 7834 6705</span><img src="04-monocolo/04-monocolo-icona-negativo.svg" alt=""></div><div class="cap">Biglietto da visita 85 × 55 mm: fronte e retro.</div></div></div>
+<div class="file">File: <a href="04-monocolo/04-monocolo-colori.svg">colori</a> · <a href="04-monocolo/04-monocolo-rosso.svg">rosso</a> · <a href="04-monocolo/04-monocolo-nero.svg">nero</a> · <a href="04-monocolo/04-monocolo-negativo.svg">negativo</a> · <a href="04-monocolo/04-monocolo-notte.svg">notte</a> · icona: <a href="04-monocolo/04-monocolo-icona-colori.svg">svg</a>, <a href="04-monocolo/png/04-monocolo-icona-colori-512.png">png 512</a> · PNG 1000/2000 trasparenti nella cartella <a href="04-monocolo/png/">04-monocolo/png/</a></div>
+</section>
+<section class="tav" id="05-scritta-occhiale">
+<h2><span class="num">CONCETTO 05</span>Scritta-occhiale</h2>
+<div class="su">
+  <div class="princ largo"><img src="05-scritta-occhiale/05-scritta-occhiale-colori.svg" alt="Scritta-occhiale — versione principale"></div>
+  <div class="testo">
+    <h3>L'idea</h3><p>Una sola riga: la O di OTTICA è una lente perfetta e la sua stanghetta diventa la barra delle due T (una legatura costruita, non un disegnino). Century Gothic neretto.</p>
+    <h3>Perché funziona</h3><p>Moderna e leggibilissima da lontano: è la scelta più adatta a un&#x27;insegna luminosa in fascia. L&#x27;icona è la tessera «OT» con la stessa legatura.</p>
+    <h3>Caratteri e colori</h3><p>Century Gothic neretto (O costruita come cerchio perfetto)</p>
+    <p class="sw" style="margin-top:6px"><span><i style="background:#C63D2F"></i>rosso #C63D2F</span><span><i style="background:#161413"></i>nero #161413</span><span><i style="background:#F4EEE3"></i>carta #F4EEE3</span></p>
+    <h3>Icona: prova a misura vera</h3>
+    <div class="icone">
+      <figure><div class="q"><img src="05-scritta-occhiale/05-scritta-occhiale-icona-colori.svg" width="48" height="48" alt=""></div>48 px</figure>
+      <figure><div class="q"><img src="05-scritta-occhiale/05-scritta-occhiale-icona-colori.svg" width="24" height="24" alt=""></div>24 px</figure>
+      <figure><div class="q sc"><img src="05-scritta-occhiale/05-scritta-occhiale-icona-negativo.svg" width="48" height="48" alt=""></div>negativo</figure>
+      <figure><div class="q tab"><img src="05-scritta-occhiale/05-scritta-occhiale-icona-colori.svg" width="16" height="16" alt="">Ottica Macrì</div>scheda del browser</figure>
+    </div>
+  </div>
+</div>
+<div class="sez">Positivo e negativo · 1 e 2 colori</div>
+<div class="var"><figure><div class="q" style="background:var(--carta)"><img src="05-scritta-occhiale/05-scritta-occhiale-colori.svg" alt="2 colori"></div><figcaption>2 colori</figcaption></figure><figure><div class="q" style="background:#fff"><img src="05-scritta-occhiale/05-scritta-occhiale-rosso.svg" alt="1 colore rosso"></div><figcaption>1 colore rosso</figcaption></figure><figure><div class="q" style="background:#fff"><img src="05-scritta-occhiale/05-scritta-occhiale-nero.svg" alt="1 colore nero"></div><figcaption>1 colore nero</figcaption></figure><figure><div class="q" style="background:#C63D2F"><img src="05-scritta-occhiale/05-scritta-occhiale-negativo.svg" alt="negativo su rosso"></div><figcaption>negativo su rosso</figcaption></figure><figure><div class="q" style="background:#161413"><img src="05-scritta-occhiale/05-scritta-occhiale-notte.svg" alt="2 colori su scuro"></div><figcaption>2 colori su scuro</figcaption></figure></div>
+<div class="sez">Applicazioni</div>
+<div class="app"><div><div class="notte"><div class="fascia"><img src="05-scritta-occhiale/05-scritta-occhiale-notte.svg" alt=""></div><div class="muro"><div class="vetrina"></div></div></div><div class="cap">Insegna in fascia sopra la vetrina, di notte (lettere retroilluminate).</div></div><div class="biglietti"><div class="bv f"><img src="05-scritta-occhiale/05-scritta-occhiale-colori.svg" alt=""></div><div class="bv r" style="font-family:'Century Gothic',Futura,'Avenir Next',sans-serif"><span class="n">Aldo Macrì</span><span class="m">Ottica Macrì</span><span class="d">Via Poggi d’Oro 23 · 00179 Roma<br>06 7834 6705</span><img src="05-scritta-occhiale/05-scritta-occhiale-icona-negativo.svg" alt=""></div><div class="cap">Biglietto da visita 85 × 55 mm: fronte e retro.</div></div></div>
+<div class="file">File: <a href="05-scritta-occhiale/05-scritta-occhiale-colori.svg">colori</a> · <a href="05-scritta-occhiale/05-scritta-occhiale-rosso.svg">rosso</a> · <a href="05-scritta-occhiale/05-scritta-occhiale-nero.svg">nero</a> · <a href="05-scritta-occhiale/05-scritta-occhiale-negativo.svg">negativo</a> · <a href="05-scritta-occhiale/05-scritta-occhiale-notte.svg">notte</a> · icona: <a href="05-scritta-occhiale/05-scritta-occhiale-icona-colori.svg">svg</a>, <a href="05-scritta-occhiale/png/05-scritta-occhiale-icona-colori-512.png">png 512</a> · PNG 1000/2000 trasparenti nella cartella <a href="05-scritta-occhiale/png/">05-scritta-occhiale/png/</a></div>
+</section>
+<section class="tav" id="06-ovale">
+<h2><span class="num">CONCETTO 06</span>Ovale da bottega<span class="badge">consigliato</span></h2>
+<div class="su">
+  <div class="princ"><img src="06-ovale/06-ovale-colori.svg" alt="Ovale da bottega — versione principale"></div>
+  <div class="testo">
+    <h3>L'idea</h3><p>Ovale a doppio filo come le targhe d&#x27;epoca; il draghetto vero si affaccia e rompe la cornice (taglio esatto sulla sua sagoma, con uno stacco). Scritta in Copperplate Gothic, il carattere delle targhe e dei biglietti da bottega.</p>
+    <h3>Perché funziona</h3><p>Il più «bottega romana di quartiere»: caldo, riconoscibile, completo (nome, mestiere, città). Funziona come emblema su insegna, biglietti, sacchetti; l&#x27;icona è la M nell&#x27;ovale.</p>
+    <h3>Caratteri e colori</h3><p>Copperplate Gothic neretto (MACRÌ 0,06 em · OTTICA e ROMA spaziate)</p>
+    <p class="sw" style="margin-top:6px"><span><i style="background:#C63D2F"></i>rosso #C63D2F</span><span><i style="background:#161413"></i>nero #161413</span><span><i style="background:#F4EEE3"></i>carta #F4EEE3</span></p>
+    <h3>Icona: prova a misura vera</h3>
+    <div class="icone">
+      <figure><div class="q"><img src="06-ovale/06-ovale-icona-colori.svg" width="48" height="48" alt=""></div>48 px</figure>
+      <figure><div class="q"><img src="06-ovale/06-ovale-icona-colori.svg" width="24" height="24" alt=""></div>24 px</figure>
+      <figure><div class="q sc"><img src="06-ovale/06-ovale-icona-negativo.svg" width="48" height="48" alt=""></div>negativo</figure>
+      <figure><div class="q tab"><img src="06-ovale/06-ovale-icona-colori.svg" width="16" height="16" alt="">Ottica Macrì</div>scheda del browser</figure>
+    </div>
+  </div>
+</div>
+<div class="sez">Positivo e negativo · 1 e 2 colori</div>
+<div class="var"><figure><div class="q" style="background:var(--carta)"><img src="06-ovale/06-ovale-colori.svg" alt="2 colori"></div><figcaption>2 colori</figcaption></figure><figure><div class="q" style="background:#fff"><img src="06-ovale/06-ovale-rosso.svg" alt="1 colore rosso"></div><figcaption>1 colore rosso</figcaption></figure><figure><div class="q" style="background:#fff"><img src="06-ovale/06-ovale-nero.svg" alt="1 colore nero"></div><figcaption>1 colore nero</figcaption></figure><figure><div class="q" style="background:#C63D2F"><img src="06-ovale/06-ovale-negativo.svg" alt="negativo su rosso"></div><figcaption>negativo su rosso</figcaption></figure><figure><div class="q" style="background:#161413"><img src="06-ovale/06-ovale-notte.svg" alt="2 colori su scuro"></div><figcaption>2 colori su scuro</figcaption></figure></div>
+<div class="sez">Applicazioni</div>
+<div class="app"><div><div class="notte"><div class="fascia"><img src="06-ovale/06-ovale-notte.svg" alt=""></div><div class="muro"><div class="vetrina"></div></div></div><div class="cap">Insegna in fascia sopra la vetrina, di notte (lettere retroilluminate).</div></div><div class="biglietti"><div class="bv f"><img src="06-ovale/06-ovale-colori.svg" alt=""></div><div class="bv r" style="font-family:'Copperplate Gothic Light',Copperplate,'Copperplate Gothic',serif"><span class="n">Aldo Macrì</span><span class="m">Ottica Macrì</span><span class="d">Via Poggi d’Oro 23 · 00179 Roma<br>06 7834 6705</span><img src="06-ovale/06-ovale-icona-negativo.svg" alt=""></div><div class="cap">Biglietto da visita 85 × 55 mm: fronte e retro.</div></div></div>
+<div class="file">File: <a href="06-ovale/06-ovale-colori.svg">colori</a> · <a href="06-ovale/06-ovale-rosso.svg">rosso</a> · <a href="06-ovale/06-ovale-nero.svg">nero</a> · <a href="06-ovale/06-ovale-negativo.svg">negativo</a> · <a href="06-ovale/06-ovale-notte.svg">notte</a> · icona: <a href="06-ovale/06-ovale-icona-colori.svg">svg</a>, <a href="06-ovale/png/06-ovale-icona-colori-512.png">png 512</a> · PNG 1000/2000 trasparenti nella cartella <a href="06-ovale/png/">06-ovale/png/</a></div>
+</section>
+<p class="nota">Bozze da confermare con Fabrice e Aldo. Rigenerare tutto: <code>python genera.py</code> in questa cartella (serve Chrome per i PNG). Dati del biglietto: dalla scheda azienda (info-azienda.html).</p>
+<script src="../../../nascondi-note.js"></script>
+</body></html>

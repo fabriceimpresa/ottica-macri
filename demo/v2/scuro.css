@@ -1,0 +1,127 @@
+/* =====================================================================
+   OTTICA MACRÌ · DEMO APP V2 · TEMA SCURO CALDO (5/11/2026)
+   Si accende con html[data-tema="scuro"] (interruttore ☀/☾ in testata e IMPOSTAZIONI › TEMA; vivo.js).
+   Non nero freddo: caffè e radica scura, testi crema, mattone e blu schiariti per il contrasto.
+   Stesse trame HUD/CRT e stessa vita del chiaro. Le grafiche da stampa (cartelli, DYMO, slide, poster,
+   e-mail) restano come sono: sono «carta» e devono vedersi come usciranno.
+   Il chiaro non cambia: qui dentro tutto è sotto html[data-tema="scuro"].
+   ===================================================================== */
+html[data-tema="scuro"]{
+  --h-bianco:#2b2019; --h-beige:#1d1611; --h-beige2:#3a2c21; --h-fango:#8a7863; --h-fango2:#5e4f41;
+  --h-blu:#9cc7ee; --h-blu2:#b7d7f3; --h-mat:#f19a7f; --h-mat2:#c9583b; --h-oro:#e3bd6e; --h-oro-d:#c9a04f;
+  --h-bg:#1a130e; --h-bg2:#140f0b;
+  --h-panel:rgba(46,35,26,.94);
+  --h-line:rgba(240,215,180,.15); --h-line2:rgba(240,215,180,.32);
+  --h-text:#f3e8d6; --h-mut:#d6c6ad; --h-dim:#b3a189; --h-ice:#fff5e6;
+  --h-cyan:#9cc7ee; --h-gold:#f19a7f; --h-gold2:#e07a5c; --h-green:#8bd69a; --h-red:#f3826d;
+  --h-glow:rgba(156,199,238,.5);
+  --h-ombra:0 10px 28px -14px rgba(0,0,0,.7);
+  color-scheme:dark;
+}
+html[data-tema="scuro"] body.hud{background:var(--h-bg);color-scheme:dark}
+/* fondo: radica calda con luce di lampada in alto, griglia e righe CRT color crema */
+html[data-tema="scuro"] body.hud::before{background:
+  radial-gradient(1300px 560px at 50% -12%,rgba(226,160,96,.16),transparent 70%),
+  radial-gradient(900px 620px at 0% 100%,rgba(90,140,190,.08),transparent 70%),
+  radial-gradient(1000px 700px at 100% 100%,rgba(201,88,59,.12),transparent 70%),
+  linear-gradient(rgba(240,215,180,.035) 1px,transparent 1px) 0 0/48px 48px,
+  linear-gradient(90deg,rgba(240,215,180,.035) 1px,transparent 1px) 0 0/48px 48px,
+  linear-gradient(180deg,#241a13 0%,#1a130e 55%,#140f0b 100%)}
+html[data-tema="scuro"] body.hud::after{background:repeating-linear-gradient(0deg,rgba(255,235,205,.022) 0 1px,transparent 1px 3px)}
+html[data-tema="scuro"] .hud-fx .floor{background-image:linear-gradient(rgba(156,199,238,.12) 1px,transparent 1px),linear-gradient(90deg,rgba(156,199,238,.12) 1px,transparent 1px)}
+html[data-tema="scuro"] .hud-fx .vig{background:radial-gradient(ellipse 80% 90% at 50% 40%,transparent 55%,rgba(0,0,0,.45) 100%)}
+html[data-tema="scuro"] .hud-fx .righello{opacity:.25;filter:invert(1)}
+html[data-tema="scuro"] .hud-scan{background:linear-gradient(180deg,transparent,rgba(255,225,180,.045) 70%,rgba(156,199,238,.06) 99%,transparent)}
+html[data-tema="scuro"] #main::before{background:repeating-linear-gradient(0deg,rgba(255,235,205,.025) 0 1px,transparent 1px 4px)}
+
+/* vetro: pannelli color caffè, filo di luce in alto */
+html[data-tema="scuro"] .glass{
+  background:linear-gradient(180deg,rgba(255,230,195,.06),rgba(255,230,195,0) 90px),linear-gradient(160deg,rgba(50,38,28,.97),rgba(38,29,22,.97));
+  box-shadow:inset 0 1px 0 rgba(255,230,195,.10),inset 0 -50px 60px -50px rgba(0,0,0,.45);outline-color:rgba(240,215,180,.06)}
+html[data-tema="scuro"] .scheda.dorata{background:linear-gradient(180deg,rgba(201,88,59,.20),rgba(201,88,59,0) 120px),linear-gradient(160deg,#33261d,#271d16)}
+
+/* barra demo, menu, testata */
+html[data-tema="scuro"] #demobar{background:linear-gradient(180deg,#2e231b,#211912);border-bottom-color:rgba(240,215,180,.22);box-shadow:0 6px 18px -12px #000}
+html[data-tema="scuro"] #demobar button,html[data-tema="scuro"] #demobar .demolink{background:#2b2019;border-color:rgba(156,199,238,.4)}
+html[data-tema="scuro"] #demobar .demolink{border-color:rgba(241,154,127,.45)}
+html[data-tema="scuro"] #demobar button:hover,html[data-tema="scuro"] #demobar .demolink:hover{background:#3a2c21}
+html[data-tema="scuro"] #demobar button.on{background:#2c6aa0;border-color:#4a86bb;color:#fff}
+html[data-tema="scuro"] #demobar .pianos button.on,html[data-tema="scuro"] #demobar .demolink.casa{background:#b5462c;border-color:#c9583b;color:#fff}
+html[data-tema="scuro"] #sidebar{background:linear-gradient(180deg,rgba(40,30,22,.98),rgba(29,22,17,.98));box-shadow:8px 0 30px -20px #000}
+html[data-tema="scuro"] .orologio,html[data-tema="scuro"] .mode-switcher{background:rgba(43,32,25,.95)}
+html[data-tema="scuro"] .mode-btn:hover,html[data-tema="scuro"] .sb-voci a:hover,html[data-tema="scuro"] .sb-voci button:hover{background:rgba(156,199,238,.09)}
+html[data-tema="scuro"] .sb-voci a.on{background:rgba(201,88,59,.18)}
+html[data-tema="scuro"] .mode-btn.fuori{color:#9c8a73}
+html[data-tema="scuro"] .carousel-arrow{background:rgba(43,32,25,.97)}
+
+/* superfici che nel chiaro erano «bianco carta» */
+html[data-tema="scuro"] :is(.sb-chiudi,.sysmenu .voce,.scelte button,.burger,.nota .x,.torna,.campo input,.campo select,.campo textarea,.inp,.chipb,
+  .riga-art,.qty button,.cliente-riga,.fogli-lista .fl,.calendario .g,.pl-riga,.pl-riga .az button,.finestra .chiudi,.mail-intest,.vb-st,.menu-sistema-btn,.chip){background:#2b2019}
+html[data-tema="scuro"] .btn:not(.pri):not(.blu):not(.verde),html[data-tema="scuro"] .hbtn:not(.pri){background:#2b2019}
+html[data-tema="scuro"] .mobile-footer .btn:not(.pri){background:none}
+html[data-tema="scuro"] .finestra,html[data-tema="scuro"] .sysmenu{background-color:#2b2019}
+html[data-tema="scuro"] .tab th{background:#251c15}
+html[data-tema="scuro"] .tab tr:hover td{background:rgba(156,199,238,.06)}
+html[data-tema="scuro"] .campo input,html[data-tema="scuro"] .campo select,html[data-tema="scuro"] .campo textarea,html[data-tema="scuro"] .inp{border-color:rgba(240,215,180,.38);color:var(--h-text)}
+html[data-tema="scuro"] select option{background:#2b2019;color:#f3e8d6}
+html[data-tema="scuro"] ::placeholder{color:#a8957c}
+html[data-tema="scuro"] .btn{border-color:rgba(156,199,238,.5)}
+html[data-tema="scuro"] .btn:hover,html[data-tema="scuro"] .chipb:hover,html[data-tema="scuro"] a.vb-st:hover{background:#3a2c21}
+html[data-tema="scuro"] .scelte button.on,html[data-tema="scuro"] .chipb.on{background:#2c6aa0;border-color:#4a86bb;color:#fff}
+html[data-tema="scuro"] .giac.zero,html[data-tema="scuro"] .fuori-b{background:#b5462c;color:#fff}
+html[data-tema="scuro"] .giac{background:rgba(139,214,154,.14)}
+html[data-tema="scuro"] .giac.basso{background:rgba(241,154,127,.16)}
+html[data-tema="scuro"] .thumb.widget{background:linear-gradient(160deg,#33261d,#241b14)}
+html[data-tema="scuro"] .thumb{border-color:rgba(240,215,180,.16)}
+html[data-tema="scuro"] .nota{background:rgba(156,199,238,.08)}
+html[data-tema="scuro"] .nota.mattone,html[data-tema="scuro"] .fiscale,html[data-tema="scuro"] .banda-b{background:rgba(201,88,59,.10)}
+html[data-tema="scuro"] .fiscale,html[data-tema="scuro"] .banda-b{border-color:rgba(241,154,127,.5)}
+html[data-tema="scuro"] .risultato,html[data-tema="scuro"] .vivo-dopo{background:rgba(156,199,238,.09)}
+html[data-tema="scuro"] .escluso>*:not(.fuori-b){opacity:.32}
+html[data-tema="scuro"] .bacheca-nota{background:#3b3220;border-color:#6b5a32;color:#f3e8d6}
+html[data-tema="scuro"] .avatar{background:#3a2c21}
+html[data-tema="scuro"] .interruttore input{background:#5e4f41}
+html[data-tema="scuro"] .progresso{background:rgba(240,215,180,.12)}
+html[data-tema="scuro"] .velo,html[data-tema="scuro"] .velo-menu{background:rgba(8,5,3,.62)}
+html[data-tema="scuro"] #toast{background:#f3e8d6;color:#231a13;box-shadow:0 12px 30px -10px #000}
+html[data-tema="scuro"] .mobile-footer{background:#110c08}
+html[data-tema="scuro"] .device{box-shadow:0 30px 80px rgba(0,0,0,.6),inset 0 0 0 2px #4a3d31}
+html[data-tema="scuro"] #tutto .tc{background:#2b2019;color:#f3e8d6;border-color:#5e4f41}
+html[data-tema="scuro"] #tutto .tg a,html[data-tema="scuro"] #tutto .tx{background:#33261d;border-color:#5e4f41;color:#f3e8d6}
+
+html[data-tema="scuro"] .stato.att{color:#e8c46e;border-color:rgba(232,196,110,.5)}
+html[data-tema="scuro"] .stato.ok{border-color:rgba(139,214,154,.45)}
+html[data-tema="scuro"] .stato.blu{border-color:rgba(156,199,238,.45)}
+html[data-tema="scuro"] :is(.sb-label .nuovo,.section-title .nuovo,.badge-nuovo){background:#b5462c}
+html[data-tema="scuro"] :is(.sb-label .fr,.stella,.marchio i){color:#e07a5c}
+
+/* pagine CARTELLI (cartelli.css dell'altro agente): solo le superfici dell'interfaccia; inserti e fogli restano carta bianca */
+html[data-tema="scuro"] :is(.cv-sup,.cv-riga select,.cv-riga input,.cv-np,.cv-riprow,.cv-voce){background:#2b2019;color:var(--h-text)}
+html[data-tema="scuro"] .cv-voce.video{background:#33261d}
+html[data-tema="scuro"] .cv-sup.on{background:#3d2a20;box-shadow:0 0 0 3px rgba(226,112,79,.25)}
+html[data-tema="scuro"] .cv-np.on{background:#3d2a20}
+html[data-tema="scuro"] .cv-rotolo{background:#241b14}
+
+/* logo con scritta scura: su una «targa» color crema, come l'insegna del negozio */
+html[data-tema="scuro"] .store-hero img.logo,html[data-tema="scuro"] .thumb.widget img{padding:10px 16px;background:linear-gradient(180deg,#fbf3e6,#efe2cd);box-shadow:0 0 0 1px rgba(201,88,59,.35),0 8px 20px -12px #000}
+
+/* accoglienza e vita */
+html[data-tema="scuro"] .vb-drago .lente{background:radial-gradient(circle at 50% 38%,#fbf1e2 0 55%,#e8d6bd 100%);box-shadow:inset 0 0 0 1px rgba(201,88,59,.4),0 0 0 3px rgba(240,215,180,.06),0 8px 20px -10px #000}
+html[data-tema="scuro"] .vb-drago .alone{border-color:rgba(241,154,127,.5)}
+html[data-tema="scuro"] .vb-st.warn .pall{background:#e0a640}
+html[data-tema="scuro"] .esito .v{background:radial-gradient(circle,rgba(139,214,154,.16),rgba(139,214,154,.04));border-color:rgba(139,214,154,.55)}
+html[data-tema="scuro"] .esito .v::after{border-color:rgba(139,214,154,.6)}
+html[data-tema="scuro"] .crt::after{box-shadow:inset 0 0 28px rgba(0,0,0,.5)}
+
+/* interruttore sole/luna (testata) */
+.tema-btn{flex:none;display:inline-grid;place-items:center;width:56px;height:56px;border:1px solid var(--h-line2);background:rgba(255,253,249,.92);cursor:pointer;color:var(--h-mat);
+  clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));transition:border-color .2s,background .2s}
+.tema-btn:hover{border-color:var(--h-blu)}
+.tema-btn svg{width:28px;height:28px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;transition:transform .5s var(--h-ease),opacity .3s}
+.tema-btn .luna{position:absolute;opacity:0;transform:rotate(-60deg) scale(.6)}
+.tema-btn{position:relative}
+html[data-tema="scuro"] .tema-btn{background:#2b2019;color:var(--h-oro)}
+html[data-tema="scuro"] .tema-btn .sole{opacity:0;transform:rotate(90deg) scale(.6)}
+html[data-tema="scuro"] .tema-btn .luna{opacity:1;transform:none}
+@media (max-width:699px){.tema-btn{width:48px;height:48px}.tema-btn svg{width:24px;height:24px}}
+@media print{.tema-btn{display:none!important}}

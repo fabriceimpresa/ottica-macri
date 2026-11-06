@@ -1,0 +1,476 @@
+/* =====================================================================
+   OTTICA MACRÌ · TEMA HUD condiviso — versione «HUD DI GIORNO» (5/11/2026)
+   Chiaro e caldo: beige rilassante, scala di toni fango / bianco / beige,
+   accenti a contrasto rosso mattone + blu profondo, oro solo come tocco STORE // CRAFT.
+   Stesse forme del tema HUD (angoli tagliati, staffe, linee sottili, numeri mono).
+   - Pagine per Aldo:        <body class="hud">            (portale, visita, video, preventivi)
+   - Pagine interne (Fabrice): <body class="hud-interno">  (solo token e componenti ridefiniti, la loro logica JS resta)
+   Il tema scuro di prima è in tema-hud.scuro.css (+ tema-hud.scuro.js): per tornare indietro si copiano sopra a questi.
+   Font locali in vendor/fonts (SIL Open Font License 1.1). Effetti in tema-hud.js.
+   In stampa tutto torna chiaro su fondo bianco.
+   ===================================================================== */
+@import url("vendor/fonts/fonts.css");
+
+:root{
+  /* scala dei toni chiari */
+  --h-bianco:#fffdf9; --h-beige:#efe6d8; --h-beige2:#e6dac6; --h-fango:#a89a86; --h-fango2:#cbbfae;
+  /* accenti a contrasto */
+  --h-blu:#1f4e79; --h-blu2:#2c6aa0; --h-mat:#9e3b25; --h-mat2:#b5462c; --h-oro:#7d5a1c; --h-oro-d:#c39a4e;
+  /* token del tema (stessi nomi di prima: --h-cyan = accento principale, ora blu profondo; --h-gold = accento caldo, ora mattone) */
+  --h-bg:#efe6d8; --h-bg2:#e6dac6;
+  --h-panel:rgba(255,253,249,.86);
+  --h-line:rgba(110,92,72,.22); --h-line2:rgba(110,92,72,.42);
+  --h-text:#2b2118; --h-mut:#5e4f41; --h-dim:#6b5c4c; --h-ice:#2a1d12;
+  --h-cyan:#1f4e79; --h-gold:#9e3b25; --h-gold2:#b5462c; --h-green:#3d7748; --h-red:#a3301f;
+  --h-glow:rgba(44,106,160,.55);
+  --h-ombra:0 10px 28px -14px rgba(92,68,44,.35);
+  --h-cut:16px;
+  --h-font:"Chakra Petch","Rajdhani","Segoe UI",-apple-system,system-ui,sans-serif;
+  --h-title:"Rajdhani","Chakra Petch","Segoe UI",-apple-system,sans-serif;
+  --h-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  --h-ease:cubic-bezier(.22,.9,.24,1);
+}
+
+/* ---------- base comune (pagine per Aldo) ---------- */
+body.hud{margin:0;min-height:100vh;color:var(--h-text);background:var(--h-bg);font:400 18px/1.55 var(--h-font);letter-spacing:.15px;color-scheme:light;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body.hud *,body.hud *::before,body.hud *::after{box-sizing:border-box}
+body.hud a{color:var(--h-cyan)}
+body.hud :focus-visible,body.hud-interno :focus-visible{outline:2px solid var(--h-blu2);outline-offset:3px}
+
+/* fondo a strati: luce calda di giorno, griglia appena visibile, grana sottile */
+body.hud::before,body.hud-interno::before{content:"";position:fixed;inset:0;z-index:-3;pointer-events:none;background:
+  radial-gradient(1400px 600px at 50% -12%,rgba(255,253,249,.95),transparent 70%),
+  radial-gradient(900px 620px at 0% 100%,rgba(44,106,160,.06),transparent 70%),
+  radial-gradient(1000px 700px at 100% 100%,rgba(181,70,44,.07),transparent 70%),
+  linear-gradient(rgba(110,92,72,.045) 1px,transparent 1px) 0 0/48px 48px,
+  linear-gradient(90deg,rgba(110,92,72,.045) 1px,transparent 1px) 0 0/48px 48px,
+  linear-gradient(180deg,#f5eee3 0%,#efe6d8 55%,#e6dac6 100%)}
+body.hud::after,body.hud-interno::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:repeating-linear-gradient(0deg,rgba(110,92,72,.018) 0 1px,transparent 1px 3px)}
+.hud-fx{position:fixed;inset:0;z-index:-2;pointer-events:none;overflow:hidden}
+.hud-fx .floor{position:absolute;left:-30%;right:-30%;bottom:-8%;height:56%;
+  background-image:linear-gradient(rgba(31,78,121,.16) 1px,transparent 1px),linear-gradient(90deg,rgba(31,78,121,.16) 1px,transparent 1px);
+  background-size:70px 70px;transform:perspective(520px) rotateX(64deg);transform-origin:50% 100%;
+  -webkit-mask-image:linear-gradient(to top,#000 0%,rgba(0,0,0,.5) 40%,transparent 85%);mask-image:linear-gradient(to top,#000 0%,rgba(0,0,0,.5) 40%,transparent 85%);opacity:.45}
+.hud-fx .horizon{position:absolute;left:0;right:0;top:46%;height:1px;background:linear-gradient(90deg,transparent,rgba(181,70,44,.35),transparent);opacity:.6}
+.hud-fx .vig{position:absolute;inset:0;background:radial-gradient(ellipse 80% 90% at 50% 40%,transparent 60%,rgba(168,154,134,.22) 100%)}
+.hud-fx .righello{position:absolute;left:0;right:0;height:9px;opacity:.4;
+  background:repeating-linear-gradient(90deg,rgba(110,92,72,.55) 0 1px,transparent 1px 10px),repeating-linear-gradient(90deg,rgba(158,59,37,.8) 0 1px,transparent 1px 100px);
+  background-size:100% 4px,100% 9px;background-repeat:no-repeat}
+.hud-fx .righello.su{top:0}.hud-fx .righello.giu{bottom:0;transform:scaleY(-1)}
+
+/* banda di scansione ogni 14 s e linea al cambio pagina */
+.hud-scan{position:fixed;left:0;right:0;top:0;height:140px;z-index:30;pointer-events:none;
+  background:linear-gradient(180deg,transparent,rgba(255,253,249,.10) 70%,rgba(44,106,160,.08) 99%,transparent);
+  transform:translateY(-160px);animation:hud-scan 14s linear 2s infinite}
+@keyframes hud-scan{0%{transform:translateY(-160px)}18%{transform:translateY(105vh)}100%{transform:translateY(105vh)}}
+.hud-sweep{position:fixed;left:0;right:0;top:0;height:2px;z-index:32;pointer-events:none;opacity:0;
+  background:linear-gradient(90deg,transparent,rgba(44,106,160,.6) 20%,#b5462c 50%,rgba(44,106,160,.6) 80%,transparent);
+  box-shadow:0 0 12px 2px rgba(181,70,44,.18)}
+.hud-sweep.go{animation:hud-sweep .6s cubic-bezier(.45,0,.25,1) forwards}
+@keyframes hud-sweep{0%{opacity:0;transform:translate3d(0,40px,0)}10%{opacity:1}85%{opacity:.8}100%{opacity:0;transform:translate3d(0,100vh,0)}}
+
+/* ---------- impaginazione ---------- */
+.hud-pag{position:relative;max-width:1260px;margin:0 auto;padding:22px 24px 70px}
+.hud-pag.stretta{max-width:1060px}
+
+/* ---------- vetro con angoli tagliati e staffe ---------- */
+.glass{position:relative;
+  background:linear-gradient(180deg,rgba(255,255,255,.7),rgba(255,255,255,0) 90px),linear-gradient(160deg,rgba(255,253,249,.92),rgba(250,244,234,.86));
+  border:1px solid var(--h-line);
+  clip-path:polygon(0 0,calc(100% - var(--h-cut)) 0,100% var(--h-cut),100% 100%,var(--h-cut) 100%,0 calc(100% - var(--h-cut)));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9),inset 0 -50px 60px -50px rgba(168,154,134,.28);
+  outline:1px solid rgba(110,92,72,.07);outline-offset:-6px;transition:border-color .25s,box-shadow .25s,background .25s}
+.glass::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:1;opacity:.95;background:
+  linear-gradient(45deg,transparent calc(50% - .8px),var(--h-glow) calc(50% - .8px),var(--h-glow) calc(50% + .8px),transparent calc(50% + .8px)) right top/var(--h-cut) var(--h-cut) no-repeat,
+  linear-gradient(45deg,transparent calc(50% - .8px),var(--h-glow) calc(50% - .8px),var(--h-glow) calc(50% + .8px),transparent calc(50% + .8px)) left bottom/var(--h-cut) var(--h-cut) no-repeat,
+  linear-gradient(var(--h-blu),var(--h-blu)) left top/24px 2px no-repeat,
+  linear-gradient(var(--h-blu),var(--h-blu)) left top/2px 24px no-repeat,
+  linear-gradient(var(--h-mat2),var(--h-mat2)) right bottom/24px 2px no-repeat,
+  linear-gradient(var(--h-mat2),var(--h-mat2)) right bottom/2px 24px no-repeat,
+  repeating-linear-gradient(90deg,rgba(110,92,72,.5) 0 1px,transparent 1px 9px) calc(100% - 46px) 0/110px 5px no-repeat,
+  repeating-linear-gradient(90deg,rgba(110,92,72,.35) 0 1px,transparent 1px 7px) 46px 100%/84px 4px no-repeat,
+  linear-gradient(var(--h-oro-d),var(--h-oro-d)) 40px 0/34px 2px no-repeat}
+.glass>*{position:relative;z-index:2}
+
+/* ---------- barra superiore ---------- */
+.hud-top{--h-cut:20px;display:flex;align-items:center;gap:22px;padding:14px 24px;flex-wrap:wrap;border-color:rgba(110,92,72,.3);
+  background:linear-gradient(180deg,rgba(255,255,255,.85),rgba(255,253,249,.6)),linear-gradient(90deg,rgba(239,230,216,.9),rgba(255,253,249,.92) 50%,rgba(239,230,216,.9))}
+.hud-brand{display:flex;align-items:center;gap:18px;text-decoration:none;color:inherit;min-width:0}
+.hud-logo{position:relative;flex:none;width:50px;height:50px;border-radius:50%;display:grid;place-items:center;margin:6px;
+  background:radial-gradient(circle,#fffdf9,rgba(239,230,216,.9) 70%);border:1px solid rgba(31,78,121,.5);
+  box-shadow:0 2px 10px rgba(92,68,44,.18),inset 0 0 10px rgba(168,154,134,.25)}
+.hud-logo .ic{width:26px;height:26px;stroke:var(--h-blu)}
+.hud-logo .rings{position:absolute;left:50%;top:50%;width:84px;height:84px;margin:-42px 0 0 -42px;pointer-events:none;overflow:visible}
+.hud-logo .rings .r1 circle{stroke:rgba(31,78,121,.7)}
+.hud-logo .rings .r2 circle{stroke:var(--h-mat2)}
+.hud-logo .rings .r3 circle{stroke:var(--h-fango)}
+.rings .r1,.rings .r2,.rings .r3{transform-origin:50px 50px}
+.rings .r1{animation:hud-rot 38s linear infinite}.rings .r2{animation:hud-rot 22s linear infinite reverse}.rings .r3{animation:hud-rot 60s linear infinite}
+@keyframes hud-rot{to{transform:rotate(360deg)}}
+.hud-brand h1{margin:0;font:700 28px/1 var(--h-title);letter-spacing:4px;text-transform:uppercase;color:var(--h-ice);white-space:nowrap}
+.hud-brand h1 span{color:var(--h-mat)}
+.hud-brand small{display:block;margin-top:6px;font:500 12px/1.2 var(--h-mono);letter-spacing:1.6px;color:var(--h-mut);text-transform:uppercase}
+.hud-vitals{margin-left:auto;display:flex;align-items:center;gap:26px}
+.vital b{display:block;font:500 18px/1.1 var(--h-mono);color:var(--h-green);font-variant-numeric:tabular-nums}
+.vital em{display:block;margin-top:3px;font:600 11.5px var(--h-title);font-style:normal;letter-spacing:2.4px;text-transform:uppercase;color:var(--h-mut)}
+.vital.clock b{font-weight:300;font-size:30px;color:var(--h-blu);letter-spacing:3px}
+.vital.gold b{color:var(--h-oro)}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:currentColor;box-shadow:0 0 0 3px rgba(61,119,72,.15);vertical-align:1px;margin-right:8px}
+.dot.ok{color:var(--h-green)}
+.sc-firma{font:700 13px/1 var(--h-mono);letter-spacing:2px;color:var(--h-oro);white-space:nowrap}
+
+/* ---------- testi ---------- */
+.hud-sect{margin:44px 0 18px;font:600 14px var(--h-title);letter-spacing:3.4px;text-transform:uppercase;color:var(--h-cyan);display:flex;align-items:center;gap:12px}
+.hud-sect::before{content:"";flex:none;width:7px;height:7px;background:var(--h-mat2);transform:rotate(45deg)}
+.hud-sect::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--h-mat2),rgba(110,92,72,.25) 30%,transparent)}
+.hud-sect .cod{font:400 11px var(--h-mono);letter-spacing:1.5px;color:var(--h-dim)}
+.hud-sect.oro{color:var(--h-gold)}.hud-sect.oro::before{background:var(--h-blu2)}
+.hud-h2{margin:0;font:650 26px/1.15 var(--h-title);letter-spacing:1.4px;text-transform:uppercase;color:var(--h-ice)}
+.hud-lead{font-size:20px;line-height:1.5;color:var(--h-mut);max-width:62ch}
+.mono{font-family:var(--h-mono);font-variant-numeric:tabular-nums}
+.oro{color:var(--h-gold)}
+.num-sec{display:inline-block;font:500 12px/1.4 var(--h-mono);letter-spacing:1px;color:var(--h-cyan);padding:2px 7px;border:1px solid rgba(31,78,121,.35);background:rgba(31,78,121,.06);
+  clip-path:polygon(0 0,calc(100% - 5px) 0,100% 5px,100% 100%,5px 100%,0 calc(100% - 5px))}
+.num-sec::before{content:"SEC·"}
+
+/* ---------- pulsanti e chip ---------- */
+.hbtn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:13px 20px;min-height:48px;font:600 16px/1 var(--h-title);letter-spacing:1.4px;text-transform:uppercase;color:var(--h-blu);
+  background:rgba(255,253,249,.9);border:1px solid rgba(31,78,121,.45);text-decoration:none;cursor:pointer;transition:.18s;
+  clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px))}
+.hbtn:hover{background:rgba(31,78,121,.08);border-color:var(--h-blu);color:#173c5e}
+.hbtn.pri{background:linear-gradient(180deg,#b5462c,#9e3b25);border-color:#8a321f;color:#fffdf9;box-shadow:inset 0 1px 0 rgba(255,255,255,.25)}
+.hbtn.pri:hover{filter:brightness(1.08);color:#fff}
+.hbtn.piccolo{min-height:38px;padding:9px 14px;font-size:14px}
+.chip{display:inline-flex;align-items:center;gap:7px;padding:6px 12px;font:600 13.5px var(--h-title);letter-spacing:1.2px;text-transform:uppercase;color:var(--h-mut);
+  background:rgba(255,253,249,.8);border:1px solid var(--h-line2);clip-path:polygon(0 0,calc(100% - 7px) 0,100% 7px,100% 100%,7px 100%,0 calc(100% - 7px))}
+.chip.oro{color:var(--h-gold);border-color:rgba(158,59,37,.45);background:rgba(181,70,44,.07)}
+.chip.ok{color:var(--h-green);border-color:rgba(61,119,72,.45);background:rgba(61,119,72,.08)}
+
+/* bollino BOZZA (solo a schermo) */
+.bollino-bozza{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;font:700 13px var(--h-mono);letter-spacing:3px;color:#8a321f;
+  background:repeating-linear-gradient(-45deg,rgba(181,70,44,.13) 0 8px,rgba(255,253,249,.9) 8px 16px);border:1px solid rgba(158,59,37,.6);
+  clip-path:polygon(0 0,calc(100% - 7px) 0,100% 7px,100% 100%,7px 100%,0 calc(100% - 7px))}
+
+/* ---------- card del portale ---------- */
+.hud-griglia{display:grid;gap:22px;grid-template-columns:repeat(3,minmax(0,1fr))}
+.hud-card{--h-cut:14px;display:flex;flex-direction:column;gap:12px;min-height:230px;padding:26px 26px 22px;color:var(--h-text);text-decoration:none}
+a.hud-card:hover,.hud-card.attiva{border-color:rgba(31,78,121,.55);background:linear-gradient(180deg,rgba(44,106,160,.07),rgba(44,106,160,0) 120px),linear-gradient(160deg,#fffdf9,#f8f1e6)}
+.hud-card .testa{display:flex;align-items:center;gap:14px}
+.hud-card .ico{flex:none;width:58px;height:58px;display:grid;place-items:center;border:1px solid rgba(31,78,121,.35);
+  background:radial-gradient(circle at 50% 58%,rgba(44,106,160,.12),rgba(44,106,160,.03) 55%,transparent 72%),repeating-linear-gradient(0deg,rgba(110,92,72,.05) 0 1px,transparent 1px 4px),#fffdf9;
+  clip-path:polygon(0 0,calc(100% - 9px) 0,100% 9px,100% 100%,9px 100%,0 calc(100% - 9px))}
+.hud-card .ico svg{width:30px;height:30px;stroke:var(--h-blu);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.hud-card .nn{margin-left:auto;font:300 34px/1 var(--h-mono);color:#8a7a66;letter-spacing:2px}
+.hud-card h3{margin:4px 0 0;font:700 27px/1.1 var(--h-title);letter-spacing:1.6px;text-transform:uppercase;color:var(--h-ice)}
+.hud-card .tag-sopra{font:500 12px var(--h-mono);letter-spacing:1.8px;color:var(--h-cyan);text-transform:uppercase}
+.hud-card p{margin:0;color:var(--h-mut);font-size:17.5px;line-height:1.5}
+.hud-card .piede{margin-top:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:8px}
+.hud-card .vai{font:600 15px var(--h-title);letter-spacing:2.4px;text-transform:uppercase;color:var(--h-cyan)}
+.hud-card .vai::after{content:"  ›";transition:.2s}
+a.hud-card:hover .vai::after{padding-left:6px}
+.hud-card.oro .ico{border-color:rgba(158,59,37,.45);background:radial-gradient(circle at 50% 58%,rgba(181,70,44,.13),rgba(181,70,44,.03) 55%,transparent 72%),#fffdf9}
+.hud-card.oro .ico svg{stroke:var(--h-mat)}
+.hud-card.oro .tag-sopra,.hud-card.oro .vai{color:var(--h-gold)}
+.hud-card.largo{grid-column:span 2}
+
+/* ---------- mirino al passaggio del mouse ---------- */
+.hud-mirino{position:fixed;z-index:50;pointer-events:none;opacity:0;transition:opacity .15s}
+.hud-mirino i{position:absolute;width:20px;height:20px;border:2px solid var(--h-blu2)}
+.hud-mirino .a1{left:0;top:0;border-right:0;border-bottom:0}.hud-mirino .a2{right:0;top:0;border-left:0;border-bottom:0}
+.hud-mirino .a3{left:0;bottom:0;border-right:0;border-top:0}.hud-mirino .a4{right:0;bottom:0;border-left:0;border-top:0}
+.hud-mirino b{position:absolute;left:0;top:-22px;padding:1px 6px;font:500 11px var(--h-mono);letter-spacing:1.8px;color:var(--h-blu);background:rgba(255,253,249,.92);white-space:nowrap}
+.hud-mirino.oro i{border-color:var(--h-mat2)}.hud-mirino.oro b{color:var(--h-mat)}
+
+/* ---------- avvio cinematografico: un velo beige che si apre ---------- */
+html.hud-boot .hud-entra{opacity:0}
+.hud-avvio{position:fixed;inset:0;z-index:200;display:grid;place-items:center;cursor:pointer;
+  background:radial-gradient(ellipse at center,#fffdf9 0%,#f3ebdf 55%,#e6dac6 100%);transition:opacity .7s ease,filter .7s ease,clip-path .8s cubic-bezier(.6,0,.2,1)}
+.hud-avvio::before{content:"";position:absolute;inset:0;pointer-events:none;background:
+  linear-gradient(rgba(110,92,72,.06) 1px,transparent 1px) 0 0/48px 48px,linear-gradient(90deg,rgba(110,92,72,.06) 1px,transparent 1px) 0 0/48px 48px}
+.hud-avvio.via{opacity:0;filter:brightness(1.08) blur(2px);clip-path:inset(0 50% 0 50%)}
+.hud-avvio .centro{position:relative;display:grid;justify-items:center;gap:22px;padding:20px;text-align:center}
+.hud-avvio .lente{width:min(240px,52vw);height:auto;overflow:visible}
+.hud-avvio .lente .tr{fill:none;stroke:var(--h-blu2);stroke-width:1.2}
+.hud-avvio .lente .tg{fill:none;stroke:var(--h-mat2);stroke-width:2.4}
+.hud-avvio .lente .pu{fill:var(--h-mat)}
+.hud-avvio .tit{font:700 clamp(30px,4.4vw,64px)/1 var(--h-title);letter-spacing:.38em;margin-right:-.38em;color:var(--h-ice);opacity:0}
+.hud-avvio .tit.on{animation:hud-cin 1.1s steps(1,end) both}
+.hud-avvio .sotto{font:500 clamp(12px,1.2vw,15px) var(--h-mono);letter-spacing:.3em;color:var(--h-mat);min-height:1.4em}
+.hud-avvio .term{width:min(520px,86vw);min-height:6.2em;text-align:left;font:400 13px/1.55 var(--h-mono);color:var(--h-mut);white-space:pre}
+.hud-avvio .term .ok{color:var(--h-green)}
+.hud-avvio .barra{width:min(520px,86vw);height:7px;background:repeating-linear-gradient(90deg,rgba(110,92,72,.18) 0 6px,transparent 6px 8px)}
+.hud-avvio .barra i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--h-blu2),var(--h-mat2));
+  -webkit-mask:repeating-linear-gradient(90deg,#000 0 6px,transparent 6px 8px);mask:repeating-linear-gradient(90deg,#000 0 6px,transparent 6px 8px)}
+.hud-avvio .salta{position:absolute;right:22px;bottom:18px;font:500 12px var(--h-mono);letter-spacing:2px;color:var(--h-dim)}
+.hud-avvio .cur{display:inline-block;width:.55em;height:1em;margin-left:.1em;background:var(--h-mat2);vertical-align:-.12em;animation:hud-blink .8s steps(1) infinite}
+@keyframes hud-cin{0%{opacity:0}8%{opacity:.9}12%{opacity:.1}20%{opacity:.75}26%{opacity:.25}38%{opacity:1}46%{opacity:.6}60%,100%{opacity:1}}
+@keyframes hud-blink{50%{opacity:0}}
+
+/* sfarfallio leggero ogni tanto su un titolo (mattone e blu) */
+.crt{animation:hud-crt .55s steps(1) 1}
+@keyframes hud-crt{0%{opacity:1}10%{opacity:.45;text-shadow:2px 0 rgba(181,70,44,.55),-2px 0 rgba(44,106,160,.55)}20%{opacity:1}35%{opacity:.7;text-shadow:-1px 0 rgba(181,70,44,.45),1px 0 rgba(44,106,160,.45)}50%{opacity:1;text-shadow:none}100%{text-shadow:none}}
+
+/* nastro in basso */
+.hud-nastro{display:flex;gap:26px;flex-wrap:wrap;justify-content:space-between;margin-top:40px;padding-top:14px;border-top:1px solid var(--h-line2);font:400 12px var(--h-mono);letter-spacing:1.6px;color:var(--h-dim);text-transform:uppercase}
+
+/* ---------- piccoli schermi ---------- */
+@media (max-width:1100px){
+  .hud-griglia{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .hud-card.largo{grid-column:span 2}
+}
+@media (max-width:700px){
+  body.hud{font-size:17px}
+  .hud-pag{padding:12px 16px 50px}
+  .hud-griglia{grid-template-columns:1fr;gap:16px}
+  .hud-card.largo{grid-column:auto}
+  .hud-card{min-height:0;padding:22px 20px 18px}
+  .hud-card h3{font-size:24px}
+  .hud-top{padding:12px 16px;gap:12px}
+  .hud-brand{gap:14px}
+  .hud-brand h1{font-size:21px;letter-spacing:2.6px}
+  .hud-logo{width:42px;height:42px}.hud-logo .rings{width:70px;height:70px;margin:-35px 0 0 -35px}
+  .hud-vitals{margin-left:0;width:100%;justify-content:space-between;gap:12px}
+  .vital.clock b{font-size:24px}
+  .vital b{white-space:nowrap}
+  .hud-vitals .vital.gold{display:none}
+  .hud-brand small{font-size:10.5px;letter-spacing:1px}
+  .hud-sect .cod{display:none}
+  .hud-vitals{border-top:1px solid var(--h-line);padding-top:10px}
+  .hud-lead{font-size:18px}
+}
+
+/* ---------- movimento ridotto: niente effetti ---------- */
+@media (prefers-reduced-motion:reduce){
+  .hud-scan,.hud-sweep{display:none!important}
+  .rings g{animation:none!important}
+  html.hud-boot .hud-entra{opacity:1}
+}
+
+/* =====================================================================
+   PAGINE INTERNE (info-azienda, previsione-progetto, preventivo bozza)
+   Versione HUD sobria: si ridefiniscono solo i token e gli stili esistenti.
+   ===================================================================== */
+body.hud-interno{
+  --bg:#efe6d8; --carta:rgba(255,253,249,.94); --ink:#2b2118; --fioco:#5e4f41; --linea:rgba(110,92,72,.26);
+  --acc:#1f4e79; --acc2:rgba(31,78,121,.09);
+  --ok:#2f6a3c; --okbg:#e3efe2; --warn:#7a4a0e; --warnbg:#f6e9d2;
+  --ko:#9e3b25; --kobg:#f7e3dc; --oro:#7d5a1c;
+  background:var(--bg);color:var(--ink);font-family:var(--h-font);font-size:15.5px;color-scheme:light}
+body.hud-interno h1{font-family:var(--h-title);font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--h-ice)}
+body.hud-interno h1 small{font-family:var(--h-mono);font-weight:500;color:var(--h-mat);letter-spacing:2.4px}
+body.hud-interno .card{position:relative;border-radius:0;background:linear-gradient(180deg,rgba(255,255,255,.75),rgba(255,255,255,0) 80px),var(--carta);border-color:var(--linea);
+  clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,14px 100%,0 calc(100% - 14px));box-shadow:inset 0 1px 0 #fff,inset 0 -40px 50px -46px rgba(168,154,134,.35)}
+body.hud-interno .card::before{content:"";position:absolute;left:0;top:0;width:22px;height:22px;border-left:2px solid var(--h-blu);border-top:2px solid var(--h-blu);pointer-events:none;opacity:.85}
+body.hud-interno .card::after{content:"";position:absolute;right:0;bottom:0;width:22px;height:22px;border-right:2px solid var(--h-mat2);border-bottom:2px solid var(--h-mat2);pointer-events:none;opacity:.8}
+body.hud-interno .card[style*="#fbfdff"]{background:linear-gradient(180deg,rgba(181,70,44,.07),rgba(181,70,44,0) 90px),var(--carta)!important;border-color:rgba(158,59,37,.45)!important}
+body.hud-interno .card h2{font-family:var(--h-title);font-weight:650;font-size:20px;letter-spacing:.8px;color:var(--h-ice)}
+body.hud-interno .card h2 .n{border-radius:0;background:var(--h-blu);border:1px solid var(--h-blu);color:#fffdf9;font-family:var(--h-mono);font-weight:500;
+  clip-path:polygon(0 0,calc(100% - 5px) 0,100% 5px,100% 100%,5px 100%,0 calc(100% - 5px))}
+body.hud-interno .card h3,body.hud-interno th,body.hud-interno label{font-family:var(--h-title);letter-spacing:1.4px;color:var(--h-cyan)}
+body.hud-interno label{color:var(--fioco)}
+body.hud-interno .bozza{border-radius:0;background:rgba(181,70,44,.1);border:1px solid rgba(158,59,37,.5);color:#8a321f;font-family:var(--h-mono);
+  clip-path:polygon(0 0,calc(100% - 7px) 0,100% 7px,100% 100%,7px 100%,0 calc(100% - 7px))}
+body.hud-interno nav.menu a{border-radius:0;background:rgba(255,253,249,.85);border-color:var(--h-line2);color:var(--fioco);font-family:var(--h-title);letter-spacing:1px;text-transform:uppercase;font-size:13.5px;
+  clip-path:polygon(0 0,calc(100% - 7px) 0,100% 7px,100% 100%,7px 100%,0 calc(100% - 7px))}
+body.hud-interno nav.menu a:hover{color:var(--h-blu);border-color:var(--h-blu);background:rgba(31,78,121,.07)}
+body.hud-interno .voce,body.hud-interno .sb,body.hud-interno .area{border-radius:0;background:rgba(239,230,216,.35);border-color:var(--linea)}
+body.hud-interno .area .tit{color:var(--h-cyan);font-family:var(--h-title);letter-spacing:1px;text-transform:uppercase}
+body.hud-interno .pac{border-radius:0;background:rgba(239,230,216,.3);border-color:var(--linea)}
+body.hud-interno .pac.top,body.hud-interno .sb.top{border-color:var(--h-mat2);background:linear-gradient(180deg,rgba(181,70,44,.09),rgba(181,70,44,.02))}
+body.hud-interno .pac .prezzo,body.hud-interno .sb .big{font-family:var(--h-mono);font-weight:500;color:var(--h-blu);font-variant-numeric:tabular-nums}
+body.hud-interno .pac.top .prezzo,body.hud-interno .sb.top .big{color:var(--h-mat)}
+body.hud-interno td.num{font-family:var(--h-mono);font-variant-numeric:tabular-nums}
+body.hud-interno tr.tot td{border-top-color:var(--h-mat2);color:var(--h-ice)}
+body.hud-interno input,body.hud-interno select,body.hud-interno textarea{border-radius:0;background:#fffdf9;color:var(--ink);border-color:var(--h-line2)}
+body.hud-interno input:focus,body.hud-interno select:focus,body.hud-interno textarea:focus{outline:1px solid var(--h-blu2);border-color:var(--h-blu2);box-shadow:0 0 0 3px rgba(44,106,160,.15)}
+body.hud-interno select option{background:#fffdf9;color:var(--ink)}
+body.hud-interno .btn{border-radius:0;background:linear-gradient(180deg,#b5462c,#9e3b25);border:1px solid #8a321f;color:#fffdf9;font-family:var(--h-title);
+  letter-spacing:1.2px;text-transform:uppercase;font-size:14.5px;clip-path:polygon(0 0,calc(100% - 9px) 0,100% 9px,100% 100%,9px 100%,0 calc(100% - 9px))}
+body.hud-interno .btn.sec{background:#fffdf9;border-color:rgba(31,78,121,.45);color:var(--h-blu)}
+body.hud-interno .btn:hover{filter:brightness(1.06)}
+body.hud-interno .diff button{border-radius:0;background:#fffdf9;border-color:var(--h-line2);color:var(--fioco)}
+body.hud-interno .diff button.on{background:var(--h-blu);border-color:var(--h-blu);color:#fffdf9}
+body.hud-interno .diffbar i{border-radius:0;background:rgba(110,92,72,.2)}
+body.hud-interno .diffbar i.on{background:var(--ko)}
+body.hud-interno .tag{border-radius:0;font-family:var(--h-mono);font-weight:500;border:1px solid currentColor}
+body.hud-interno .tag.ok{color:var(--ok)!important;background:var(--okbg)!important}
+body.hud-interno .tag.warn,body.hud-interno .tag.ver{color:var(--warn)!important;background:var(--warnbg)!important}
+body.hud-interno .tag.ko,body.hud-interno .tag.no{color:var(--ko)!important;background:var(--kobg)!important}
+body.hud-interno .avviso{border-radius:0;background:#f6e9d2;border-color:rgba(158,110,40,.4);color:var(--ink)}
+body.hud-interno .blocco{border-left-width:4px}
+body.hud-interno .blocco.b1{border-left-color:var(--h-blu)}
+body.hud-interno .blocco.b2{border-left-color:var(--h-green)}
+body.hud-interno .blocco.b3{border-left-color:var(--h-mat2)}
+body.hud-interno a{color:var(--h-cyan)}
+body.hud-interno a[style*="#1d5c8f"]{color:var(--h-cyan)!important;font-family:var(--h-title);letter-spacing:1px;text-transform:uppercase}
+body.hud-interno .btn-nascondi{border-radius:0;background:#fffdf9;border-color:var(--h-line2);color:var(--fioco)}
+body.hud-interno .btn-nascondi:hover{border-color:var(--ko);color:var(--ko)}
+body.hud-interno .mostra-note{color:var(--h-cyan)}
+body.hud-interno .griglia>*,body.hud-interno .riga>*,body.hud-interno .aree>*,body.hud-interno .pacchetti>*,body.hud-interno .sintesi>*{min-width:0}  /* le tabelle larghe scorrono dentro .tab-wrap invece di allargare la pagina sul telefono */
+@media (max-width:600px){body.hud-interno{overflow-x:hidden}body.hud-interno table{display:block;max-width:100%;overflow-x:auto}}
+body.hud-interno .torna-portale{display:inline-block;margin:0 0 14px;font:600 13px var(--h-mono);letter-spacing:2px;text-transform:uppercase;text-decoration:none;color:var(--h-mat)}
+
+/* =====================================================================
+   STAMPA: sempre chiara, su fondo bianco
+   ===================================================================== */
+@media print{
+  .solo-schermo,.hud-fx,.hud-scan,.hud-sweep,.hud-mirino,.hud-avvio{display:none!important}
+  html.hud-boot .hud-entra{opacity:1!important}
+  body.hud::before,body.hud::after,body.hud-interno::before,body.hud-interno::after{display:none!important}
+  body.hud{background:#fff!important;color:#1f2328!important}
+  body.hud-interno{--bg:#fff;--carta:#fff;--ink:#1f2328;--fioco:#5b6068;--linea:#d8d3ca;--acc:#1d5c8f;--acc2:#e8f0f7;
+    --ok:#2e7d4f;--okbg:#e4f3ea;--warn:#7a5a00;--warnbg:#fff3cd;--ko:#a33a2b;--kobg:#fbe9e6;--oro:#b8863b;background:#fff!important;color:#1f2328}
+  body.hud-interno h1,body.hud-interno h1 small,body.hud-interno .card h2,body.hud-interno .card h3,body.hud-interno th,body.hud-interno .area .tit,
+  body.hud-interno .pac .prezzo,body.hud-interno .sb .big,body.hud-interno tr.tot td{color:#1f2328!important;text-shadow:none!important}
+  body.hud-interno .card,body.hud-interno .pac,body.hud-interno .sb,body.hud-interno .voce,body.hud-interno .area,body.hud-interno .card[style*="#fbfdff"]{background:#fff!important;clip-path:none!important;box-shadow:none!important}
+  body.hud-interno .card::before{display:none}
+  body.hud-interno .pac.top,body.hud-interno .sb.top{background:#f6f1ea!important;border-color:#b8863b!important}
+  body.hud-interno .card h2 .n{background:#1d5c8f;color:#fff;clip-path:none;border-radius:50%}
+  body.hud-interno input,body.hud-interno select,body.hud-interno textarea{background:#fff!important;color:#1f2328!important;border-color:#ccc!important;box-shadow:none!important}
+  body.hud-interno .diff button.on{background:#1d5c8f;color:#fff}
+  body.hud-interno .bozza{background:#fff3cd;color:#7a5a00;border-color:#e0c66f}
+  body.hud-interno .tag{border:0}
+  body.hud-interno .avviso{background:#fff3cd;color:#1f2328}
+}
+
+/* =====================================================================
+   PREVENTIVI PER IL CLIENTE (preventivo-a.html, preventivo-b.html · disegnati da preventivo-cliente.js)
+   ===================================================================== */
+.pv-testa{--h-cut:22px;display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:30px;align-items:start;margin-top:22px;padding:36px 38px 32px}
+.pv-testa .bollino-bozza{position:absolute;right:42px;top:16px;z-index:3}
+.pv-eti{font:500 12.5px var(--h-mono);letter-spacing:2.4px;color:var(--h-cyan);text-transform:uppercase}
+.pv-testa h2{margin:12px 0 10px;font:700 clamp(30px,3.6vw,48px)/1.06 var(--h-title);letter-spacing:1.6px;text-transform:uppercase;color:var(--h-ice)}
+.pv-testa .hud-lead{margin:0}
+.pv-dati{margin:18px 0 0;display:grid;gap:12px}
+.pv-dati div{padding:10px 14px;border-left:2px solid var(--h-mat2);background:rgba(239,230,216,.5)}
+.pv-dati dt{font:600 12px var(--h-title);letter-spacing:2.2px;text-transform:uppercase;color:var(--h-mut)}
+.pv-dati dd{margin:2px 0 0;font-size:17px}
+.pv-k{display:block;font:600 12.5px var(--h-title);letter-spacing:2.2px;text-transform:uppercase;color:var(--h-mut)}
+.pv-blocchi{display:grid;gap:14px}
+.pv-blocco{--h-cut:12px;display:grid;grid-template-columns:62px minmax(0,1fr) 170px 170px;gap:20px;align-items:center;padding:20px 26px}
+.pv-n{font:300 34px/1 var(--h-mono);color:#8a7a66}
+.pv-cosa h3{margin:0 0 6px;font:700 23px/1.15 var(--h-title);letter-spacing:1.6px;text-transform:uppercase;color:var(--h-ice)}
+.pv-cosa h3 small{font:600 17px var(--h-title);letter-spacing:1px;color:var(--h-cyan);text-transform:none}
+.pv-cosa p{margin:0;color:var(--h-mut);font-size:17px;line-height:1.5}
+.pv-tempi .mono{font-size:16px;color:var(--h-text)}
+.pv-prezzo{text-align:right}
+.pv-cifra{font:400 26px/1.15 var(--h-mono);color:var(--h-blu);white-space:nowrap}
+.pv-cifra.grande{display:block;font-size:34px;margin-top:4px}
+.pv-cifra.oro{color:var(--h-mat)}
+.pv-pacchetti{display:grid;gap:16px;grid-template-columns:repeat(var(--n,3),minmax(0,1fr))}
+.pv-pac{--h-cut:12px;display:flex;flex-direction:column;gap:10px;padding:22px 20px 20px}
+.pv-pac h3{margin:0;font:700 21px/1.15 var(--h-title);letter-spacing:1.4px;text-transform:uppercase;color:var(--h-ice)}
+.pv-pac ul{list-style:none;margin:4px 0 0;padding:0;display:grid;gap:5px;font:600 14px var(--h-title);letter-spacing:1px;text-transform:uppercase}
+.pv-pac li{display:flex;gap:8px;align-items:center}
+.pv-pac li::before{content:"";flex:none;width:8px;height:8px;transform:rotate(45deg)}
+.pv-pac li.si{color:var(--h-text)}.pv-pac li.si::before{background:var(--h-blu)}
+.pv-pac li.no{color:var(--h-dim);text-decoration:line-through;text-decoration-color:rgba(110,92,72,.5)}.pv-pac li.no::before{border:1px solid var(--h-fango)}
+.pv-tot{margin-top:auto;padding-top:12px;border-top:1px dashed var(--h-line2)}
+.pv-pieno{font-size:15px;color:var(--h-mut)}.pv-pieno s{color:var(--h-mut)}
+.pv-risparmio{margin-top:4px;font:600 14px var(--h-title);letter-spacing:1.6px;text-transform:uppercase;color:var(--h-green)}
+.pv-tempo{font-size:15px;color:var(--h-mut)}
+.pv-pac.top{border-color:rgba(158,59,37,.6);background:linear-gradient(180deg,rgba(181,70,44,.09),rgba(181,70,44,0) 120px),linear-gradient(160deg,#fffdf9,#f8f0e4)}
+.pv-pac.top li.si::before{background:var(--h-mat2)}
+.pv-consigliato{align-self:flex-start;padding:3px 10px;font:700 11.5px var(--h-mono);letter-spacing:2px;text-transform:uppercase;color:#fffdf9;background:var(--h-mat)}
+.pv-nota{margin:12px 2px 0;font-size:15px;color:var(--h-mut)}
+.pv-canone{--h-cut:12px;margin-top:22px;padding:20px 26px}
+.pv-canone p{margin:6px 0 0;font-size:18px}
+.pv-schermi{display:grid;gap:16px;grid-template-columns:repeat(3,minmax(0,1fr))}
+.pv-schermo{--h-cut:12px;padding:22px 22px 18px}
+.pv-schermo h3{margin:8px 0 6px;font:700 20px/1.2 var(--h-title);letter-spacing:1px;color:var(--h-ice)}
+.pv-schermo .pv-fascia{font-size:26px;color:var(--h-blu)}
+.pv-schermo p{margin:6px 0 0;color:var(--h-mut);font-size:16px}
+.pv-schermo.top{border-color:rgba(158,59,37,.6)}.pv-schermo.top .pv-eti{color:var(--h-gold)}
+.pv-condizioni{--h-cut:14px;margin-top:34px;padding:26px 30px}
+.pv-condizioni .hud-sect{margin:0 0 12px}
+.pv-condizioni ul{margin:0;padding-left:22px;display:grid;gap:6px}
+.pv-firme{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:30px;margin-top:26px}
+.pv-firma .nome{margin-top:10px;font:700 26px var(--h-title);letter-spacing:1.6px;text-transform:uppercase;color:var(--h-ice)}
+.pv-firma .riga{height:44px;border-bottom:1px solid var(--h-line2)}
+.pv-firma .motto{margin-top:6px;font:500 12px var(--h-mono);letter-spacing:2px;color:var(--h-dim)}
+.pv-altro{--h-cut:14px;display:grid;gap:4px;margin-top:22px;padding:22px 28px;text-decoration:none;color:var(--h-text)}
+.pv-altro b{font:700 28px var(--h-title);letter-spacing:1.6px;text-transform:uppercase;color:var(--h-gold)}
+.pv-altro span:last-child{color:var(--h-mut)}
+.pv-altro:hover{border-color:rgba(158,59,37,.6)}
+.pv-comandi{display:flex;gap:12px;justify-content:flex-end;flex-wrap:wrap;margin-top:22px}
+.pv-errore{padding:20px;border:1px solid var(--h-red);color:var(--h-red);background:#f7e3dc}
+@media (max-width:1100px){.pv-pacchetti{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:900px){
+  .pv-testa{grid-template-columns:1fr;padding:30px 24px 24px}
+  .pv-blocco{grid-template-columns:44px minmax(0,1fr);gap:8px 14px}
+  .pv-blocco .pv-tempi,.pv-blocco .pv-prezzo{grid-column:2;text-align:left;display:flex;gap:12px;align-items:baseline;justify-content:space-between}
+  .pv-pacchetti{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .pv-schermi{grid-template-columns:1fr}
+}
+@media (max-width:600px){
+  .pv-testa .bollino-bozza{position:static;justify-self:start;margin-bottom:-8px}
+  .pv-pacchetti{grid-template-columns:1fr}
+  .pv-blocco{padding:18px 18px}
+  .pv-n{font-size:26px}
+  .pv-firme{grid-template-columns:1fr}
+  .pv-condizioni{padding:22px 20px}
+}
+
+
+/* ---------- stampa delle pagine per Aldo: chiara, A4 ---------- */
+@media print{
+  @page{size:A4;margin:14mm 13mm}
+  body.hud{font-size:11.5pt;line-height:1.45}
+  body.hud *,body.hud *::before,body.hud *::after{text-shadow:none!important;box-shadow:none!important;animation:none!important}
+  body.hud .hud-pag{max-width:none;padding:0}
+  body.hud .glass{background:#fff!important;clip-path:none!important;border:1px solid #d6d1c8!important;outline:none!important}
+  body.hud .glass::before{display:none!important}
+  body.hud .hud-entra{opacity:1!important;transform:none!important;filter:none!important;clip-path:none!important}
+  body.hud .hud-top{background:#fff!important}
+  body.hud .pv-tempi .mono{white-space:nowrap}
+  body.hud .pv-cifra[data-finale]{font-size:0!important}
+  body.hud .hud-sect{break-after:avoid;page-break-after:avoid}
+  body.hud .pv-testa{grid-template-columns:minmax(0,1.3fr) minmax(0,1fr)!important;gap:18px}
+  body.hud .pv-testa .pv-dati{margin:0;gap:6px}
+  body.hud .pv-testa .pv-dati div{padding:5px 10px}
+  body.hud .pv-testa .pv-dati dd{font-size:10.5pt}
+  body.hud .pv-blocco .pv-tempi,body.hud .pv-blocco .pv-prezzo{grid-column:auto!important;display:block!important}
+  body.hud .pv-blocco .pv-prezzo{text-align:right!important}
+  body.hud .pv-pac h3{font-size:10.5pt!important;overflow-wrap:anywhere}
+  body.hud .pv-pac ul{font-size:7.5pt!important;letter-spacing:.4px}
+  body.hud .pv-pac .pv-tempo,body.hud .pv-pieno{font-size:9pt}
+  body.hud .pv-consigliato{font-size:7.5pt;letter-spacing:1px}
+  body.hud .pv-firme{grid-template-columns:1fr 1fr!important}
+  body.hud .pv-cifra[data-finale]::after{content:attr(data-finale);font-size:14pt}
+  body.hud .pv-cifra.grande[data-finale]::after{font-size:16pt}
+  body.hud .hud-top{padding:6px 0 10px!important;border:0!important;border-bottom:2px solid #1f2328!important}
+  body.hud .hud-logo .rings,body.hud .hud-vitals .vital.clock,body.hud .hud-nastro{display:none!important}
+  body.hud .hud-logo{background:#fff!important;border-color:#b8863b!important}
+  body.hud .hud-logo .ic{filter:none!important;stroke:#1f2328!important}
+  body.hud .hud-brand h1,body.hud .hud-brand h1 span,body.hud h2,body.hud h3,body.hud .pv-cifra,body.hud .pv-n,body.hud .pv-firma .nome,body.hud .pv-dati dd,body.hud .pv-tempi .mono,body.hud .pv-schermo .pv-fascia,body.hud .pv-pac li.si,body.hud li{color:#1f2328!important}
+  body.hud .hud-brand small,body.hud .hud-lead,body.hud p,body.hud .pv-k,body.hud .pv-dati dt,body.hud .pv-pieno,body.hud .pv-pieno s,body.hud .pv-tempo,body.hud .pv-firma .motto,body.hud .vital em{color:#5b6068!important}
+  body.hud .hud-sect,body.hud .pv-eti,body.hud .pv-cosa h3 small,body.hud .vital b{color:#1d5c8f!important}
+  body.hud .hud-sect::before{background:#1d5c8f!important}
+  body.hud .hud-sect::after{background:#d6d1c8!important}
+  body.hud .oro,body.hud .hud-sect.oro,body.hud .pv-cifra.oro,body.hud .vital.gold b,body.hud .pv-schermo.top .pv-eti{color:#8a5a2b!important}
+  body.hud .hud-sect.oro::before,body.hud .pv-pac.top li.si::before{background:#b8863b!important}
+  body.hud .pv-pac li.si::before{background:#1d5c8f!important}
+  body.hud .pv-pac li.no{color:#a0a4aa!important}
+  body.hud .pv-pac.top,body.hud .pv-schermo.top{border:2px solid #b8863b!important;background:#fbf6ef!important}
+  body.hud .pv-consigliato{background:#b8863b!important;color:#fff!important}
+  body.hud .pv-risparmio{color:#2e7d4f!important}
+  body.hud .pv-dati div{background:#f7f5f1!important;border-left-color:#b8863b!important}
+  body.hud .pv-testa{margin-top:10px;padding:16px 18px}
+  body.hud .pv-testa h2{font-size:22pt}
+  body.hud .hud-sect{margin:16px 0 8px}
+  body.hud .pv-blocco{padding:10px 14px;gap:12px;grid-template-columns:34px minmax(0,1fr) 140px 100px}
+  body.hud .pv-cosa h3{font-size:14pt}
+  body.hud .pv-cosa p{font-size:10.5pt}
+  body.hud .pv-n{font-size:16pt}
+  body.hud .pv-cifra{font-size:14pt}
+  body.hud .pv-cifra.grande{font-size:16pt}
+  body.hud .pv-pacchetti{grid-template-columns:repeat(var(--n,3),minmax(0,1fr))!important;gap:8px}
+  body.hud .pv-pac{padding:10px 10px 10px}
+  body.hud .pv-pac h3{font-size:12pt}
+  body.hud .pv-pac ul{font-size:8.5pt}
+  body.hud .pv-schermi{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:8px}
+  body.hud .pv-schermo,body.hud .pv-canone,body.hud .pv-condizioni{padding:10px 14px}
+  body.hud .pv-blocco,body.hud .pv-pac,body.hud .pv-schermo,body.hud .pv-condizioni,body.hud .pv-canone{break-inside:avoid}
+  body.hud .pv-firma .riga{border-bottom-color:#1f2328!important}
+}

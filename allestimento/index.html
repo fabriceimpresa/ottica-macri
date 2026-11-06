@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Piano allestimento</title>
+<!-- Ottica Macrì · FASE 1 · 6/11/2026. Fabrice conferma DOVE vanno cartelli, porta-prezzi, cornici, totem, tablet e schermi.
+     Dati: ../dispositivi.js (vetrine = allestimento deciso il 5/11; interno = allestimento.interno, proposta da confermare).
+     Scelte salvate solo nel browser (localStorage 'om-piano-allestimento'). Nessun invio online. -->
+<style>
+:root{--fondo:#f4efe6;--carta:#fffdf9;--fango:#8a7560;--testo:#2b241d;--muto:#6d6154;--linea:#e2d8c8;--rosso:#b5462c;--blu:#1f4e79;--verde:#2f7a46;--giallo:#b8860b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fondo);color:var(--testo);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{position:sticky;top:0;z-index:5;display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 16px;background:var(--carta);border-bottom:2px solid var(--linea)}
+header h1{font-size:18px;margin:0 auto 0 0}
+header a,header button{font:inherit;font-size:14px;padding:6px 12px;border-radius:8px;border:1px solid var(--linea);background:#fff;color:var(--testo);text-decoration:none;cursor:pointer}
+header .pri{background:var(--rosso);border-color:var(--rosso);color:#fff}
+#conta{font-size:13px;color:var(--muto)}
+main{max-width:1200px;margin:0 auto;padding:16px}
+.nota{background:#fff8e6;border:1px solid #ecd9a8;border-radius:10px;padding:10px 14px;margin:0 0 14px;position:relative}
+.griglia{display:grid;grid-template-columns:minmax(0,420px) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:820px){.griglia{grid-template-columns:1fr}}
+.pianta{position:sticky;top:64px;background:var(--carta);border:1px solid var(--linea);border-radius:12px;padding:8px}
+@media (max-width:820px){.pianta{position:static}}
+.pianta .box{position:relative}
+.pianta img{display:block;width:100%;height:auto}
+.pin{position:absolute;transform:translate(-50%,-50%);width:26px;height:26px;border-radius:50%;border:2px solid #fff;font:700 12px/22px system-ui;text-align:center;color:#fff;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.4);padding:0}
+.pin.vetrina{background:var(--blu)}.pin.interno{background:var(--rosso)}
+.pin[data-v=ok]{background:var(--verde)}.pin[data-v=cambia]{background:var(--giallo)}.pin[data-v=togli]{background:#777;text-decoration:line-through}
+.pin.attivo{outline:3px solid #000;outline-offset:1px}
+.legenda{font-size:12px;color:var(--muto);margin:6px 4px 0}
+.legenda i{display:inline-block;width:10px;height:10px;border-radius:50%;margin:0 4px 0 8px;vertical-align:middle}
+h2{font-size:17px;margin:18px 0 8px;color:var(--fango);text-transform:uppercase;letter-spacing:.04em}
+.c{background:var(--carta);border:1px solid var(--linea);border-left:6px solid var(--linea);border-radius:12px;padding:12px;margin:0 0 12px;display:grid;grid-template-columns:150px 1fr;gap:12px;scroll-margin-top:70px}
+@media (max-width:520px){.c{grid-template-columns:1fr}}
+.c[data-v=ok]{border-left-color:var(--verde)}.c[data-v=cambia]{border-left-color:var(--giallo)}.c[data-v=togli]{border-left-color:#777;opacity:.7}
+.c.attivo{box-shadow:0 0 0 3px var(--blu)}
+.foto{display:flex;flex-direction:column;gap:6px}
+.foto a{display:block;position:relative}
+.foto img{width:100%;height:110px;object-fit:cover;border-radius:8px;display:block}
+.foto span{position:absolute;left:4px;top:4px;background:rgba(0,0,0,.6);color:#fff;font-size:11px;padding:1px 6px;border-radius:5px}
+.c h3{margin:0 0 4px;font-size:16px}
+.c h3 b{display:inline-block;min-width:26px;height:26px;border-radius:50%;color:#fff;text-align:center;font-size:13px;line-height:26px;margin-right:6px}
+.c.vetrina h3 b{background:var(--blu)}.c.interno h3 b{background:var(--rosso)}
+.stato{font-size:12px;color:var(--muto)}
+table{border-collapse:collapse;width:100%;font-size:13px;margin:6px 0}
+td,th{border-bottom:1px solid var(--linea);padding:4px 6px;text-align:left;vertical-align:top}
+th{color:var(--muto);font-weight:600}
+td.q{text-align:right;white-space:nowrap;font-weight:700}
+.nuovo{font-size:10px;background:var(--rosso);color:#fff;border-radius:4px;padding:0 4px;margin-left:4px}
+.cont{font-size:14px;margin:4px 0}
+.sc{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.sc button{font:inherit;font-size:13px;padding:5px 10px;border-radius:8px;border:1px solid var(--linea);background:#fff;cursor:pointer}
+.sc button[data-v=ok].on{background:var(--verde);color:#fff;border-color:var(--verde)}
+.sc button[data-v=cambia].on{background:var(--giallo);color:#fff;border-color:var(--giallo)}
+.sc button[data-v=togli].on{background:#777;color:#fff;border-color:#777}
+.sc input{flex:1 1 180px;font:inherit;font-size:13px;padding:5px 8px;border:1px solid var(--linea);border-radius:8px}
+#riep table{background:var(--carta)}
+#riep td,#riep th{padding:6px 8px}
+.piccolo{font-size:12px;color:var(--muto)}
+#grande{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;z-index:20;cursor:zoom-out}
+#grande img{max-width:94vw;max-height:92vh}
+</style>
+</head>
+<body>
+<header>
+  <h1>Piano allestimento · vetrine e negozio</h1>
+  <span id="conta"></span>
+  <button class="pri" id="copia">Copia le mie scelte</button>
+  <a href="../index.html">☰ Menu</a>
+</header>
+<main>
+<p class="nota"><b>Fase 1 · conferma definitiva.</b> Per ogni posizione: <b>✓ Confermo</b>, <b>✎ Cambia</b> (scrivi cosa nella nota) o <b>✕ Togli</b>.
+Le <b style="color:var(--blu)">vetrine</b> sono quelle già decise da Fabrice il 5/11; l'<b style="color:var(--rosso)">interno</b> è una proposta nuova.
+Quantità e misure sono stime (le misure dei supporti vengono da <code>dispositivi.js</code>). Alla fine «Copia le mie scelte» e incollale a Claude:
+da qui si sistemano le aree dell'app (sezione cartelli: formati e supporti). Le scelte restano solo in questo browser.</p>
+
+<div class="griglia">
+  <div class="pianta">
+    <div class="box" id="box"><img src="../visita/negozio3d/pianta.svg" alt="Pianta del negozio con le posizioni numerate"></div>
+    <div class="legenda"><i style="background:var(--blu)"></i>vetrine (deciso)<i style="background:var(--rosso)"></i>interno (proposta)<i style="background:var(--verde)"></i>confermato<i style="background:var(--giallo)"></i>da cambiare<i style="background:#777"></i>tolto</div>
+  </div>
+  <div id="schede"></div>
+</div>
+
+<section id="riep">
+  <h2>Cosa deve stampare e gestire l'app</h2>
+  <p class="piccolo">Calcolato dalle posizioni qui sopra (le posizioni «✕ Togli» non contano). Ogni riga è un formato che la sezione cartelli dell'app deve saper produrre.</p>
+  <div id="riepTab"></div>
+</section>
+</main>
+<div id="grande"><img alt=""></div>
+<script src="../dispositivi.js"></script>
+<script src="../nascondi-note.js"></script>
+<script>
+(function(){
+var D=window.DISPOSITIVI||{supporti:[],allestimento:{}}, A=D.allestimento||{}, INT=A.interno||{supporti:[],posizioni:[]};
+var R='../';
+function sup(id){for(var i=0;i<D.supporti.length;i++)if(D.supporti[i].id===id)return D.supporti[i];
+  for(var j=0;j<(INT.supporti||[]).length;j++)if(INT.supporti[j].id===id){var s=INT.supporti[j];s._nuovo=true;return s}return null}
+function esc(t){return String(t==null?'':t).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+
+/* VETRINE: ruoli e supporti da dispositivi.js (deciso il 5/11). Quantità e punto in pianta: proposta di questa pagina. */
+function ruolo(v,p){var a=A[v]||{};return p?((a[p]||{}).ruolo||''):(a.nota||'')}
+var VETRINE=[
+ {id:'vsx-sopra',nome:'Vetrina sinistra · ripiano SOPRA',pianta:[160,186],foto:'visita/visita-reale/f-vetrina-sx-vicino-l.jpg',dopo:'visita/negozio3d/controllo/giro2-vetrina-sx.jpg',
+  supporti:[['plexi-a5',2],['plexi-13x18',1],['cornice-13x18',1],['tablet-13',1]],contenuto:ruolo('vetrina-sx','sopra')+'. '+(A['vetrina-sx']||{}).nota},
+ {id:'vsx-sotto',nome:'Vetrina sinistra · ripiano SOTTO',pianta:[222,222],foto:'visita/visita-reale/f-vetrina-sx-l.jpg',dopo:'visita/negozio3d/controllo/giro2-vetrina-sx.jpg',
+  supporti:[['plexi-10x15',3],['plexi-a7',6]],alternativa:'cornice-10x15',contenuto:ruolo('vetrina-sx','sotto')},
+ {id:'vdx-sopra',nome:'Vetrina destra · ripiano SOPRA',pianta:[470,140],foto:'visita/visita-reale/f-vetrina-dx-l.jpg',dopo:'visita/negozio3d/controllo/giro2-vetrina-dx.jpg',
+  supporti:[['plexi-a3',1],['appeso-a3',1],['vetrofania',1]],contenuto:ruolo('vetrina-dx','sopra')},
+ {id:'vdx-sotto',nome:'Vetrina destra · ripiano SOTTO',pianta:[550,200],foto:'visita/visita-reale/f-strada-dx-vicino-l.jpg',dopo:'visita/negozio3d/controllo/giro2-vetrina-dx-vicino.jpg',
+  supporti:[['cubo-10',1],['plexi-a7',3],['plexi-13x18',1]],contenuto:ruolo('vetrina-dx','sotto')},
+ {id:'ingresso',nome:'Appena entrati · totem',pianta:[460,322],foto:'visita/visita-reale/f-vestibolo-l.jpg',
+  supporti:[['totem-a3',1]],alternativa:'totem-a4',contenuto:'Promo del momento. '+((A.ingresso||{}).nota||'')+' Proposta: a destra della porta aperta, da controllare che non intralci il passaggio.'}
+];
+var POS=VETRINE.map(function(p){p.zona='vetrina';return p}).concat((INT.posizioni||[]).map(function(p){p.zona='interno';return p}));
+POS.forEach(function(p,i){p.n=i+1});
+
+var K='om-piano-allestimento',st={};try{st=JSON.parse(localStorage.getItem(K)||'{}')||{}}catch(e){st={}}
+function salva(){try{localStorage.setItem(K,JSON.stringify(st))}catch(e){}aggiorna()}
+
+function misura(s){if(!s)return'?';if(s.stampa)return s.stampa[0]+'×'+s.stampa[1]+' mm'+(s.facce?' ×'+s.facce+' facce':'')+(s.coda?' (+ coda '+s.coda+' mm)':'');
+  if(s.pixel)return s.pixel[0]+'×'+s.pixel[1]+' px'+(s.schermo?' · schermo ≈'+s.schermo[0]+'×'+s.schermo[1]+' mm':'');if(s.usa)return'usa '+s.usa.join(', ');return'—'}
+
+var box=document.getElementById('box'),schede=document.getElementById('schede'),html='',zona='';
+POS.forEach(function(p){
+  if(p.zona!==zona){zona=p.zona;html+='<h2>'+(zona==='vetrina'?'Vetrine e ingresso':'Dentro il negozio')+'</h2>'}
+  var righe=p.supporti.map(function(x){var s=sup(x[0]);return'<tr><td>'+esc(s?s.nome:x[0])+(s&&s._nuovo?'<span class="nuovo">nuovo</span>':'')+'<br><span class="piccolo">'+esc(x[0])+'</span></td><td>'+esc(misura(s))+'</td><td class="q">× '+x[1]+'</td></tr>'}).join('');
+  var alt=p.alternativa?(function(){var s=sup(p.alternativa);return'<div class="piccolo">In alternativa: '+esc(s?s.nome:p.alternativa)+' ('+esc(misura(s))+')</div>'})():'';
+  var ex=p.extra?'<div class="piccolo">In più: '+esc(p.extra)+'</div>':'';
+  html+='<article class="c '+p.zona+'" id="p-'+p.id+'" data-id="'+p.id+'">'+
+   '<div class="foto"><a href="'+R+p.foto+'" data-g><img loading="lazy" src="'+R+p.foto+'" alt="Foto della posizione"><span>OGGI</span></a>'+
+   (p.dopo?'<a href="'+R+p.dopo+'" data-g><img loading="lazy" src="'+R+p.dopo+'" alt="Come verrebbe (3D)"><span>DOPO (3D)</span></a>':'')+'</div>'+
+   '<div><h3><b>'+p.n+'</b>'+esc(p.nome)+'</h3><div class="stato">'+(p.zona==='vetrina'?'Deciso da Fabrice il 5/11 · da riconfermare':'Proposta nuova · da confermare')+'</div>'+
+   '<table><tr><th>Supporto</th><th>Misura</th><th>Q.tà</th></tr>'+righe+'</table>'+alt+ex+
+   '<p class="cont"><b>Contenuto:</b> '+esc(p.contenuto)+'</p>'+
+   '<div class="sc"><button data-v="ok">✓ Confermo</button><button data-v="cambia">✎ Cambia</button><button data-v="togli">✕ Togli</button><input class="no" placeholder="nota (cosa cambiare, quantità…)"></div></div></article>';
+  var b=document.createElement('button');b.className='pin '+p.zona;b.textContent=p.n;b.title=p.n+'. '+p.nome;b.dataset.id=p.id;
+  b.style.left=(p.pianta[0]/737*100)+'%';b.style.top=(p.pianta[1]/990*100)+'%';
+  b.onclick=function(){var el=document.getElementById('p-'+p.id);el.scrollIntoView({behavior:'smooth',block:'start'});evid(p.id)};
+  box.appendChild(b);
+});
+schede.innerHTML=html;
+function evid(id){document.querySelectorAll('.attivo').forEach(function(e){e.classList.remove('attivo')});
+  var c=document.getElementById('p-'+id);if(c)c.classList.add('attivo');var b=box.querySelector('.pin[data-id="'+id+'"]');if(b)b.classList.add('attivo')}
+
+document.querySelectorAll('.c').forEach(function(c){var id=c.dataset.id,s=st[id]||{};
+  var inp=c.querySelector('.no');inp.value=s.n||'';
+  c.querySelectorAll('.sc button').forEach(function(b){b.onclick=function(){s.v=(s.v===b.dataset.v?'':b.dataset.v);st[id]=s;salva();evid(id)}});
+  inp.oninput=function(){s.n=inp.value;st[id]=s;salva()};
+  c.addEventListener('mouseenter',function(){var b=box.querySelector('.pin[data-id="'+id+'"]');if(b)b.classList.add('attivo')});
+  c.addEventListener('mouseleave',function(){if(!c.classList.contains('attivo')){var b=box.querySelector('.pin[data-id="'+id+'"]');if(b)b.classList.remove('attivo')}});
+});
+
+function riepilogo(){var tot={},ord=[];
+  POS.forEach(function(p){var s=st[p.id]||{};if(s.v==='togli')return;p.supporti.forEach(function(x){
+    if(!tot[x[0]]){tot[x[0]]={q:0,dove:[]};ord.push(x[0])}tot[x[0]].q+=x[1];tot[x[0]].dove.push(p.n+(s.v==='cambia'?'✎':''))})});
+  var gr={stampa:[],etichette:[],schermi:[],periferiche:[]};
+  ord.forEach(function(id){var s=sup(id)||{},t=s.tipo;var g=t==='stanghetta'||t==='dymo'?'etichette':(s.pixel?'schermi':(t==='periferica'?'periferiche':'stampa'));gr[g].push([id,s])});
+  var titoli={stampa:'Cartelli e inserti da stampare (A4 di Aldo o tipografia)',etichette:'Etichette e cartellini prezzo',schermi:'Schermi: grafiche e video da preparare',periferiche:'Apparecchi che l\'app deve gestire'};
+  var h='';Object.keys(gr).forEach(function(g){if(!gr[g].length)return;
+    h+='<h3 style="margin:14px 0 4px;font-size:15px">'+titoli[g]+'</h3><table><tr><th>Supporto</th><th>Formato</th><th>Q.tà</th><th>Posizioni</th></tr>'+
+    gr[g].map(function(r){var s=r[1];return'<tr><td>'+esc(s.nome||r[0])+(s._nuovo?'<span class="nuovo">nuovo</span>':'')+'</td><td>'+esc(misura(s))+(s.orient?' · '+s.orient:'')+'</td><td class="q">'+tot[r[0]].q+'</td><td>'+tot[r[0]].dove.join(', ')+'</td></tr>'}).join('')+'</table>'});
+  /* formati distinti */
+  var f={};ord.forEach(function(id){var s=sup(id)||{};if(s.stampa&&s.tipo!=='periferica')f[s.stampa[0]+'×'+s.stampa[1]+' mm']=1;if(s.pixel)f[s.pixel[0]+'×'+s.pixel[1]+' px']=1;});
+  h+='<p class="cont"><b>Formati distinti da gestire nell\'app:</b> '+Object.keys(f).join(' · ')+'</p><p class="piccolo">Quantità indicative (occhiali contati a occhio dalle foto). ✎ = posizione da cambiare.</p>';
+  document.getElementById('riepTab').innerHTML=h;return{tot:tot,ord:ord,f:Object.keys(f)}}
+
+function aggiorna(){var n={ok:0,cambia:0,togli:0};
+  POS.forEach(function(p){var s=st[p.id]||{},c=document.getElementById('p-'+p.id),b=box.querySelector('.pin[data-id="'+p.id+'"]');
+    if(s.v)n[s.v]++;c.dataset.v=s.v||'';b.dataset.v=s.v||'';
+    c.querySelectorAll('.sc button').forEach(function(x){x.classList.toggle('on',x.dataset.v===s.v)})});
+  document.getElementById('conta').textContent='✓ '+n.ok+' · ✎ '+n.cambia+' · ✕ '+n.togli+' su '+POS.length;riepilogo()}
+aggiorna();
+
+var NOMI={ok:'CONFERMO',cambia:'CAMBIA',togli:'TOGLI'};
+document.getElementById('copia').onclick=function(){var r=['SCELTE PIANO ALLESTIMENTO (Ottica Macrì):'];
+  POS.forEach(function(p){var s=st[p.id]||{};r.push('- '+p.n+'. '+p.nome+': '+(s.v?NOMI[s.v]:'non deciso')+(s.n?' · '+s.n:''))});
+  var R2=riepilogo();r.push('Formati: '+R2.f.join(' · '));var t=r.join('\n');
+  function ok(){var b=document.getElementById('copia');b.textContent='Copiato ✓';setTimeout(function(){b.textContent='Copia le mie scelte'},1500)}
+  function vecchio(){var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');ok()}catch(e){prompt('Copia da qui:',t)}a.remove()}
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(ok,vecchio);else vecchio()};
+
+var G=document.getElementById('grande');
+document.addEventListener('click',function(e){var a=e.target.closest('a[data-g]');if(a){e.preventDefault();G.querySelector('img').src=a.href;G.style.display='flex'}});
+G.onclick=function(){G.style.display='none'};
+})();
+</script>
+</body>
+</html>

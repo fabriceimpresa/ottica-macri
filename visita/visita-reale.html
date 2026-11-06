@@ -1,0 +1,946 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<link rel="icon" type="image/svg+xml" href="../media/logo/marchi6/04-monocolo/04-monocolo-icona-colori.svg">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Visita fotografica · Ottica Macrì</title>
+<meta name="color-scheme" content="light">
+<!--
+  VISITA REALE (5/11/2026): le foto e il video VERI fatti da Fabrice in negozio il 5/11.
+  - Sotto: la foto (<img>) o il video (<video>) in HTML, con pan/zoom fatti in CSS. Le immagini locali da file:// non si possono usare
+    come texture WebGL: per questo la foto NON entra in three.js.
+  - Sopra: canvas three.js TRASPARENTE solo con gli oggetti STORE // CRAFT. Ogni tappa ha una «camera della foto» (campo visivo dell'iPhone,
+    inclinazione, rollio); il pan/zoom della foto diventa cam.setViewOffset(), così gli oggetti restano incollati alla foto.
+  - Le grafiche (Black Friday, loop del tablet) arrivano come data: URI da ../media/blackfriday/*.js -> si possono usare come texture.
+  - Ordine delle tappe (dato vero di Fabrice): strada -> vetrine -> vestibolo tra le vetrine -> porta interna a vetro sempre aperta
+    -> bancone subito a SINISTRA -> resto del negozio.
+  - Taratura: visita-reale.html?cal=1 mostra una griglia di 10 cm sotto ogni oggetto e, cliccando, il punto della foto in pixel.
+  - Foto e video preparati da visita-reale/_script/ (privacy: sfocate le foto di bambini, i riflessi e le persone).
+  - GIRO 2 (5/11 sera): tappe nuove facciata, vetrine dalla strada (IMG_9492-9494), vetrina sinistra da vicino (9490), dietro il bancone (9487);
+    4 passeggiate in più (giro-*.mp4, _script/sfoca_giri.py). Scala dal FOGLIO A4 (210×297 mm) che Fabrice ha appeso nelle vetrine:
+    larghezza in pixel -> distanza (d = 0,21 m × f / px). Nel DOPO il foglio è coperto dalle nostre grafiche (window.BF_VETRINE) secondo
+    window.DISPOSITIVI.allestimento. Copia di prima: visita-reale.html.bak-giro2.
+-->
+<link rel="stylesheet" href="../tema-hud.css">
+<script src="../tema-hud.js"></script>
+<script src="../media/blackfriday/bf-data.js"></script>
+<script src="../media/blackfriday/bf-loop-data.js"></script>
+<script src="../ricerca/display-vetrina.js"></script>
+<script src="../dispositivi.js"></script>
+<script src="../proposta-schermo.js"></script>
+<script src="../media/blackfriday/vetrine/bf-vetrine-data.js"></script>
+<script src="../vendor/three/three-bundle.js"></script>
+<style>
+:root{--vr-bianco:#fffdf9;--vr-beige:#efe6d8;--vr-beige2:#e6dac6;--vr-fango:#a89a86;--vr-testo:#2b2118;--vr-mut:#5e4f41;
+  --vr-mat:#b5462c;--vr-mat-d:#9e3b25;--vr-blu:#1f4e79;--vr-linea:rgba(110,92,72,.32)}
+body{margin:0;background:var(--vr-beige);color:var(--vr-testo);font:400 18px/1.5 var(--h-font,"Segoe UI",system-ui,sans-serif)}
+*{box-sizing:border-box}
+.vr{max-width:1600px;margin:0 auto;padding:12px 16px 40px}
+.vr-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.vr-play{min-width:190px;min-height:62px;justify-content:center;font-size:20px;box-shadow:0 0 0 3px rgba(181,70,44,.18),0 10px 22px -10px rgba(181,70,44,.7);animation:vrPulsa 2.4s ease-in-out infinite}
+.vr-play .ic{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;background:#fffaf2;color:#b5462c;font-size:16px;letter-spacing:-2px;margin-right:4px}
+@keyframes vrPulsa{0%,100%{box-shadow:0 0 0 3px rgba(181,70,44,.18),0 10px 22px -10px rgba(181,70,44,.7)}50%{box-shadow:0 0 0 8px rgba(181,70,44,.08),0 10px 22px -10px rgba(181,70,44,.7)}}
+.vr-bt{display:inline-flex;align-items:center;gap:8px;min-height:52px;padding:10px 18px;font:700 18px/1 var(--h-title,sans-serif);letter-spacing:1.1px;text-transform:uppercase;
+  color:var(--vr-blu);text-decoration:none;border:1px solid var(--vr-linea);background:var(--vr-bianco);cursor:pointer;
+  clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px))}
+.vr-bt:hover{border-color:var(--vr-blu)}
+.vr-bt.rosso{background:linear-gradient(180deg,#b5462c,#9e3b25);color:#fffdf9;border-color:#8a321f}
+.vr-tit{flex:1;min-width:280px;padding:0 6px}
+.vr-tit h1{margin:0;font:700 clamp(22px,2.6vw,34px)/1.05 var(--h-title,sans-serif);letter-spacing:1.2px;text-transform:uppercase;color:#2a1d12}
+.vr-tit h1 b{color:var(--vr-mat)}
+.vr-tit p{margin:3px 0 0;color:var(--vr-mut);font-size:17px}
+.vr-firma{font:600 13px var(--h-mono,monospace);letter-spacing:2px;color:var(--vr-mat);border:1px solid rgba(181,70,44,.45);padding:7px 11px;background:rgba(181,70,44,.06)}
+
+/* striscia delle tappe */
+.vr-tappe{display:flex;gap:8px;overflow-x:auto;padding:12px 2px 10px;scrollbar-width:thin}
+.vr-t{flex:0 0 auto;appearance:none;cursor:pointer;display:flex;align-items:center;gap:10px;min-height:66px;padding:6px 14px 6px 6px;background:var(--vr-bianco);
+  border:1px solid var(--vr-linea);color:var(--vr-mut);text-align:left;font:700 16px/1.1 var(--h-title,sans-serif);letter-spacing:.6px;text-transform:uppercase;
+  clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));transition:.15s}
+.vr-t img{width:44px;height:54px;object-fit:cover;border:1px solid var(--vr-linea);background:#2b2118}
+.vr-t .n{font:600 11px var(--h-mono,monospace);color:var(--vr-fango);display:block;letter-spacing:1px}
+.vr-t small{display:block;font:500 11.5px var(--h-mono,monospace);text-transform:none;letter-spacing:.3px;color:var(--vr-fango);margin-top:3px}
+.vr-t:hover{border-color:var(--vr-blu);color:var(--vr-blu)}
+.vr-t[aria-pressed="true"]{background:linear-gradient(180deg,#b5462c,#9e3b25);color:#fffdf9;border-color:#8a321f}
+.vr-t[aria-pressed="true"] .n,.vr-t[aria-pressed="true"] small{color:#f6dccf}
+.vr-t.giro{color:var(--vr-blu)}
+.vr-t.giro .ico{width:44px;height:54px;display:grid;place-items:center;background:#1f4e79;color:#fff;font-size:22px}
+
+/* layout: vista + pannello */
+.vr-corpo{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:14px;align-items:start}
+@media(max-width:1100px){.vr-corpo{grid-template-columns:1fr}}
+.vr-vista{position:relative;width:100%;height:clamp(460px,calc(100vh - 250px),980px);background:#241a12;overflow:hidden;border:1px solid var(--vr-linea);
+  user-select:none;-webkit-user-select:none;touch-action:none;cursor:grab}
+.vr-vista.trascino{cursor:grabbing}
+.vr-vista.su-oggetto{cursor:pointer}
+.vr-sfondo{position:absolute;inset:-40px;background:#241a12 center/cover no-repeat;filter:blur(26px) brightness(.55) saturate(.9);transform:scale(1.05)}
+.vr-foglio{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform;transition:opacity .25s}
+.vr-foglio img{display:block;width:100%;height:100%;pointer-events:none;-webkit-user-drag:none}
+.vr-vista.cambio .vr-foglio,.vr-vista.cambio canvas.vr-3d,.vr-vista.cambio .vr-etis{opacity:0}
+.vr-vista canvas.vr-3d{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;transition:opacity .45s}
+.vr-vista.prima canvas.vr-3d,.vr-vista.prima .vr-etis,.vr-vista.prima .vr-dopo2d{opacity:0;pointer-events:none}
+.vr-video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#241a12;display:none}
+.vr-vista.giro .vr-video{display:block}
+.vr-vista.giro .vr-foglio,.vr-vista.giro canvas.vr-3d,.vr-vista.giro .vr-etis,.vr-vista.giro .vr-zoom,.vr-vista.giro .vr-taglio,.vr-vista.giro .vr-dopo2d{display:none!important}
+.vr-staffe{position:absolute;inset:8px;pointer-events:none;z-index:6;background:
+  linear-gradient(#b5462c,#b5462c) left top/34px 2px no-repeat,linear-gradient(#b5462c,#b5462c) left top/2px 34px no-repeat,
+  linear-gradient(#1f4e79,#1f4e79) right top/34px 2px no-repeat,linear-gradient(#1f4e79,#1f4e79) right top/2px 34px no-repeat,
+  linear-gradient(#1f4e79,#1f4e79) left bottom/34px 2px no-repeat,linear-gradient(#1f4e79,#1f4e79) left bottom/2px 34px no-repeat,
+  linear-gradient(#b5462c,#b5462c) right bottom/34px 2px no-repeat,linear-gradient(#b5462c,#b5462c) right bottom/2px 34px no-repeat}
+.vr-hud{position:absolute;left:14px;top:12px;z-index:7;font:600 12.5px var(--h-mono,monospace);letter-spacing:1px;color:#fffdf9;background:rgba(43,33,24,.7);padding:7px 10px;pointer-events:none}
+.vr-badge{position:absolute;right:14px;top:12px;z-index:7;font:700 14px var(--h-title,sans-serif);letter-spacing:1.6px;color:#fff;padding:7px 12px;pointer-events:none;background:rgba(158,59,37,.92)}
+.vr-vista.prima .vr-badge{background:rgba(43,33,24,.78)}
+.vr-vista.confronta .vr-badge,.vr-vista.giro .vr-badge{display:none}
+/* frecce grandi */
+.vr-freccia{position:absolute;top:50%;transform:translateY(-50%);z-index:8;width:64px;height:96px;border:1px solid rgba(255,253,249,.5);background:rgba(43,33,24,.55);color:#fff;
+  font:700 40px/1 var(--h-title,sans-serif);cursor:pointer;display:grid;place-items:center}
+.vr-freccia:hover{background:rgba(158,59,37,.9)}
+.vr-freccia.s{left:10px}.vr-freccia.d{right:10px}
+.vr-freccia small{display:block;font:600 10px var(--h-mono,monospace);letter-spacing:.5px;margin-top:-10px}
+.vr-freccia:disabled{opacity:.25;cursor:default}
+/* zoom */
+.vr-zoom{position:absolute;right:12px;bottom:12px;z-index:8;display:flex;flex-direction:column;gap:6px}
+.vr-zoom button{width:58px;height:54px;border:1px solid rgba(255,253,249,.55);background:rgba(43,33,24,.62);color:#fff;font:700 26px/1 var(--h-title,sans-serif);cursor:pointer}
+.vr-zoom button:hover{background:#1f4e79}
+.vr-zoom button small{display:block;font:600 9.5px var(--h-mono,monospace);letter-spacing:.4px}
+.vr-aiuto-v{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);z-index:7;background:rgba(43,33,24,.74);color:#fffdf9;padding:8px 14px;font:500 15px var(--h-font,sans-serif);
+  pointer-events:none;transition:opacity .6s;white-space:nowrap;max-width:calc(100% - 180px);overflow:hidden;text-overflow:ellipsis}
+.vr-aiuto-v.via{opacity:0}
+/* etichette */
+.vr-etis{position:absolute;inset:0;pointer-events:none;z-index:5;transition:opacity .45s}
+.vr-eti{position:absolute;left:0;top:0;pointer-events:auto;cursor:pointer;white-space:nowrap;
+  background:rgba(255,253,249,.94);color:#2a1d12;border:1px solid rgba(110,92,72,.45);padding:6px 11px 6px 10px;font:700 15px/1.15 var(--h-title,sans-serif);letter-spacing:.6px;
+  box-shadow:0 8px 18px -10px rgba(40,25,10,.55);clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,0 100%)}
+.vr-eti::after{content:"";position:absolute;left:50%;top:100%;width:2px;height:var(--gamba,14px);background:rgba(255,253,249,.92);box-shadow:0 0 2px rgba(0,0,0,.45)}
+.vr-eti{overflow:visible;clip-path:none}
+.vr-eti small{display:block;font:500 11.5px var(--h-mono,monospace);color:#1f4e79;letter-spacing:.3px}
+.vr-eti::before{content:"+";display:inline-grid;place-items:center;width:18px;height:18px;margin-right:6px;background:#b5462c;color:#fff;font:700 14px/1 sans-serif;vertical-align:-2px}
+.vr-eti:hover{border-color:#b5462c}
+.vr-noeti .vr-eti{display:none}
+/* elemento 2D del «dopo» (es. il draghetto) */
+.vr-dopo2d{position:absolute;z-index:9;left:88px;bottom:64px;width:min(330px,calc(100% - 180px));background:rgba(255,253,249,.96);border:1px solid var(--vr-linea);padding:14px 16px;
+  box-shadow:0 22px 50px -22px rgba(40,25,10,.7);transition:opacity .45s;display:none}
+.vr-dopo2d.on{display:block}
+.vr-dopo2d img{width:100%;height:150px;object-fit:contain;background:#f4ede2;border:1px solid var(--vr-linea)}
+/* tappa del draghetto: banner BLU «STUDIO // PROVE DI STAMPA E ANIMAZIONI DEL NUOVO LOGO» al posto dei comandi VISTA/GRAFICHE.
+   Angoli tagliati HUD, spigoli oro che si accendono e pulsano piano, leggero bagliore, hover evidente. */
+.vr-logoban{display:block;text-decoration:none;color:#fffdf9!important;animation:vrBanBagliore 2.8s ease-in-out infinite;transition:transform .18s}
+.vr-logoban[hidden]{display:none}
+.vr-logoban .in{position:relative;display:flex;flex-direction:column;gap:6px;padding:20px 22px 18px;min-height:120px;justify-content:center;
+  background:linear-gradient(160deg,#2a64a0 0%,#1f4e79 55%,#173b5c 100%);
+  clip-path:polygon(18px 0,100% 0,100% calc(100% - 18px),calc(100% - 18px) 100%,0 100%,0 18px);transition:filter .18s,background .18s}
+.vr-logoban .in::before{content:"";position:absolute;inset:0;pointer-events:none;animation:vrBanAngoli 2.8s ease-in-out infinite;
+  background:linear-gradient(135deg,transparent 0 16px,#e2b04a 16px 21px,transparent 21px) top left/60px 60px no-repeat,
+             linear-gradient(315deg,transparent 0 16px,#e2b04a 16px 21px,transparent 21px) bottom right/60px 60px no-repeat,
+             linear-gradient(#e2b04a,#e2b04a) top right/26px 3px no-repeat,linear-gradient(#e2b04a,#e2b04a) top right/3px 26px no-repeat,
+             linear-gradient(#e2b04a,#e2b04a) bottom left/26px 3px no-repeat,linear-gradient(#e2b04a,#e2b04a) bottom left/3px 26px no-repeat}
+.vr-logoban .mini{display:block;position:relative;background:#f4ede2;border:2px solid #e2b04a;aspect-ratio:16/9;overflow:hidden;
+  clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px)}
+.vr-logoban .mini img{display:block;width:100%;height:100%;object-fit:contain}
+.vr-logoban strong{font-size:19px!important}
+.vr-logoban small{font:600 13px/1 var(--h-mono,Consolas,monospace);letter-spacing:2.5px;color:#f1c96b}
+.vr-logoban strong{font:700 23px/1.12 var(--h-title,'Rajdhani',sans-serif);letter-spacing:1.4px;text-transform:uppercase}
+.vr-logoban em{font-style:normal;font:600 15px/1.2 var(--h-font,'Segoe UI',sans-serif);color:#d8e6f4}
+.vr-logoban em b{font-size:20px;color:#f1c96b}
+.vr-logoban:hover,.vr-logoban:focus-visible{transform:translateY(-3px) scale(1.02);outline:none;animation:none;filter:drop-shadow(0 0 14px rgba(241,201,107,.85)) drop-shadow(0 12px 16px rgba(23,59,92,.55))}
+.vr-logoban:hover .in,.vr-logoban:focus-visible .in{background:linear-gradient(160deg,#3474b5 0%,#255d90 55%,#1b4568 100%)}
+.vr-logoban:hover .in::before{animation:none;opacity:1}
+@keyframes vrBanAngoli{0%,100%{opacity:.5}50%{opacity:1}}
+@keyframes vrBanBagliore{0%,100%{filter:drop-shadow(0 0 0 rgba(241,201,107,0)) drop-shadow(0 10px 14px rgba(23,59,92,.45))}50%{filter:drop-shadow(0 0 10px rgba(241,201,107,.6)) drop-shadow(0 10px 14px rgba(23,59,92,.45))}}
+@media (prefers-reduced-motion:reduce){.vr-logoban,.vr-logoban .in::before{animation:none;opacity:1}}
+.vr-dopo2d h3{margin:8px 0 4px;font:700 20px/1.1 var(--h-title,sans-serif);text-transform:uppercase;letter-spacing:.8px}
+.vr-dopo2d p{margin:0 0 8px;font-size:16px}
+/* prima / dopo: tendina */
+.vr-taglio{position:absolute;top:0;bottom:0;width:0;z-index:8;display:none}
+.vr-vista.confronta .vr-taglio{display:block}
+.vr-taglio::before{content:"";position:absolute;top:0;bottom:0;left:-1px;width:3px;background:#fffdf9;box-shadow:0 0 8px rgba(0,0,0,.45)}
+.vr-taglio span{position:absolute;top:50%;left:0;transform:translate(-50%,-50%);width:62px;height:62px;border-radius:50%;background:#b5462c;color:#fff;display:grid;place-items:center;
+  font:700 22px var(--h-title,sans-serif);cursor:ew-resize;box-shadow:0 6px 18px rgba(0,0,0,.35);border:3px solid #fffdf9;touch-action:none}
+.vr-taglio em{position:absolute;top:52px;font:700 14px var(--h-title,sans-serif);letter-spacing:2px;color:#fff;background:rgba(43,33,24,.75);padding:5px 10px;font-style:normal;white-space:nowrap}
+.vr-taglio em.a{right:12px}.vr-taglio em.b{left:12px;background:rgba(158,59,37,.92)}
+/* barra del giro video */
+.vr-barra{display:none;margin-top:10px;background:var(--vr-bianco);border:1px solid var(--vr-linea);padding:12px}
+.vr-corpo.giro .vr-barra{display:block}
+.vr-corpo.giro .vr-vista{height:clamp(420px,calc(100vh - 380px),900px)}
+.vr-barra .riga{display:flex;align-items:center;gap:12px}
+.vr-barra input[type=range]{flex:1;height:44px;accent-color:#b5462c;cursor:pointer}
+.vr-barra .tempo{font:600 15px var(--h-mono,monospace);min-width:96px;text-align:right}
+.vr-capitoli{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.vr-cap{appearance:none;cursor:pointer;min-height:46px;padding:8px 12px;font:700 15px/1 var(--h-title,sans-serif);letter-spacing:.6px;color:#2a1d12;background:var(--vr-beige);border:1px solid var(--vr-linea)}
+.vr-cap small{font:500 11px var(--h-mono,monospace);color:var(--vr-mut);margin-left:6px}
+.vr-cap.on{background:#1f4e79;color:#fff;border-color:#173c5e}.vr-cap.on small{color:#d6e3ef}
+.vr-giri{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+.vr-giro{flex:0 0 auto;appearance:none;cursor:pointer;display:flex;align-items:center;gap:9px;min-height:62px;padding:5px 12px 5px 5px;background:var(--vr-bianco);border:1px solid var(--vr-linea);
+  text-align:left;font:700 15px/1.1 var(--h-title,sans-serif);letter-spacing:.5px;color:#2a1d12}
+.vr-giro img{width:34px;height:52px;object-fit:cover;background:#2b2118}
+.vr-giro small{display:block;font:500 11px var(--h-mono,monospace);color:var(--vr-mut);margin-top:3px}
+.vr-giro:hover{border-color:#1f4e79}
+.vr-giro[aria-pressed="true"]{background:#1f4e79;color:#fff;border-color:#173c5e}.vr-giro[aria-pressed="true"] small{color:#d6e3ef}
+/* pannello a destra */
+.vr-pann{display:flex;flex-direction:column;gap:12px}
+.vr-box{background:var(--vr-bianco);border:1px solid var(--vr-linea);padding:14px 16px}
+.vr-box h2{margin:0 0 4px;font:700 26px/1.05 var(--h-title,sans-serif);letter-spacing:1px;text-transform:uppercase;color:#2a1d12}
+.vr-box h2 span{color:var(--vr-mat);font-family:var(--h-mono,monospace);font-size:15px;letter-spacing:1px;margin-right:8px;vertical-align:4px}
+.vr-box .dove{font:600 12.5px var(--h-mono,monospace);letter-spacing:1px;color:var(--vr-blu);text-transform:uppercase}
+.vr-box p{margin:8px 0 0;font-size:17px}
+.vr-box p b{color:#9e3b25}
+.vr-box ul{margin:6px 0 0;padding-left:20px;font-size:16.5px}
+.vr-box li{margin:3px 0}
+.vr-rl{display:block;font:600 12.5px var(--h-mono,monospace);letter-spacing:1.6px;text-transform:uppercase;color:var(--vr-mut);margin:2px 0 6px}
+.vr-seg{display:flex;gap:6px;flex-wrap:wrap}
+.vr-s{appearance:none;cursor:pointer;flex:1 1 auto;min-height:54px;padding:10px 12px;font:700 17px/1.05 var(--h-title,sans-serif);letter-spacing:.7px;color:#2a1d12;background:var(--vr-bianco);border:1px solid var(--vr-linea)}
+.vr-s:hover{border-color:#1f4e79}
+.vr-s[aria-pressed="true"]{background:#1f4e79;color:#fff;border-color:#173c5e}
+.vr-s.rosso[aria-pressed="true"]{background:#b5462c;border-color:#8a321f}
+.vr-s:disabled{opacity:.4;cursor:default}
+.vr-ogg{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+.vr-ogg button{appearance:none;cursor:pointer;text-align:left;min-height:50px;padding:8px 12px;background:var(--vr-beige);border:1px solid var(--vr-linea);font:700 16px/1.15 var(--h-title,sans-serif);letter-spacing:.5px;color:#2a1d12}
+.vr-ogg button small{display:block;font:500 11.5px var(--h-mono,monospace);color:var(--vr-blu);letter-spacing:.2px}
+.vr-ogg button:hover{border-color:#b5462c;background:#fffdf9}
+.vr-note{margin:12px 0 0;color:var(--vr-mut);font-size:12.5px;text-transform:uppercase;letter-spacing:.8px;line-height:1.55}
+/* scheda flottante (stessa della vetrina aumentata) */
+.vr-scheda{position:absolute;z-index:10;width:min(420px,calc(100% - 24px));max-height:calc(100% - 24px);overflow:auto;background:rgba(255,253,249,.97);color:#2a1d12;
+  border:1px solid rgba(110,92,72,.45);box-shadow:0 26px 60px -24px rgba(40,25,10,.65);padding:18px 18px 16px;cursor:auto;
+  clip-path:polygon(0 0,calc(100% - 18px) 0,100% 18px,100% 100%,18px 100%,0 calc(100% - 18px));
+  transform-origin:var(--ox,50%) var(--oy,50%);animation:vr-apri .32s cubic-bezier(.22,.9,.24,1)}
+.vr-scheda[hidden]{display:none}
+@keyframes vr-apri{from{opacity:0;transform:scale(.86) translateY(8px)}to{opacity:1;transform:none}}
+.vr-scheda::before{content:"";position:absolute;left:0;top:0;width:44px;height:3px;background:#b5462c}
+.vr-scheda .x{position:absolute;right:10px;top:10px;width:46px;height:46px;border:1px solid var(--vr-linea);background:var(--vr-beige);font:700 22px/1 sans-serif;cursor:pointer;color:#2a1d12}
+.vr-scheda h3{margin:0 52px 2px 0;font:700 24px/1.1 var(--h-title,sans-serif);letter-spacing:.8px;text-transform:uppercase}
+.vr-scheda .mis{font:600 13px var(--h-mono,monospace);color:#1f4e79;letter-spacing:.5px}
+.vr-scheda .fig{display:flex;gap:12px;margin:12px 0 8px;align-items:flex-start}
+.vr-scheda .fig img{width:120px;height:auto;max-height:170px;object-fit:contain;background:#2b2118;border:1px solid var(--vr-linea)}
+.vr-scheda .fig p{margin:0;font-size:16.5px}
+.vr-scheda h4{margin:10px 0 4px;font:700 14px var(--h-mono,monospace);letter-spacing:1.6px;text-transform:uppercase;color:#9e3b25}
+.vr-scheda ul{margin:0;padding-left:20px;font-size:16.5px}
+.vr-scheda li{margin:3px 0}
+.vr-scheda .prezzo{margin-top:10px;padding:9px 11px;background:var(--vr-beige);border-left:3px solid #1f4e79;font-size:16px}
+.vr-scheda .prezzo b{font-family:var(--h-mono,monospace);font-size:14.5px}
+.vr-scheda .azioni{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.vr-scheda .come{display:none;margin-top:10px;font-size:16px;background:#fbf6ee;border:1px dashed var(--vr-linea);padding:10px 12px}
+.vr-scheda .come.on{display:block}
+.vr-scheda .come ol{margin:0;padding-left:20px}
+.vr-app{margin:10px 0 4px;border:1px solid #cbbfae;background:#f7f1e7;font-family:var(--h-title,sans-serif)}
+.vr-app .barra{display:flex;align-items:center;gap:8px;background:#2b2118;color:#fffdf9;padding:6px 9px;font:700 13px var(--h-mono,monospace);letter-spacing:1.4px}
+.vr-app .barra img{height:20px}.vr-app .barra span{flex:1}
+.vr-app .tess{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:8px}
+.vr-app .tess div{padding:10px 6px;text-align:center;font:700 15px var(--h-title,sans-serif);letter-spacing:1px;color:#fff;background:#b5462c}
+.vr-app .tess div:nth-child(2){background:#1f4e79}.vr-app .tess div:nth-child(3){background:#6b5c4c}
+.vr-app .tess small{display:block;font:500 10.5px var(--h-mono,monospace);opacity:.85;letter-spacing:.3px}
+.vr-app .eti{margin:0 8px 8px;background:#fff;border:1px solid #cbbfae;padding:7px 9px;display:flex;gap:10px;align-items:center}
+.vr-app .eti .t{flex:1;font:700 14px/1.15 var(--h-title,sans-serif)}
+.vr-app .eti .t small{display:block;font:500 11px var(--h-mono,monospace);color:#5e4f41}
+.vr-app .eti .t b{color:#9e3b25;font-size:18px}
+.vr-app .eti svg{width:120px;height:34px}
+.vr-app .piede{font:500 11px var(--h-mono,monospace);color:#5e4f41;padding:0 8px 7px}
+.hbtn.vr-big{min-height:52px;font-size:17px}
+.vr-msg{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:9;background:rgba(255,253,249,.95);padding:18px 24px;max-width:min(560px,90%);font-size:18px;text-align:center;border:1px solid var(--vr-linea)}
+.vr-msg[hidden]{display:none}
+.vr-cal{position:absolute;left:14px;bottom:14px;z-index:9;font:600 13px var(--h-mono,monospace);background:#000c;color:#ff0;padding:6px 9px;pointer-events:none;display:none}
+.cal .vr-cal{display:block}
+</style>
+</head>
+<body class="hud">
+<main class="vr">
+ <div class="vr-top">
+  <a class="vr-bt" href="../index.html">☰ Menu</a>
+  <a class="vr-bt" href="index.html">‹ Visite</a>
+  <div class="vr-tit"><h1>Visita fotografica — <b>prima // dopo</b></h1></div>
+  <a class="vr-bt rosso" href="../demo/demo-app-v2.html">▶ Demo app</a>
+  <span class="vr-firma">VIA POGGI D’ORO 23 · 5/11/2026</span>
+ </div>
+
+ <nav class="vr-tappe" id="tappe" aria-label="Tappe della visita"></nav>
+
+ <div class="vr-corpo" id="corpo">
+  <div>
+   <div class="vr-vista dopo" id="vista">
+    <div class="vr-sfondo" id="sfondo"></div>
+    <div class="vr-foglio" id="foglio"><img id="foto" alt="" draggable="false"></div>
+    <video class="vr-video" id="giro" muted playsinline preload="auto" poster="visita-reale/giro-poster.jpg"></video>
+    <canvas class="vr-3d" id="c3d"></canvas>
+    <div class="vr-etis" id="etis"></div>
+    <div class="vr-dopo2d" id="dopo2d"></div>
+    <div class="vr-taglio" id="taglio" style="left:50%"><em class="a">PRIMA · oggi</em><em class="b">DOPO · con STORE // CRAFT</em><span>⟷</span></div>
+    <div class="vr-staffe"></div>
+    <div class="vr-hud" id="hud"></div>
+    <div class="vr-badge" id="badge">DOPO · con STORE // CRAFT</div>
+    <button class="vr-freccia s" id="prec" title="Tappa precedente" aria-label="Tappa precedente">‹</button>
+    <button class="vr-freccia d" id="succ" title="Tappa successiva" aria-label="Tappa successiva">›</button>
+    <div class="vr-zoom">
+     <button data-z="in" title="Avvicina">＋<small>ZOOM</small></button>
+     <button data-z="out" title="Allontana">－<small>ZOOM</small></button>
+     <button data-z="fit" title="Foto intera">⤢<small>INTERA</small></button>
+    </div>
+    <div class="vr-aiuto-v" id="aiutoV">Tieni premuto e trascina per muoverti · rotella per avvicinare · clic su un oggetto per i dettagli</div>
+    <div class="vr-msg" id="msg" hidden></div>
+    <div class="vr-cal" id="cal"></div>
+    <section class="vr-scheda" id="scheda" hidden></section>
+   </div>
+   <div class="vr-barra" id="barra">
+    <div class="riga">
+     <button class="vr-bt rosso vr-play" id="play"><span class="ic">▶</span>Cammina</button>
+     <input type="range" id="scrub" min="0" max="20.5" step="0.01" value="0" aria-label="Posizione nel giro">
+     <span class="tempo" id="tempo">0,0 s</span>
+    </div>
+    <div class="vr-capitoli" id="capitoli"></div>
+    <span class="vr-rl" style="margin:12px 0 4px">Altre passeggiate</span>
+    <div class="vr-giri" id="giri"></div>
+   </div>
+  </div>
+
+  <aside class="vr-pann">
+   <div class="vr-box" id="info"></div>
+   <div class="vr-box" id="boxVista">
+    <span class="vr-rl">Vista</span>
+    <div class="vr-seg">
+     <button class="vr-s rosso" data-vista="dopo" aria-pressed="true">DOPO<br><small style="font-size:12px">con STORE // CRAFT</small></button>
+     <button class="vr-s" data-vista="prima" aria-pressed="false">PRIMA<br><small style="font-size:12px">oggi</small></button>
+     <button class="vr-s" data-vista="confronta" aria-pressed="false">⟷ Confronta</button>
+    </div>
+    <span class="vr-rl" style="margin-top:12px">Grafiche</span>
+    <div class="vr-seg">
+     <button class="vr-s" data-graf="scure" aria-pressed="true">Scure</button>
+     <button class="vr-s" data-graf="chiare" aria-pressed="false">Chiare</button>
+     <button class="vr-s" data-eti="1" aria-pressed="true">Etichette sì</button>
+     <button class="vr-s" data-eti="0" aria-pressed="false">No</button>
+    </div>
+   </div>
+   <a class="vr-logoban" id="bannerLogo" href="../media/logo/index.html" hidden><span class="in"><span class="mini"><img src="../media/logo/storico/animazione/draghetto-avvio-chiaro-16x9-600.gif" alt="Animazione del nuovo logo" loading="lazy"></span><strong>STUDIO // Prove di stampa e animazioni del nuovo logo</strong><em>Apri la pagina del logo <b>›</b></em></span></a>
+   <div class="vr-box" id="boxOgg"><span class="vr-rl">In questa tappa aggiungiamo</span><div class="vr-ogg" id="ogg"></div></div>
+  </aside>
+ </div>
+ <p class="vr-note">Foto e video fatti in negozio da Fabrice il 5 novembre 2026. Per rispetto della privacy sono sfocate le foto dei bambini, le persone e i riflessi.
+  Gli oggetti aggiunti (schermo da vetrina, postazione, porta-prezzi, cornici) sono ricostruzioni 3D in misura vera: la posizione è una proposta da decidere insieme. Prezzi indicativi, da verificare.</p>
+</main>
+
+<script>
+(function(){
+'use strict';
+var $=function(s){return document.querySelector(s)};
+var BF=window.BF||{}, LOOP=window.BF_LOOP||null, PREZZI=window.DISPLAY_PREZZI||null;
+var CAL=/[?&]cal=1/.test(location.search);
+var S={i:0,vista:'dopo',graf:'scure',eti:true,taglio:0.5,giro:false};
+try{var sv=JSON.parse(localStorage.getItem('vr-pref')||'{}');['graf','eti'].forEach(function(k){if(sv[k]!=null)S[k]=sv[k]})}catch(e){}
+function salvaPref(){try{localStorage.setItem('vr-pref',JSON.stringify({graf:S.graf,eti:S.eti}))}catch(e){}}
+var D2R=Math.PI/180;
+
+/* ======================= TAPPE =======================
+   W,H = pixel della foto (versione grande); fov = campo verticale (iPhone: 67,3° foto in piedi, 53,1° foto coricata, ~62° video 4K);
+   inc = inclinazione (+ guarda in basso), rol = rollio (gradi); luce = come è illuminato quel punto.
+   Oggetti: px,py = punto d'appoggio nella foto (pixel della versione grande), d = distanza in metri, ry = rotazione (gradi, 0 = guarda la camera). */
+var COME_STAMPA=['Apri STORE // CRAFT e tocca <b>GRAFICA</b> (o la promozione del momento).','Scegli il modello e la misura: testo e prezzo si compilano da soli.','Stampa e infila il foglio nel plexiglass o nella cornice: fatto in 2 minuti.'];
+var COME_TABLET=['In STORE // CRAFT tocca <b>VETRINA DIGITALE</b>.','Scegli le slide (offerte, marchi, Black Friday) e quanto restano a schermo.','Il tablet le mostra subito, anche a negozio chiuso: si cambiano dal telefono.'];
+var COME_SCHERMO=['In STORE // CRAFT tocca <b>VETRINA DIGITALE</b> e scegli «schermo verticale».','Le stesse grafiche del tablet, girate in verticale: nessun lavoro in più.','Lo schermo le ripete tutto il giorno al posto dello spot del fornitore.'];
+var INFO={
+ tablet:{nome:'Tablet 12,4"–13" in vetrina',mis:'28,5×18,5 cm (schermo 26,7×16,7) · su supporto',serve:'Sta sul ripiano della vetrina e fa scorrere le offerte (qui: Black Friday) giorno e notte.',
+   pro:['Lavora anche a negozio chiuso, di sera e la domenica.','Le offerte si cambiano dal telefono in un minuto, senza stampare.','Il movimento attira lo sguardo di chi passa sul marciapiede.','Si accende e si spegne da solo all’orario scelto.'],proposta:true,come:COME_TABLET,slide:true},
+ display22:{nome:'Schermo da vetrina 21,5"',mis:'50,5×30 cm (area 47,6×26,8) · Android, su piede da tavolo',serve:'Lo schermo grande nel tratto interno della vetrina: fa scorrere le offerte (qui: Black Friday) e si vede bene dalla strada.',
+   pro:['Grande quasi il doppio del tablet e costa meno.','Lo comandi da STORE // CRAFT: premi «Manda in vetrina» e si aggiorna da solo.','Acceso tutto il giorno, si spegne da solo all’orario scelto.'],proposta:true,come:COME_TABLET,slide:true},
+ monitor:{nome:'Postazione STORE // CRAFT',mis:'monitor 24" · mini-PC · DYMO · lettore',app:true,serve:'Il cuore del sistema: qui Aldo registra la merce, trova un occhiale, stampa cartellini, cartelli e slide.',
+   pro:['VENDO, ARRIVA MERCE, CERCO: tre tasti grandi, niente menu complicati.','Stampa le etichette con la DYMO LabelWriter 450 in un secondo.','Prepara i cartelli e la vetrina digitale con le grafiche del negozio.'],prezzo:'si usa il PC che c’è o un mini-PC (circa 250–400 €) + monitor 24" (circa 110–160 €)'},
+ dymo:{nome:'Stampante DYMO LabelWriter 450',mis:'12,5×18,7×13,4 cm · etichette 89×28 mm',app:true,serve:'Stampa il cartellino con codice a barre per ogni occhiale che arriva.',
+   pro:['Niente più scritte a mano: tutte le etichette uguali e leggibili.','Il codice a barre si legge col lettore: vendita registrata in un clic.','Non usa inchiostro (stampa termica).'],prezzo:'circa 80–120 € (spesso si trova usata a meno)'},
+ lettore:{nome:'Lettore di codici a barre',mis:'su base, USB',app:true,serve:'Si passa sul cartellino dell’occhiale: STORE // CRAFT lo trova subito.',
+   pro:['Vendita o reso in un secondo, senza digitare.','Sa sempre cosa c’è in negozio.'],prezzo:'circa 25–45 €'},
+ plexi13:{nome:'Porta-prezzi in plexiglass',mis:'13×18 cm · plexiglass a L',prezzoK:'13x18',serve:'Accanto agli occhiali: mostra il prezzo o l’offerta a chi guarda.',
+   pro:['Il prezzo si vede subito: il cliente non deve chiedere.','Si cambia la grafica in un minuto con STORE // CRAFT.','Costa pochi euro e dura anni.','Tutti uguali e ordinati: la vetrina sembra più curata.'],come:COME_STAMPA},
+ plexiA5:{nome:'Porta-prezzi in plexiglass',mis:'A5 · 14,8×21 cm · plexiglass a L',prezzoK:'A5',serve:'L’offerta del momento, ben leggibile anche da un paio di metri.',
+   pro:['Il cliente la legge mentre aspetta o paga: vende un secondo paio.','Stampa e cambio in un minuto con STORE // CRAFT.','Costa pochi euro.'],come:COME_STAMPA},
+ plexi10:{nome:'Porta-prezzi piccolo',mis:'10×15 cm · plexiglass a L',prezzoK:'10x15',serve:'Il cartellino del singolo modello: nome, prezzo, prezzo Black Friday.',
+   pro:['Il cliente sceglie da solo, con il prezzo davanti.','Si stampa con STORE // CRAFT insieme all’etichetta DYMO.','Costa circa 2 € a pezzo.'],come:COME_STAMPA},
+ cornice:{nome:'Cornicetta in legno',mis:'13×18 cm · legno',prezzoK:'cornice-legno-13x18',serve:'Una promo che sembra un quadretto, tra gli occhiali.',
+   pro:['Fa “negozio di qualità”: calda, elegante, non sembra un volantino.','Dentro va la stampa fatta con STORE // CRAFT.','Si trova ovunque, costa poco.'],come:COME_STAMPA},
+ cornice10:{nome:'Cornicetta in legno',mis:'10×15 cm · legno',prezzoK:'cornice-legno-10x15',serve:'Una promo piccola che sembra un quadretto, tra gli occhiali.',
+   pro:['Fa “negozio di qualità”: calda, elegante, non sembra un volantino.','Dentro va la stampa fatta con STORE // CRAFT.','Costa pochi euro.'],come:COME_STAMPA},
+ schermo:{nome:'Schermo verticale con le nostre grafiche',mis:'lo schermo che c’è già (circa 32")',serve:'Lo schermo verticale oggi mostra lo spot Luxottica: può mostrare le offerte di Ottica Macrì.',
+   pro:['Nessuna spesa: lo schermo c’è già.','Mostra le stesse grafiche del tablet in vetrina, in verticale.','Il cliente seduto ad aspettare vede le offerte del negozio.'],prezzo:'0 € se lo schermo accetta una chiavetta USB o un mini-PC (circa 40–60 € una chiavetta HDMI)',come:COME_SCHERMO,slideV:true},
+ totem:{nome:'Espositore da terra A4',mis:'A4 · 21×29,7 cm · alto 130 cm',prezzoK:'A4',serve:'Vicino alle sedie, dove il cliente aspetta: la promozione più forte del momento.',
+   pro:['Il cliente lo legge mentre aspetta.','Il foglio A4 si cambia in un attimo: si stampa da STORE // CRAFT.','Leggero: si sposta dove serve.'],prezzo:'espositore da terra A4 circa 25–45 €',come:COME_STAMPA},
+ /* giro 2: supporti dell'allestimento Black Friday (dispositivi.js) */
+ plexiA7:{nome:'Cavalierino plexiglass A7',mis:'7,4×10,5 cm · plexiglass a L',serve:'Accanto al singolo occhiale: marca, modello e prezzo Black Friday.',
+   pro:['Il cliente vede il prezzo senza chiedere.','Piccolo: non copre gli occhiali.','Si stampa con STORE // CRAFT insieme agli altri cartelli.'],prezzo:'da verificare (non ancora nella ricerca prezzi)',come:COME_STAMPA},
+ plexiA3T:{nome:'Porta-poster A3 a T',mis:'A3 · 29,7×42 cm · plexiglass su base',serve:'La pubblicità grande della vetrina destra, la più visibile dalla strada: «fino al −30% TUTTI I BRAND».',
+   pro:['Si legge dal marciapiede, anche di sera.','Il poster si stampa in copisteria dal file di STORE // CRAFT.','Si cambia a ogni promozione.'],prezzo:'da verificare (non ancora nella ricerca prezzi)',come:COME_STAMPA},
+ appeso:{nome:'Cartello appeso A3',mis:'A3 orizzontale · 42×29,7 cm · con cavetti',serve:'Sospeso nel vano della vetrina, proprio dove oggi c’è il foglio bianco di prova: la scritta grande Black Friday.',
+   pro:['Sta all’altezza degli occhi di chi passa.','Non occupa il ripiano: gli occhiali restano tutti in vista.','Due cavetti e un foglio stampato: si cambia in un minuto.'],prezzo:'da verificare (non ancora nella ricerca prezzi)',come:COME_STAMPA},
+ vetrofania:{nome:'Vetrofania Black Friday',mis:'60×30 cm · adesivo sul vetro',serve:'La fascia «BLACK FRIDAY» incollata sul vetro della vetrina destra.',
+   pro:['Si vede anche da lontano e a vetrina spenta.','Si stacca senza lasciare segni a fine promozione.','Stessa grafica dei cartelli: tutto coordinato.'],prezzo:'da verificare col tipografo',come:COME_STAMPA},
+ cubo:{nome:'Cubo espositore 10 cm',mis:'10×10×10 cm · plexiglass · 4 facce',serve:'Operazione focus: il Ray-Ban Wayfarer al centro, con modello, prezzo, marca e Black Friday sulle 4 facce.',
+   pro:['Da qualunque lato lo si guardi c’è un messaggio.','Mette in risalto UN prodotto: il cliente sa cosa chiedere.','Le 4 facce si stampano insieme da STORE // CRAFT.'],prezzo:'da verificare (non ancora nella ricerca prezzi)',come:COME_STAMPA},
+ cartelloA4:{nome:'Cartello A4 al vetro',mis:'A4 · 21×29,7 cm · al posto del foglio di prova',prezzoK:'A4',serve:'Al posto del foglio bianco che Fabrice ha appeso per misurare la vetrina: la reclame Black Friday.',
+   pro:['Stessa misura e stesso punto del foglio di prova: la scala è quella vera.','Si stampa su un normale foglio A4.','Si cambia in un attimo.'],come:COME_STAMPA}
+};
+var TAPPE=[
+ {id:'facciata',nome:'La facciata',sub:'dalla strada, di sera',W:1800,H:2400,fov:67.3,inc:0,rol:0,dove:'Strada · Via Poggi d’Oro 23, l’insegna OTTICA «Aldo Macrì»',luce:'vetrina',
+  prima:'Il negozio visto dal marciapiede, di sera: l’insegna OTTICA, le due vetrine illuminate e il vestibolo con la porta a vetro.',
+  dopo:'Con l’allestimento <b>Black Friday</b>, visto da lontano: nella vetrina sinistra lo <b>schermo 21,5"</b> nel tratto interno, la <b>cornicetta</b> con le date e sotto un cartello per brand (Ray-Ban, Persol, Oakley). Nella destra, sopra resta tutto com’è; sotto il porta-cartello <b>A5</b> della Wayfarer con due cavalierini <b>A7</b>.',
+  ogg:[{t:'display22',px:725,py:1305,d:4.0,ry:-12},{t:'cornice',v:'sx-cornice-13x18-date',px:395,py:1300,d:3.7,ry:20},
+       {t:'plexi10',v:'sx-brand-rayban',px:395,py:1575,d:3.6,ry:20},{t:'cornice10',v:'sx-brand-persol',px:575,py:1560,d:3.85,ry:0},{t:'plexi10',v:'sx-brand-oakley',px:760,py:1555,d:4.0,ry:-10},
+       {t:'plexiA7',v:'dx-a7-wayfarer-901',px:1140,py:1690,d:4.2,ry:6},{t:'plexiA5',v:'dx-13x18-focus',px:1245,py:1688,d:4.25,ry:0},{t:'plexiA7',v:'dx-a7-wayfarer-902',px:1350,py:1690,d:4.3,ry:-6}]},
+ {id:'draghetto',nome:'Il draghetto',sub:'fuori, sul muro',W:1800,H:2400,fov:67.3,inc:0,rol:0,dove:'Strada · accanto all’ingresso',
+  prima:'Il draghetto dipinto (Ray-Ban «Colorize») accoglie chi arriva dalla strada: è già il simbolo del negozio.',
+  dopo:'Con STORE // CRAFT il draghetto diventa il <b>logo di Ottica Macrì</b>: lo stesso su cartelli, tablet, etichette e social.',
+  d2:{img:'../media/logo/marchi6/06-ovale/06-ovale-colori.svg',tit:'Il marchio rinnovato',txt:'Il draghetto storico nell’ovale da bottega: per insegna, cartelli e app. È nella pagina del logo.',link:'../media/logo/index.html'},ogg:[]},
+ {id:'strada-sx',nome:'Vetrine dalla strada',sub:'1 · la sinistra, di sera',W:1800,H:2400,fov:67.3,inc:4,rol:0,dove:'Strada · vetrina d’angolo a sinistra (2 ripiani)',luce:'vetrina',
+  a4:[[1061.5,766],[1210,757.5],[1205,995],[1059,994]],
+  prima:'La vetrina d’angolo di sera. Il foglio bianco A4 appeso dentro è la nostra misura: 21×29,7 cm, da lì si calcola la grandezza vera di tutto.',
+  dopo:'SOPRA le <b>offerte speciali</b>: lo <b>schermo da vetrina 21,5"</b> nel tratto più interno e la <b>cornicetta</b> con le date. SOTTO il <b>catalogo</b>: un cartello per Ray-Ban, Persol e Oakley.',
+  ogg:[{t:'cartelloA4',v:'sx-a5-sole',q:'a4',d:2.3},
+       {t:'display22',px:1265,py:1310,d:2.15,ry:-18},
+       {t:'cornice',v:'sx-cornice-13x18-date',px:365,py:1262,d:1.7,ry:32},
+       {t:'plexi10',v:'sx-brand-rayban',px:424,py:2080,d:1.62,ry:30},
+       {t:'cornice10',v:'sx-brand-persol',px:950,py:1920,d:1.92,ry:4},
+       {t:'plexi10',v:'sx-brand-oakley',px:1440,py:1950,d:2.02,ry:-12}]},
+ {id:'strada-dx',nome:'Vetrine dalla strada',sub:'2 · la destra, di sera',W:1800,H:2400,fov:67.3,inc:9,rol:1.1,dove:'Strada · vetrina a destra della porta, la più visibile',luce:'vetrina',
+  a4:[[864,617.5],[1022.5,615],[1022.5,842.5],[867.5,846]],
+  prima:'La vetrina destra, la più visibile dal marciapiede. Il foglio A4 appeso nel vano è il riferimento di misura (largo 158 pixel = circa 2,4 m di distanza).',
+  dopo:'SOPRA la vetrina resta com’è. SOTTO l’<b>operazione focus</b> Ray-Ban Wayfarer: un porta-cartello <b>A5</b> al centro e due cavalierini <b>A7</b> ai lati.',
+  ogg:[{t:'plexiA7',v:'dx-a7-wayfarer-901',px:735,py:1790,d:2.08,ry:14},{t:'plexiA5',v:'dx-13x18-focus',px:905,py:1765,d:2.12,ry:4},
+       {t:'plexiA7',v:'dx-a7-wayfarer-902',px:1080,py:1792,d:2.15,ry:-12}]},
+ {id:'strada-dx-vicino',nome:'Vetrine dalla strada',sub:'3 · la destra da vicino',W:1800,H:2400,fov:67.3,inc:-3.5,rol:-2,dove:'Strada · vetrina destra, a un passo dal vetro',luce:'vetrina',
+  a4:[[786.5,591.5],[1030,588.5],[1029,939],[792.5,940]],
+  prima:'La vetrina destra da vicino: il foglio A4 di prova è largo 243 pixel, cioè a circa 1,55 m dal telefono.',
+  dopo:'Sopra la vetrina resta com’è; sotto l’<b>operazione focus</b> Wayfarer con il porta-cartello <b>A5</b>.',
+  ogg:[{t:'plexiA5',v:'dx-13x18-focus',px:930,py:2335,d:1.22,ry:4}]},
+ {id:'vetrina-sx-vicino',nome:'Vetrina sinistra da vicino',sub:'i due ripiani',W:1350,H:2400,fov:62,inc:6,rol:0,dove:'Strada · vetrina d’angolo, da vicino (dal video)',luce:'vetrina',
+  prima:'La vetrina d’angolo da vicino: sopra Gucci, Michael Kors, Armani e Beckham; sotto Guess, Carrera, Marciano.',
+  dopo:'Da vicino si vede bene: SOPRA lo <b>schermo da vetrina 21,5"</b> nel tratto interno con le offerte che scorrono e la <b>cornicetta</b> con le date. SOTTO un solo cartello per brand: <b>Ray-Ban</b>, <b>Persol</b> e <b>Oakley</b>. Pochi pezzi: gli occhiali restano i protagonisti.',
+  ogg:[{t:'display22',px:1005,py:1345,d:2.15,ry:-18},
+       {t:'cornice',v:'sx-cornice-13x18-date',px:330,py:1345,d:1.85,ry:28},
+       {t:'plexi10',v:'sx-brand-rayban',px:300,py:1965,d:1.70,ry:30},
+       {t:'cornice10',v:'sx-brand-persol',px:790,py:1935,d:1.99,ry:-4},
+       {t:'plexi10',v:'sx-brand-oakley',px:1160,py:1965,d:2.06,ry:-16}]},
+ {id:'vetrina-sx',nome:'Vetrina sinistra',sub:'di giorno',W:1800,H:2400,fov:67.3,inc:0,rol:0,dove:'Strada · vetrina d’angolo a sinistra',luce:'vetrina',
+  prima:'La vetrina d’angolo, piena di marchi e occhiali da vista, con la tabella ottica per i bambini.',
+  dopo:'La stessa vetrina di giorno: SOPRA lo <b>schermo 21,5"</b> nel tratto interno, davanti al pannello Beckham, e la <b>cornicetta</b> con le date. SOTTO un cartello per brand: <b>Ray-Ban</b>, <b>Persol</b> e <b>Oakley</b>.',
+  ogg:[{t:'display22',px:1180,py:1395,d:2.5,ry:-18},
+       {t:'cornice',v:'sx-cornice-13x18-date',px:440,py:1350,d:2.0,ry:32},
+       {t:'plexi10',v:'sx-brand-rayban',px:470,py:1985,d:1.9,ry:30},
+       {t:'cornice10',v:'sx-brand-persol',px:930,py:1875,d:2.25,ry:4},
+       {t:'plexi10',v:'sx-brand-oakley',px:1340,py:1925,d:2.35,ry:-12}]},
+ {id:'vetrina-dx',nome:'Vetrina destra',sub:'di giorno',W:1800,H:2400,fov:67.3,inc:2,rol:0,dove:'Strada · vetrina a destra della porta',luce:'vetrina',
+  prima:'La vetrina dei Ray-Ban e dei Nuance Audio, con i bambini in basso.',
+  dopo:'SOPRA la vetrina resta com’è: Ray-Ban, Ferrari e Nuance Audio parlano da soli. SOTTO l’<b>operazione focus</b> Ray-Ban Wayfarer: il porta-cartello <b>A5</b> al centro e due cavalierini <b>A7</b> ai lati.',
+  ogg:[{t:'plexiA7',v:'dx-a7-wayfarer-901',px:760,py:2120,d:1.62,ry:12},{t:'plexiA5',v:'dx-13x18-focus',px:1000,py:2085,d:1.72,ry:2},
+       {t:'plexiA7',v:'dx-a7-wayfarer-902',px:1235,py:2120,d:1.66,ry:-10}]},
+ {id:'vestibolo',nome:'Vestibolo e porta',sub:'tra le vetrine',W:1800,H:2400,fov:67.3,inc:-4,rol:0,dove:'Ingresso · zona vetrina interna, porta a vetro sempre aperta',luce:'vetrina',
+  prima:'Superata la soglia si è nella zona vetrina tra le due vetrine; davanti, la porta a vetro sempre aperta con il draghetto rosso.',
+  dopo:'Appena entri vedi di lato lo <b>schermo 21,5"</b> della vetrina sinistra (nel tratto interno) e, sotto, i cartelli <b>Persol</b> e <b>Oakley</b>. Il vestibolo resta libero: niente totem, la porta e il passaggio vengono prima.',
+  ogg:[{t:'display22',px:850,py:1365,d:2.3,ry:-35},
+       {t:'cornice10',v:'sx-brand-persol',px:500,py:1815,d:2.0,ry:10},{t:'plexi10',v:'sx-brand-oakley',px:880,py:1830,d:2.1,ry:-20}]},
+ {id:'bancone',nome:'Bancone',sub:'subito a sinistra',W:2400,H:1800,fov:53.1,inc:0,rol:0,v0:[1.6,1500,1020],dove:'Dentro · bancone subito a sinistra della porta',luce:'dentro',
+  prima:'Il bancone di lavoro di Aldo: registratore di cassa, calcolatrice, cataloghi e, sugli scaffali dietro, lenti a contatto e collezioni.',
+  dopo:'Sul bancone la <b>postazione STORE // CRAFT</b>: <b>monitor</b>, <b>DYMO</b> per le etichette e <b>lettore</b> di codici, in fila accanto al busto. Per il cliente un solo <b>porta-cartello A5</b> con la promo del momento.',
+  h:1.5,ogg:[{t:'monitor',px:1900,py:1212,y:0.93,ry:-25},{t:'dymo',px:1690,py:1236,y:0.93,ry:-10},{t:'lettore',px:2130,py:1238,y:0.93,ry:-35},
+       {t:'plexiA5',v:'sx-a5-sole',px:1440,py:1262,y:0.93,ry:10}]},
+ {id:'dietro-bancone',nome:'Dietro il bancone',sub:'il posto di Aldo',W:1350,H:2400,fov:62,inc:45,rol:0,h:1.5,dove:'Dentro · dietro il bancone, dove lavora Aldo (dal video)',luce:'dentro',
+  prima:'Quello che vedi dal tuo posto: il bancone con il tappetino, il vassoio e, davanti, le sedie dei clienti.',
+  dopo:'Dal tuo posto vedi la <b>postazione STORE // CRAFT</b>: il monitor girato verso di te con i tre tasti VENDO / ARRIVA MERCE / CERCO, accanto la <b>DYMO 450</b> per le etichette e il <b>lettore</b> di codici a portata di mano. Il bancone resta libero per il cliente.',
+  ogg:[{t:'monitor',px:260,py:760,y:0.75,ry:30},{t:'dymo',px:900,py:790,y:0.75,ry:-15},{t:'lettore',px:620,py:1170,y:0.75,ry:10}]},
+ {id:'muro',nome:'Vetrine a muro',sub:'dietro il bancone',W:1350,H:2400,fov:62,inc:6,rol:0,dove:'Dentro · vetrine a muro dietro il bancone',luce:'dentro',
+  prima:'Le vetrine a muro con occhiali da vista, Ray-Ban e le collezioni, sopra il bancone lungo.',
+  dopo:'Le vetrine a muro restano come sono. Sul bancone vedi la <b>postazione STORE // CRAFT</b> (monitor, <b>DYMO</b>, <b>lettore</b>) accanto al busto e il <b>porta-cartello A5</b> con la promo, letto dal cliente mentre paga.',
+  h:1.42,ogg:[{t:'monitor',px:1060,py:1290,y:0.93,ry:-20},{t:'dymo',px:700,py:1385,y:0.93,ry:-5},{t:'lettore',px:1215,py:1285,y:0.93,ry:-30},
+       {t:'plexiA5',v:'sx-a5-sole',px:470,py:1440,y:0.93,ry:15}]},
+ {id:'corridoio',nome:'Corridoio e schermo',sub:'lo schermo Luxottica',W:1800,H:2400,fov:67.3,inc:0,rol:0,dove:'Dentro · verso il retro, lo schermo verticale',luce:'dentro',
+  prima:'Lo schermo verticale oggi mostra lo spot Luxottica; a destra l’espositore Ray-Ban e le sedie.',
+  dopo:'Lo schermo che c’è già <b>mostra le grafiche di Ottica Macrì</b> al posto dello spot Luxottica: le stesse della vetrina, in verticale. Nient’altro: il corridoio resta libero.',
+  ogg:[{t:'schermo',q:[[757,1372],[1006,1368],[1008,1797],[757,1801]],d:3.2}]},
+ {id:'sedie',nome:'Sedie e Ray-Ban',sub:'dove si aspetta',W:1350,H:2400,fov:62,inc:5,rol:0,dove:'Dentro · angolo delle sedie',luce:'dentro',
+  prima:'L’angolo delle sedie blu accanto all’espositore Ray-Ban: qui il cliente aspetta.',
+  dopo:'Dalle sedie il cliente vede lo <b>schermo con le grafiche di Ottica Macrì</b> (a sinistra, al posto dello spot Luxottica): le offerte gli scorrono davanti mentre aspetta. Niente totem: l’angolo è stretto e lo schermo basta.',
+  ogg:[{t:'schermo',q:[[-5,1497],[318,1494],[318,2042],[-5,2047]],d:2.6}]},
+ {id:'parete',nome:'Parete occhiali da sole',sub:'i ripiani di vetro',W:1350,H:2400,fov:62,inc:0,rol:0,dove:'Dentro · parete degli occhiali da sole',luce:'dentro',
+  prima:'La grande parete con i ripiani di vetro e i marchi (Armani, Versace, Carrera).',
+  dopo:'Qui niente cartelli grandi: solo <b>cavalierini A7</b> piccoli accanto a qualche occhiale, con marca, modello e prezzo. Il cliente sceglie da solo e la parete resta pulita.',
+  ogg:[{t:'plexiA7',v:'sx-a7-aviator',px:1150,py:692,d:1.0,ry:-22},{t:'plexiA7',v:'sx-a7-clubmaster',px:770,py:1262,d:0.98,ry:22}]},
+ {id:'vetrina-dentro',nome:'Vetrina da dentro',sub:'i cartelli a mano',W:1350,H:2400,fov:62,inc:2,rol:0,dove:'Dentro · la vetrina vista dal negozio',luce:'vetrina',
+  prima:'La vetrina vista da dentro: i cartelli «OFFERTA» sono scritti e stampati a mano.',
+  dopo:'Il cartello «OFFERTA OCCHIALE COMPLETO» fatto a mano diventa un <b>porta-cartello A5</b> stampato con STORE // CRAFT, nello stile di tutto il negozio. Il ripiano della vetrina destra resta com’è.',
+  ogg:[{t:'plexiA5',v:'sx-13x18-vista',px:215,py:1505,d:1.7,ry:12}]}
+];
+/* PASSEGGIATE: video scorrevoli (keyframe ogni 6 fotogrammi), volti sfocati. Il primo è il giro del 5/11 mattina, gli altri del giro 2. */
+var GIRI=[
+ {id:'giro',nome:'Dentro il negozio',sub:'il giro completo',src:'visita-reale/giro.mp4',poster:'visita-reale/giro-poster.jpg',dur:20.5,
+  testo:'Il giro completo, dalla porta a vetro al bancone e poi in tutto il negozio.',cap:[
+ {t:0.4,n:'Porta a vetro',tp:'vestibolo'},{t:3.6,n:'Bancone',tp:'bancone'},{t:6.6,n:'Vetrine a muro',tp:'muro'},{t:9.0,n:'Corridoio e schermo',tp:'corridoio'},
+ {t:10.4,n:'Sedie e Ray-Ban',tp:'sedie'},{t:13.9,n:'Parete occhiali da sole',tp:'parete'},{t:17.0,n:'Vetrina da dentro',tp:'vetrina-dentro'},{t:19.6,n:'Di nuovo al bancone',tp:'bancone'}]},
+ {id:'giro-ingresso',nome:'Dalla strada al negozio',sub:'facciata, vestibolo, porta',src:'visita-reale/giro-ingresso.mp4',poster:'visita-reale/giro-ingresso-poster.jpg',dur:24.6,
+  testo:'Si arriva dal marciapiede, si passa il vestibolo tra le vetrine e la porta a vetro; poi la vetrina sinistra vista da vicino.',cap:[
+  {t:0.2,n:'La facciata',tp:'facciata'},{t:1.8,n:'Vetrina sinistra',tp:'strada-sx'},{t:4.2,n:'Vestibolo e porta',tp:'vestibolo'},{t:9.0,n:'Appena entrati',tp:'corridoio'},
+  {t:12.6,n:'Vetrina sinistra da vicino',tp:'vetrina-sx-vicino'},{t:17.8,n:'La tabella ottica',tp:'vetrina-sx'}]},
+ {id:'giro-sedie',nome:'Sedie e parete',sub:'dal corridoio al bancone',src:'visita-reale/giro-sedie.mp4',poster:'visita-reale/giro-sedie-poster.jpg',dur:19.6,
+  testo:'Dal corridoio alle sedie dei clienti, la parete Tom Ford, il bancone con lo specchio e le vetrine a muro.',cap:[
+  {t:0.2,n:'Corridoio',tp:'corridoio'},{t:3.7,n:'Ray-Ban e sedie',tp:'sedie'},{t:9.0,n:'Parete occhiali da sole',tp:'parete'},{t:11.0,n:'Bancone',tp:'bancone'},
+  {t:12.7,n:'Vetrina da dentro',tp:'vetrina-dentro'},{t:14.0,n:'Dietro il bancone',tp:'dietro-bancone'},{t:15.3,n:'Vetrine a muro',tp:'muro'},{t:18.6,n:'Corridoio',tp:'corridoio'}]},
+ {id:'giro-banco',nome:'Dal bancone alla vetrina',sub:'il lato degli occhiali da sole',src:'visita-reale/giro-banco.mp4',poster:'visita-reale/giro-banco-poster.jpg',dur:18.0,
+  testo:'Dal bancone di Aldo alle vetrine a muro, l’espositore Ray-Ban, la parete degli occhiali da sole e la vetrina vista da dentro.',cap:[
+  {t:0.2,n:'Bancone',tp:'bancone'},{t:3.3,n:'Vetrine a muro',tp:'muro'},{t:5.3,n:'Corridoio e schermo',tp:'corridoio'},{t:9.0,n:'Espositore Ray-Ban',tp:'sedie'},
+  {t:13.7,n:'Parete occhiali da sole',tp:'parete'},{t:16.0,n:'Vetrina da dentro',tp:'vetrina-dentro'}]},
+ {id:'giro-facciata',nome:'La facciata',sub:'3 secondi dalla strada',src:'visita-reale/giro-facciata.mp4',poster:'visita-reale/giro-facciata-poster.jpg',dur:3.4,
+  testo:'L’insegna e le due vetrine di sera, viste dal marciapiede.',cap:[{t:0.1,n:'La facciata',tp:'facciata'}]}
+];
+var GIRO=GIRI[0];
+
+/* ======================= grafiche ======================= */
+function graf(k){var c=BF[k+'-chiaro'],s=BF[k];return (S.graf==='chiare'&&c)?c:(s||c||null)}
+/* grafiche delle vetrine (window.BF_VETRINE, data URI JPEG): versione scura o chiara */
+var BV=window.BF_VETRINE||{};
+function gv(k){var c=BV[k+'-chiaro'],s=BV[k],e=(S.graf==='chiare'&&c)?c:(s||c);return e?e.png:null}
+function grafA4(){return graf('bf-a4-modella')||graf('bf-cartello-2')}
+function slideList(vert){var L=LOOP&&(S.graf==='chiare'?(vert?LOOP.chiareV:LOOP.chiare):(vert?LOOP.scureV:LOOP.scure));if(L&&L.length)return L;
+  var out=[],ks=vert?['bf-slide-v1','bf-slide-v2','bf-slide-v3']:['bf-slide-1','bf-slide-2','bf-slide-3','bf-slide-4','bf-slide-5','bf-slide-6'];ks.forEach(function(k){var g=graf(k);if(g)out.push(g)});return out}
+var LOGO=null; /* niente SVG dentro i canvas: su file:// Safari lo considera «di un altro sito» e blocca il disegno */
+function prezzo(k){return PREZZI&&PREZZI[k]?PREZZI[k]:null}
+
+/* ======================= three.js ======================= */
+var vista=$('#vista'),cv=$('#c3d'),foglio=$('#foglio'),foto=$('#foto'),video=$('#giro');
+if(!window.THREE){$('#msg').hidden=false;$('#msg').textContent='Non riesco a caricare il motore 3D (../vendor/three/three-bundle.js): le foto si vedono lo stesso, senza oggetti.'}
+var T=window.THREE||null;
+var R,scena,cam,BLOB,M,schermi=[];
+if(T){
+R=new T.WebGLRenderer({canvas:cv,alpha:true,antialias:true,preserveDrawingBuffer:true});
+R.setClearColor(0x000000,0);R.outputColorSpace=T.SRGBColorSpace;R.toneMapping=T.ACESFilmicToneMapping;R.toneMappingExposure=1.0;
+R.shadowMap.enabled=true;R.shadowMap.type=T.PCFSoftShadowMap;
+scena=new T.Scene();
+cam=new T.PerspectiveCamera(60,1,0.03,40);cam.rotation.order='YXZ';
+var pm=new T.PMREMGenerator(R);scena.environment=pm.fromScene(new T.RoomEnvironment(),0.04).texture;
+BLOB=(function(){var c=document.createElement('canvas');c.width=c.height=128;var g=c.getContext('2d');var gr=g.createRadialGradient(64,64,4,64,64,62);
+  gr.addColorStop(0,'rgba(0,0,0,.85)');gr.addColorStop(.45,'rgba(0,0,0,.45)');gr.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gr;g.fillRect(0,0,128,128);return new T.CanvasTexture(c)})();
+}
+var texCache={};
+function texDa(uri){if(!uri)return null;if(texCache[uri])return texCache[uri];var t=new T.Texture();t.colorSpace=T.SRGBColorSpace;t.anisotropy=8;var im=new Image();im.onload=function(){t.image=im;t.needsUpdate=true;sporco=true};im.src=uri;texCache[uri]=t;return t}
+function texLegno(chiaro){var c=document.createElement('canvas');c.width=512;c.height=128;var g=c.getContext('2d');
+  g.fillStyle=chiaro?'#c99b66':'#7a4a28';g.fillRect(0,0,512,128);
+  for(var i=0;i<140;i++){var y=Math.random()*128,a=Math.random()*.16;g.strokeStyle=(Math.random()<.5?'rgba(60,30,10,':'rgba(255,220,170,')+a+')';g.lineWidth=.6+Math.random()*1.8;
+    g.beginPath();g.moveTo(0,y);for(var x=0;x<=512;x+=16)g.lineTo(x,y+Math.sin(x/(30+Math.random()*4)+i)*2.2+Math.sin(x/97+i*.3)*3);g.stroke()}
+  var t=new T.CanvasTexture(c);t.colorSpace=T.SRGBColorSpace;t.wrapS=t.wrapT=T.RepeatWrapping;t.anisotropy=8;return t}
+if(T)M={
+ plexi:new T.MeshPhysicalMaterial({color:0xffffff,metalness:0,roughness:0.04,transparent:true,opacity:0.09,clearcoat:.6,clearcoatRoughness:0.05,ior:1.49,specularIntensity:.6,envMapIntensity:0.7,side:T.DoubleSide,depthWrite:false}),
+ allu:new T.MeshStandardMaterial({color:0xc9ccd0,metalness:1,roughness:0.32}),
+ alluScuro:new T.MeshStandardMaterial({color:0x5b5e63,metalness:1,roughness:0.38}),
+ vetroNero:new T.MeshPhysicalMaterial({color:0x07080a,metalness:0,roughness:0.06,clearcoat:1,clearcoatRoughness:0.02,envMapIntensity:1.4}),
+ plastica:new T.MeshPhysicalMaterial({color:0x34363a,metalness:0,roughness:0.55,clearcoat:.25,clearcoatRoughness:.5}),
+ plasticaNera:new T.MeshStandardMaterial({color:0x151618,metalness:0,roughness:0.45}),
+ legno:new T.MeshPhysicalMaterial({map:texLegno(false),roughness:0.5,clearcoat:.35,clearcoatRoughness:.4}),
+ acciaio:new T.MeshStandardMaterial({color:0x9a9da2,metalness:1,roughness:0.25})
+};
+function box(w,h,d,m){return new T.Mesh(new T.BoxGeometry(w,h,d),m)}
+function rbox(w,h,d,r,m){return new T.Mesh(new T.RoundedBoxGeometry(w,h,d,4,r),m)}
+function grafMat(uri){return new T.MeshStandardMaterial({map:texDa(uri),roughness:0.6,metalness:0})}
+function ombre(g,w,d,forza){
+  var b=new T.Mesh(new T.PlaneGeometry(w*1.7,d*2.4),new T.MeshBasicMaterial({map:BLOB,transparent:true,opacity:forza||.55,depthWrite:false,toneMapped:false,color:0x000000}));
+  b.rotation.x=-Math.PI/2;b.position.y=0.0015;b.renderOrder=-1;b.userData.ombra=true;g.add(b);
+  var s=new T.Mesh(new T.PlaneGeometry(w*2.2,d*2.8+0.1),new T.ShadowMaterial({opacity:.3,depthWrite:false}));s.rotation.x=-Math.PI/2;s.position.y=0.001;s.receiveShadow=true;s.userData.ombra=true;g.add(s)}
+function ombreggia(o){o.traverse(function(m){if(m.isMesh&&!m.userData.ombra)m.castShadow=true})}
+
+/* --- oggetti (misure in metri; base al centro sul piano d'appoggio; fronte verso +z) --- */
+function plexiL(wcm,hcm,uri){var w=wcm/100,h=hcm/100,g=new T.Group(),inc=12*D2R,t=0.003;
+  var pan=new T.Group();pan.rotation.x=-inc;g.add(pan);
+  var lastra=box(w+0.012,h+0.012,t,M.plexi);lastra.position.set(0,(h+0.012)/2,0.004);pan.add(lastra);
+  var bordo=new T.Mesh(new T.EdgesGeometry(new T.BoxGeometry(w+0.012,h+0.012,0.0085)),new T.LineBasicMaterial({color:0xe9f6f2,transparent:true,opacity:.55}));bordo.position.set(0,(h+0.012)/2,0.001);pan.add(bordo);
+  var st=new T.Mesh(new T.PlaneGeometry(w,h),grafMat(uri));st.position.set(0,h/2+0.006,0.0022);pan.add(st);
+  var dorso=new T.Mesh(new T.PlaneGeometry(w,h),new T.MeshStandardMaterial({color:0xf2efe8,roughness:.8}));dorso.rotation.y=Math.PI;dorso.position.set(0,h/2+0.006,0.0018);pan.add(dorso);
+  var bd=Math.max(0.06,h*0.32),base=box(w+0.012,t,bd,M.plexi);base.position.set(0,t/2,-bd/2+0.004);g.add(base);
+  var bb=new T.Mesh(new T.EdgesGeometry(base.geometry),new T.LineBasicMaterial({color:0xe9f6f2,transparent:true,opacity:.45}));bb.position.copy(base.position);g.add(bb);
+  ombre(g,w+0.02,bd);ombreggia(g);g.userData.stampa=st;return g}
+function cornice(wcm,hcm,uri){var w=wcm/100,h=hcm/100,p=0.022,sp=0.016,g=new T.Group(),fr=new T.Group();fr.rotation.x=-10*D2R;g.add(fr);
+  var W=w+2*p,H=h+2*p,mat=M.legno;
+  [[0,H-p/2,W,p],[0,p/2,W,p]].forEach(function(a){var b=rbox(a[2],a[3],sp,0.003,mat);b.position.set(a[0],a[1],0);fr.add(b)});
+  [[-W/2+p/2,H/2],[W/2-p/2,H/2]].forEach(function(a){var b=rbox(p,H-2*p+0.002,sp,0.003,mat);b.position.set(a[0],a[1],0);fr.add(b)});
+  var st=new T.Mesh(new T.PlaneGeometry(w,h),grafMat(uri));st.position.set(0,H/2,-0.002);fr.add(st);
+  var vetro=box(w,h,0.002,M.plexi);vetro.position.set(0,H/2,0.002);fr.add(vetro);
+  var retro=box(W-0.01,H-0.01,0.003,new T.MeshStandardMaterial({color:0x4a3a2c,roughness:.9}));retro.position.set(0,H/2,-0.007);fr.add(retro);
+  var cav=box(0.025,H*0.7,0.004,new T.MeshStandardMaterial({color:0x4a3a2c,roughness:.9}));cav.position.set(0,H*0.33,-0.06);cav.rotation.x=0.42;g.add(cav);
+  ombre(g,W,0.1);ombreggia(g);g.userData.stampa=st;return g}
+function schermo(wPx,hPx,vert,disegno){var c=document.createElement('canvas');c.width=wPx;c.height=hPx;var t=new T.CanvasTexture(c);t.colorSpace=T.SRGBColorSpace;t.anisotropy=8;
+  var s={c:c,g:c.getContext('2d'),t:t,vert:vert,i:0,t0:performance.now(),imgs:[],disegno:disegno};schermi.push(s);caricaSlide(s);return s}
+function caricaSlide(s){if(s.disegno)return;s.imgs=slideList(s.vert).map(function(u){var im=new Image();im.src=u;return im});s.i=0;s.t0=performance.now()}
+function copri(g,im,W,H,al){var r=Math.max(W/im.naturalWidth,H/im.naturalHeight),w=im.naturalWidth*r,h=im.naturalHeight*r;g.globalAlpha=al;g.drawImage(im,(W-w)/2,(H-h)/2,w,h);g.globalAlpha=1}
+function aggiornaSchermi(now){var cambiato=false;schermi.forEach(function(s){if(!s.vis)return;var g=s.g,W=s.c.width,H=s.c.height;
+  if(s.disegno){if(!s.fatto||now-s.fatto>1000){s.disegno(g,W,H,now);s.t.needsUpdate=true;s.fatto=now;cambiato=true}return}
+  if(!s.imgs.length)return;var dur=4000,fade=900,el=now-s.t0;if(el>dur+fade){s.i=(s.i+1)%s.imgs.length;s.t0=now;el=0}
+  var a=s.imgs[s.i],b=s.imgs[(s.i+1)%s.imgs.length];
+  if(el<=dur&&s.ultimo===s.i&&s.pronto)return;
+  g.fillStyle='#000';g.fillRect(0,0,W,H);if(a.complete&&a.naturalWidth){copri(g,a,W,H,1);s.pronto=true}else s.pronto=false;
+  if(el>dur&&b.complete&&b.naturalWidth)copri(g,b,W,H,(el-dur)/fade);s.ultimo=s.i;s.t.needsUpdate=true;cambiato=true});return cambiato}
+function schermoMat(s){return new T.MeshBasicMaterial({map:s.t,toneMapped:false,color:new T.Color(0.9,0.9,0.9)})}
+function tablet(){/* tablet 12,4"–13" (es. Galaxy Tab S9 FE+): ingombro 28,5×18,5×0,65 cm, schermo 16:10 26,7×16,7 cm */var g=new T.Group(),w=0.285,h=0.185,d=0.0065,inc=15*D2R,tb=new T.Group();tb.position.set(0,0.035,0.02);tb.rotation.x=-inc;g.add(tb);
+  var corpo=rbox(w,h,d,0.0028,M.allu);corpo.position.y=h/2;tb.add(corpo);
+  var vetro=rbox(w-0.002,h-0.002,0.0012,0.0025,M.vetroNero);vetro.position.set(0,h/2,d/2);tb.add(vetro);
+  var s=schermo(1024,640,false);var sc=new T.Mesh(new T.PlaneGeometry(0.267,0.167),schermoMat(s));sc.position.set(0,h/2,d/2+0.0008);tb.add(sc);
+  var rif=new T.Mesh(new T.PlaneGeometry(w-0.004,h-0.004),new T.MeshPhysicalMaterial({color:0xffffff,transparent:true,opacity:0.06,roughness:0.02,clearcoat:1,depthWrite:false}));rif.position.set(0,h/2,d/2+0.0014);tb.add(rif);
+  var pied=rbox(0.13,0.008,0.11,0.003,M.allu);pied.position.set(0,0.004,0);g.add(pied);
+  var asta=rbox(0.05,0.11,0.008,0.003,M.allu);asta.position.set(0,0.06,-0.03);asta.rotation.x=-0.42;g.add(asta);
+  var lab=rbox(w*0.55,0.006,0.02,0.002,M.allu);lab.position.set(0,0.036,0.028);g.add(lab);
+  ombre(g,0.24,0.14,.6);ombreggia(g);g.userData.schermo=s;return g}
+function display22(){/* schermo Android 21,5" da vetrina (es. iiyama S2225AS / Hikvision): ingombro 50,5×30 cm, area 47,6×26,8 cm, su piede da tavolo */
+  var g=new T.Group(),w=0.505,h=0.30,d=0.03,tb=new T.Group();tb.position.set(0,0.10,0);tb.rotation.x=-6*D2R;g.add(tb);
+  var corpo=rbox(w,h,d,0.006,M.vetroNero);corpo.position.y=h/2;tb.add(corpo);
+  var s=schermo(1280,720,false);var sc=new T.Mesh(new T.PlaneGeometry(0.476,0.268),schermoMat(s));sc.position.set(0,h/2,d/2+0.0008);tb.add(sc);
+  var rif=new T.Mesh(new T.PlaneGeometry(w-0.006,h-0.006),new T.MeshPhysicalMaterial({color:0xffffff,transparent:true,opacity:0.05,roughness:0.02,clearcoat:1,depthWrite:false}));rif.position.set(0,h/2,d/2+0.0014);tb.add(rif);
+  var colonna=rbox(0.05,0.12,0.03,0.006,M.vetroNero);colonna.position.set(0,0.06,-0.01);g.add(colonna);
+  var base=rbox(0.24,0.012,0.16,0.006,M.vetroNero);base.position.set(0,0.006,0);g.add(base);
+  ombre(g,0.30,0.18,.6);ombreggia(g);g.userData.schermo=s;return g}
+function monitor(){var g=new T.Group(),w=0.548,h=0.33,s=schermo(1280,770,false,disegnaApp);
+  var sch=new T.Group();sch.position.y=0.12;sch.rotation.x=-5*D2R;g.add(sch);
+  var corpo=rbox(w+0.012,h+0.02,0.018,0.004,M.plasticaNera);corpo.position.set(0,h/2,-0.009);sch.add(corpo);
+  var sc=new T.Mesh(new T.PlaneGeometry(w,h),schermoMat(s));sc.position.set(0,h/2+0.004,0.0012);sch.add(sc);
+  var rif=new T.Mesh(new T.PlaneGeometry(w,h),new T.MeshPhysicalMaterial({color:0xffffff,transparent:true,opacity:0.05,roughness:0.15,clearcoat:.6,depthWrite:false}));rif.position.set(0,h/2+0.004,0.0016);sch.add(rif);
+  var collo=rbox(0.05,0.17,0.025,0.006,M.alluScuro);collo.position.set(0,0.085,-0.05);g.add(collo);
+  var piede=rbox(0.22,0.012,0.16,0.005,M.alluScuro);piede.position.set(0,0.006,-0.04);g.add(piede);
+  ombre(g,0.24,0.16,.6);ombreggia(g);g.userData.schermo=s;return g}
+function dymo(){var g=new T.Group(),corpo=rbox(0.125,0.10,0.187,0.022,M.plastica);corpo.position.y=0.05;g.add(corpo);
+  var cop=rbox(0.118,0.04,0.14,0.016,new T.MeshPhysicalMaterial({color:0x2a2c30,roughness:.35,clearcoat:.6,transparent:true,opacity:.92}));cop.position.set(0,0.108,-0.015);g.add(cop);
+  var tasto=new T.Mesh(new T.CylinderGeometry(0.009,0.009,0.004,24),new T.MeshStandardMaterial({color:0x6aa7d8,emissive:0x1f4e79,emissiveIntensity:.6,roughness:.4}));tasto.position.set(0.035,0.101,0.07);g.add(tasto);
+  var c=document.createElement('canvas');c.width=512;c.height=160;disegnaEtichetta(c.getContext('2d'),512,160);var tx=new T.CanvasTexture(c);tx.colorSpace=T.SRGBColorSpace;
+  var et=new T.Mesh(new T.PlaneGeometry(0.089,0.028),new T.MeshStandardMaterial({map:tx,roughness:.7,side:T.DoubleSide}));et.position.set(0,0.112,0.105);et.rotation.x=-1.05;g.add(et);
+  ombre(g,0.13,0.19,.6);ombreggia(g);return g}
+function lettore(){var g=new T.Group(),base=new T.Mesh(new T.CylinderGeometry(0.045,0.05,0.018,32),M.plasticaNera);base.position.y=0.009;g.add(base);
+  var cul=new T.Mesh(new T.CylinderGeometry(0.03,0.035,0.05,32,1,true),M.plasticaNera);cul.position.y=0.04;g.add(cul);
+  var imp=rbox(0.032,0.12,0.04,0.012,M.plastica);imp.position.set(0,0.085,0.0);imp.rotation.x=0.35;g.add(imp);
+  var testa=rbox(0.075,0.05,0.085,0.016,M.plastica);testa.position.set(0,0.15,0.035);testa.rotation.x=0.35;g.add(testa);
+  var fin=new T.Mesh(new T.PlaneGeometry(0.06,0.03),new T.MeshBasicMaterial({color:0xff3b2a,transparent:true,opacity:.75}));fin.position.set(0,0.13,0.08);fin.rotation.x=0.35-Math.PI/2+0.3;g.add(fin);
+  ombre(g,0.1,0.1,.6);ombreggia(g);return g}
+function totem(uri){var g=new T.Group(),base=new T.Mesh(new T.CylinderGeometry(0.15,0.16,0.012,48),M.acciaio);base.position.y=0.006;g.add(base);
+  var asta=new T.Mesh(new T.CylinderGeometry(0.009,0.009,1.0,20),M.acciaio);asta.position.y=0.51;g.add(asta);
+  var tes=new T.Group();tes.position.y=1.0;tes.rotation.x=-15*D2R;g.add(tes);
+  var w=0.21,h=0.297;var st=new T.Mesh(new T.PlaneGeometry(w,h),grafMat(uri));st.position.set(0,h/2,0.002);tes.add(st);
+  var l=box(w+0.016,h+0.016,0.003,M.plexi);l.position.set(0,h/2,0.005);tes.add(l);
+  var bo=new T.Mesh(new T.EdgesGeometry(new T.BoxGeometry(w+0.016,h+0.016,0.009)),new T.LineBasicMaterial({color:0xe9f6f2,transparent:true,opacity:.6}));bo.position.set(0,h/2,0.002);tes.add(bo);
+  var att=box(0.04,0.03,0.02,M.acciaio);att.position.set(0,-0.005,-0.01);tes.add(att);
+  ombre(g,0.32,0.32,.65);ombreggia(g);g.userData.stampa=st;return g}
+/* --- giro 2: supporti dell'allestimento Black Friday (misure da dispositivi.js) --- */
+function plexiT(uri){var w=0.297,h=0.42,g=new T.Group(),t=0.004;
+  var lastra=box(w+0.016,h+0.016,t,M.plexi);lastra.position.set(0,0.03+(h+0.016)/2,0);g.add(lastra);
+  var bo=new T.Mesh(new T.EdgesGeometry(new T.BoxGeometry(w+0.016,h+0.016,0.008)),new T.LineBasicMaterial({color:0xe9f6f2,transparent:true,opacity:.55}));bo.position.copy(lastra.position);g.add(bo);
+  var st=new T.Mesh(new T.PlaneGeometry(w,h),grafMat(uri));st.position.set(0,0.038+h/2,0.0032);g.add(st);
+  var st2=new T.Mesh(new T.PlaneGeometry(w,h),grafMat(uri));st2.rotation.y=Math.PI;st2.position.set(0,0.038+h/2,-0.0032);g.add(st2);
+  var piede=box(0.30,0.012,0.11,M.plexi);piede.position.y=0.006;g.add(piede);
+  var pb=new T.Mesh(new T.EdgesGeometry(piede.geometry),new T.LineBasicMaterial({color:0xe9f6f2,transparent:true,opacity:.5}));pb.position.copy(piede.position);g.add(pb);
+  var ins=box(0.32,0.03,0.022,M.plexi);ins.position.y=0.027;g.add(ins);
+  ombre(g,0.3,0.12,.55);ombreggia(g);g.userData.stampa=st;g.userData.stampa2=st2;return g}
+/* cartello appeso (A3 orizzontale) con due cavetti: origine al CENTRO del cartello */
+function appeso(uri){var w=0.42,h=0.297,g=new T.Group();
+  var fondo=box(w+0.006,h+0.006,0.005,new T.MeshStandardMaterial({color:0xf3efe8,roughness:.85}));fondo.position.z=-0.003;g.add(fondo);
+  var st=new T.Mesh(new T.PlaneGeometry(w,h),grafMat(uri));st.position.z=0.0002;g.add(st);
+  var cav=new T.MeshStandardMaterial({color:0x9a9da2,metalness:1,roughness:.3});
+  [-w*0.38,w*0.38].forEach(function(x){var c=new T.Mesh(new T.CylinderGeometry(0.0007,0.0007,0.6,6),cav);c.position.set(x,h/2+0.3,-0.002);g.add(c);
+    var k=new T.Mesh(new T.SphereGeometry(0.004,10,8),cav);k.position.set(x,h/2+0.003,-0.002);g.add(k)});
+  ombreggia(g);g.userData.stampa=st;g.userData.centro=true;return g}
+/* vetrofania 60x30 incollata sul vetro: origine al centro */
+function vetrofania(uri){var g=new T.Group();var st=new T.Mesh(new T.PlaneGeometry(0.6,0.3),new T.MeshStandardMaterial({map:texDa(uri),roughness:.35,metalness:0,transparent:true,opacity:.96}));g.add(st);
+  var lucido=new T.Mesh(new T.PlaneGeometry(0.6,0.3),new T.MeshPhysicalMaterial({color:0xffffff,transparent:true,opacity:0.05,roughness:0.03,clearcoat:1,depthWrite:false}));lucido.position.z=0.001;g.add(lucido);
+  g.userData.stampa=st;g.userData.centro=true;return g}
+/* cubo plexiglass 10 cm con le 4 facce del prodotto focus */
+function cubo(){var l=0.1,g=new T.Group(),c=new T.Group();c.position.y=l/2+0.001;g.add(c);
+  var guscio=box(l,l,l,M.plexi);c.add(guscio);
+  var ed=new T.Mesh(new T.EdgesGeometry(guscio.geometry),new T.LineBasicMaterial({color:0xe9f6f2,transparent:true,opacity:.6}));c.add(ed);
+  var facce=[];['dx-cubo-1','dx-cubo-2','dx-cubo-3','dx-cubo-4'].forEach(function(k,i){var m=new T.Mesh(new T.PlaneGeometry(l*0.96,l*0.96),grafMat(gv(k)));
+    var a=i*Math.PI/2;m.rotation.y=a;m.position.set(Math.sin(a)*(l/2-0.002),0,Math.cos(a)*(l/2-0.002));m.userData.chiave=k;c.add(m);facce.push(m)});
+  ombre(g,0.11,0.11,.55);ombreggia(g);g.userData.facce=facce;return g}
+/* immagine che ricopre ESATTAMENTE il foglio A4 di prova (4 angoli in pixel alla profondità z) */
+function quadImg(tp,q,z,uri){var g=new T.Group();var P=q.map(function(p){return raggioZ(tp,p[0],p[1],z)});
+  var geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute([P[3].x,P[3].y,P[3].z,P[2].x,P[2].y,P[2].z,P[1].x,P[1].y,P[1].z,P[0].x,P[0].y,P[0].z],3));
+  geo.setAttribute('uv',new T.Float32BufferAttribute([0,0,1,0,1,1,0,1],2));geo.setIndex([0,1,2,0,2,3]);geo.computeVertexNormals();
+  var m=new T.Mesh(geo,new T.MeshStandardMaterial({map:texDa(uri),roughness:.7,side:T.DoubleSide}));g.add(m);
+  g.userData.fisso=true;g.userData.stampa=m;return g}
+/* profondità del foglio A4 di prova dalla sua altezza in pixel (29,7 cm) e centro */
+function infoA4(tp){var q=tp.a4,f=(tp.H/2)/Math.tan(tp.fov/2*D2R);var hpx=((q[3][1]-q[0][1])+(q[2][1]-q[1][1]))/2;
+  return{z:0.297*f/hpx,cx:(q[0][0]+q[1][0]+q[2][0]+q[3][0])/4,cy:(q[0][1]+q[1][1]+q[2][1]+q[3][1])/4}}
+/* schermo che ricopre esattamente un quadrilatero della foto (4 angoli in pixel, alla distanza d) */
+function schermoQuad(tp,q,d){var g=new T.Group(),s=schermo(540,960,true);
+  var P=q.map(function(p){return raggio(tp,p[0],p[1]).multiplyScalar(d)});
+  var geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute([P[3].x,P[3].y,P[3].z,P[2].x,P[2].y,P[2].z,P[1].x,P[1].y,P[1].z,P[0].x,P[0].y,P[0].z],3));
+  geo.setAttribute('uv',new T.Float32BufferAttribute([0,0,1,0,1,1,0,1],2));geo.setIndex([0,1,2,0,2,3]);geo.computeVertexNormals();
+  var m=new T.Mesh(geo,new T.MeshBasicMaterial({map:s.t,toneMapped:false,color:new T.Color(.92,.92,.92),side:T.DoubleSide}));g.add(m);
+  /* bagliore leggero dello schermo */
+  g.userData.schermo=s;g.userData.fisso=true;return g}
+
+/* --- app sul monitor --- */
+function disegnaApp(g,W,H){
+  g.fillStyle='#f4ede2';g.fillRect(0,0,W,H);g.fillStyle='#2b2118';g.fillRect(0,0,W,86);
+  if(LOGO){try{g.drawImage(LOGO,22,10,66,66)}catch(e){}}
+  g.fillStyle='#fffdf9';g.font='700 40px Rajdhani,Segoe UI,sans-serif';g.fillText('OTTICA MACRÌ',LOGO?104:28,56);
+  g.fillStyle='#d9a089';g.font='600 22px Consolas,monospace';g.textAlign='right';g.fillText('STORE // CRAFT',W-28,54);g.textAlign='left';
+  [['VENDO','#b5462c','scansiona e vendi'],['ARRIVA MERCE','#1f4e79','carico + etichette'],['CERCO','#6b5c4c','marca, modello, prezzo']].forEach(function(t,i){var x=28+i*((W-56-40)/3+20),w=(W-56-40)/3;g.fillStyle=t[1];g.fillRect(x,120,w,250);
+    g.fillStyle='#fff';g.font='700 58px Rajdhani,Segoe UI,sans-serif';g.textAlign='center';g.fillText(t[0],x+w/2,250);g.font='400 26px Segoe UI,sans-serif';g.fillText(t[2],x+w/2,300);g.textAlign='left'});
+  g.fillStyle='#fff';g.fillRect(28,410,620,190);g.strokeStyle='#cbbfae';g.lineWidth=3;g.strokeRect(28,410,620,190);
+  g.fillStyle='#2b2118';g.font='700 38px Rajdhani,Segoe UI,sans-serif';g.fillText('RAY-BAN RB2132 NEW WAYFARER',50,465);
+  g.fillStyle='#5e4f41';g.font='400 24px Consolas,monospace';g.fillText('Nero lucido · 55□18 · cod. 8053672',50,503);
+  g.fillStyle='#9e3b25';g.font='700 56px Rajdhani,Segoe UI,sans-serif';g.fillText('€ 112',50,575);codice(g,330,520,290,64);
+  g.fillStyle='#2b2118';g.fillRect(680,410,W-708,190);g.fillStyle='#d9c3a0';g.font='600 24px Consolas,monospace';g.fillText('VETRINA DIGITALE · ON',700,450);
+  var sl=slideList(false);if(sl.length){if(!disegnaApp.im){disegnaApp.im=new Image();disegnaApp.im.src=sl[0]}var im=disegnaApp.im;if(im.complete&&im.naturalWidth)g.drawImage(im,700,465,224,126)}
+  g.fillStyle='#fffdf9';g.font='500 22px Segoe UI,sans-serif';g.fillText('Black Friday 24–30 nov.',940,500);g.fillText('Cartelli: 4 pronti',940,540);g.fillText('Etichette DYMO: 18',940,580);
+  g.fillStyle='#6b5c4c';g.font='400 20px Consolas,monospace';g.fillText('Oggi: 3 vendite · 12 occhiali arrivati · stampa etichette pronta',28,650);
+  g.fillStyle='#1f4e79';g.fillRect(28,680,W-56,8);g.fillStyle='#b5462c';g.fillRect(28,680,(W-56)*.62,8)}
+function codice(g,x,y,w,h){g.fillStyle='#000';for(var i=0;i<60;i++){var b=((i*37+11)%5===0)?3:((i*13)%3===0?2:1);g.fillRect(x+(i/60)*w,y,b*1.6,h)}g.font='400 16px Consolas,monospace';g.fillText('8 053672 112004',x+40,y+h+18)}
+function disegnaEtichetta(g,W,H){g.fillStyle='#fff';g.fillRect(0,0,W,H);g.fillStyle='#111';g.font='700 30px Arial';g.fillText('RAY-BAN RB2132',14,36);g.font='400 20px Arial';g.fillText('55□18 · nero lucido',14,62);
+  g.font='700 40px Arial';g.fillText('€ 112',14,112);codice(g,230,52,260,62)}
+
+/* --- geometria della foto: raggio dalla camera attraverso il pixel (px,py) --- */
+function camQuat(tp){var e=new T.Euler(-tp.inc*D2R,0,tp.rol*D2R,'YXZ');return new T.Quaternion().setFromEuler(e)}
+function raggio(tp,px,py){var f=(tp.H/2)/Math.tan(tp.fov/2*D2R);var v=new T.Vector3((px-tp.W/2)/f,-(py-tp.H/2)/f,-1);return v.applyQuaternion(camQuat(tp)).normalize()}
+/* punto della foto alla PROFONDITÀ z (asse della camera), non alla distanza lungo il raggio */
+function raggioZ(tp,px,py,z){var f=(tp.H/2)/Math.tan(tp.fov/2*D2R);return new T.Vector3((px-tp.W/2)/f*z,-(py-tp.H/2)/f*z,-z).applyQuaternion(camQuat(tp))}
+
+/* --- luci per tipo di posto --- */
+function luci(tp,g,centro){var L=tp.luce||'dentro';
+  if(L==='vetrina'){g.add(new T.HemisphereLight(0xfff0d8,0x6a5030,0.75));
+    var k=new T.DirectionalLight(0xffe2b8,1.6);k.position.copy(centro).add(new T.Vector3(0.25,1.6,-0.4));k.target.position.copy(centro);
+    var p=new T.PointLight(0xffd7a0,2.2,3,1.6);p.position.copy(centro).add(new T.Vector3(-0.3,0.5,0.6));g.add(p);
+    tp.filtro='saturate(.95) sepia(.06) contrast(1.02)';tp.exp=1.0;g.add(k,k.target);ombraK(k)}
+  else{g.add(new T.HemisphereLight(0xfff6ea,0x7a5a3a,0.9));
+    var k2=new T.DirectionalLight(0xfff4e6,1.35);k2.position.copy(centro).add(new T.Vector3(-0.3,2.0,0.3));k2.target.position.copy(centro);g.add(k2,k2.target);ombraK(k2);
+    var p2=new T.PointLight(0xffe6c8,1.2,4,1.5);p2.position.copy(centro).add(new T.Vector3(0.6,0.7,0.9));g.add(p2);
+    tp.filtro='saturate(.97) contrast(1.02)';tp.exp=1.0}}
+function ombraK(k){k.castShadow=true;k.shadow.mapSize.set(2048,2048);var c=k.shadow.camera;c.left=-1.2;c.right=1.2;c.top=1.2;c.bottom=-1.2;c.near=0.05;c.far=6;k.shadow.radius=6;k.shadow.bias=-0.0006;k.shadow.normalBias=0.01}
+
+/* --- costruzione degli oggetti per ogni tappa --- */
+var OGG=[];
+function costruisci(tp,o){var g,U=o.v?gv(o.v):graf(o.g);
+  if(o.t==='tablet')g=tablet();else if(o.t==='display22')g=display22();else if(o.t==='monitor')g=monitor();else if(o.t==='dymo')g=dymo();else if(o.t==='lettore')g=lettore();
+  else if(o.t==='plexi13')g=plexiL(13,18,U);else if(o.t==='plexiA5')g=plexiL(14.8,21,U);else if(o.t==='plexi10')g=plexiL(10,15,U);else if(o.t==='plexiA7')g=plexiL(7.4,10.5,U);
+  else if(o.t==='cornice')g=cornice(13,18,U);else if(o.t==='cornice10')g=cornice(10,15,U);else if(o.t==='totem')g=totem(grafA4());else if(o.t==='schermo')g=schermoQuad(tp,o.q,o.d);
+  else if(o.t==='plexiA3T')g=plexiT(U);else if(o.t==='appeso')g=appeso(U);else if(o.t==='vetrofania')g=vetrofania(U);else if(o.t==='cubo')g=cubo();
+  else if(o.t==='cartelloA4'&&tp.a4)g=quadImg(tp,tp.a4,infoA4(tp).z-0.004,U);
+  if(!g)return null;
+  /* oggetto centrato sul foglio A4 di prova, poco davanti (q:'a4'): posizione e profondità le dà il foglio */
+  if(o.q==='a4'&&tp.a4&&!g.userData.fisso){var A=infoA4(tp),pa=raggioZ(tp,A.cx,A.cy,A.z-0.07);g.position.copy(pa);g.rotation.y=Math.atan2(-pa.x,-pa.z)}
+  else if(!g.userData.fisso){var r0=raggio(tp,o.px,o.py),p;
+    /* con o.y (altezza del piano dal pavimento) e tp.h (altezza del telefono) la distanza esce da sola: il raggio incontra il piano */
+    if(o.y!=null&&tp.h!=null&&r0.y<-0.01)p=r0.multiplyScalar((o.y-tp.h)/r0.y);else p=r0.multiplyScalar(o.d);
+    g.position.copy(p);
+    /* «ry = 0» = guarda verso la camera; positivo = ruota a sinistra */
+    g.rotation.y=Math.atan2(-p.x,-p.z)+(o.ry||0)*D2R;if(o.s)g.scale.setScalar(o.s)}
+  var inf=Object.assign({},INFO[o.t]);if(o.g)inf.chiave=o.g;if(o.v)inf.chiaveV=o.v;if(o.t==='cubo')inf.chiaveV='dx-cubo-1';g.userData.info=inf;g.userData.def=o;
+  if(CAL&&!g.userData.fisso){var gr=new T.GridHelper(1,10,0xff0000,0xffff00);gr.material.transparent=true;gr.material.opacity=.6;gr.position.y=0.002;g.add(gr)}
+  return g}
+if(T)TAPPE.forEach(function(tp){var g=new T.Group();g.visible=false;scena.add(g);tp.gr=g;tp.oggetti=[];
+  tp.ogg.forEach(function(o){var x=costruisci(tp,o);if(x){g.add(x);tp.oggetti.push(x);OGG.push(x)}});
+  var c=new T.Vector3();if(tp.oggetti.length){tp.oggetti.forEach(function(x){c.add(x.userData.fisso?new T.Box3().setFromObject(x).getCenter(new T.Vector3()):x.position)});c.multiplyScalar(1/tp.oggetti.length)}else c.set(0,-1,-2);
+  luci(tp,g,c)});
+function aggiornaGrafiche(){if(!T)return;OGG.forEach(function(o){var d=o.userData.def,st=o.userData.stampa;
+  if(st&&d.g){st.material.map=texDa(d.g==='A4'?grafA4():graf(d.g));st.material.needsUpdate=true}
+  if(d.v){[st,o.userData.stampa2].forEach(function(m){if(m){m.material.map=texDa(gv(d.v));m.material.needsUpdate=true}})}
+  (o.userData.facce||[]).forEach(function(m){m.material.map=texDa(gv(m.userData.chiave));m.material.needsUpdate=true})});
+  schermi.forEach(function(s){caricaSlide(s);s.pronto=false});sporco=true}
+
+/* ======================= vista: pan / zoom ======================= */
+var V={s:1,tx:0,ty:0,fit:1},Vt={s:1,tx:0,ty:0},dimV={w:1,h:1};
+function tp(){return TAPPE[S.i]}
+function misura(){dimV.w=vista.clientWidth;dimV.h=vista.clientHeight;
+  if(T){R.setPixelRatio(Math.min(2,window.devicePixelRatio||1));R.setSize(dimV.w,dimV.h,false)}
+  var t=tp();V.fit=Math.min(dimV.w/t.W,dimV.h/t.H);sporco=true}
+function limita(v){var t=tp(),s=Math.max(V.fit,Math.min(V.fit*6,v.s));v.s=s;var w=t.W*s,h=t.H*s;
+  v.tx=w<=dimV.w?(dimV.w-w)/2:Math.min(0,Math.max(dimV.w-w,v.tx));v.ty=h<=dimV.h?(dimV.h-h)/2:Math.min(0,Math.max(dimV.h-h,v.ty));return v}
+function intera(subito,inizio){var t=tp();Vt.s=V.fit;Vt.tx=0;Vt.ty=0;
+  if(inizio&&t.v0){Vt.s=V.fit*t.v0[0];Vt.tx=dimV.w/2-t.v0[1]*Vt.s;Vt.ty=dimV.h/2-t.v0[2]*Vt.s}limita(Vt);if(subito){V.s=Vt.s;V.tx=Vt.tx;V.ty=Vt.ty}sporco=true}
+function zoomA(f,cx,cy){if(cx==null){cx=dimV.w/2;cy=dimV.h/2}var s0=Vt.s,s1=Math.max(V.fit,Math.min(V.fit*6,s0*f));
+  Vt.tx=cx-(cx-Vt.tx)*(s1/s0);Vt.ty=cy-(cy-Vt.ty)*(s1/s0);Vt.s=s1;limita(Vt);sporco=true}
+function applicaVista(){var t=tp();foglio.style.width=t.W+'px';foglio.style.height=t.H+'px';
+  foglio.style.transform='translate('+V.tx.toFixed(2)+'px,'+V.ty.toFixed(2)+'px) scale('+V.s.toFixed(5)+')';
+  if(T){cam.fov=t.fov;cam.aspect=t.W/t.H;cam.quaternion.copy(camQuat(t));cam.position.set(0,0,0);
+    cam.setViewOffset(t.W,t.H,-V.tx/V.s,-V.ty/V.s,dimV.w/V.s,dimV.h/V.s);cam.updateProjectionMatrix();cam.updateMatrixWorld()}
+  clipCanvas();var z=V.s/V.fit;$('#hud').textContent=(S.i+1)+'/'+TAPPE.length+' · '+t.nome.toUpperCase()+(z>1.02?' · ZOOM ×'+z.toFixed(1):'')}
+
+/* trascinamento (con inerzia), rotella, pizzico, doppio clic */
+var punt={},drag=null,iner={x:0,y:0},noClick=false;
+vista.addEventListener('pointerdown',function(e){if(e.target.closest('button,a,.vr-scheda,.vr-eti,.vr-taglio span,.vr-dopo2d'))return;
+  punt[e.pointerId]={x:e.clientX,y:e.clientY};try{vista.setPointerCapture(e.pointerId)}catch(_){}
+  if(Object.keys(punt).length===1){drag={x:e.clientX,y:e.clientY,x0:e.clientX,y0:e.clientY,t:performance.now(),mosso:false};iner.x=iner.y=0}
+  else{drag=null;var k=Object.keys(punt),a=punt[k[0]],b=punt[k[1]];pizz={d:Math.hypot(a.x-b.x,a.y-b.y)}}});
+var pizz=null;
+vista.addEventListener('pointermove',function(e){
+  if(!drag&&!pizz){if(!S.giro)hover(e);return}
+  if(punt[e.pointerId]){punt[e.pointerId].x=e.clientX;punt[e.pointerId].y=e.clientY}
+  if(pizz){var k=Object.keys(punt);if(k.length<2)return;var a=punt[k[0]],b=punt[k[1]],d=Math.hypot(a.x-b.x,a.y-b.y),r=vista.getBoundingClientRect();
+    zoomA(d/pizz.d,(a.x+b.x)/2-r.left,(a.y+b.y)/2-r.top);V.s=Vt.s;V.tx=Vt.tx;V.ty=Vt.ty;pizz.d=d;return}
+  if(!drag.mosso&&Math.hypot(e.clientX-drag.x0,e.clientY-drag.y0)>5){drag.mosso=true;vista.classList.add('trascino');chiudiScheda();via()}
+  if(!drag.mosso)return;var dx=e.clientX-drag.x,dy=e.clientY-drag.y,now=performance.now(),dt=Math.max(1,now-drag.t);
+  if(S.giro){scrubDelta(-dx/dimV.w*9)}else{Vt.tx+=dx;Vt.ty+=dy;limita(Vt);V.tx=Vt.tx;V.ty=Vt.ty;iner.x=dx/dt*16;iner.y=dy/dt*16}
+  drag.x=e.clientX;drag.y=e.clientY;drag.t=now;sporco=true});
+function fine(e){delete punt[e.pointerId];if(Object.keys(punt).length<2)pizz=null;
+  if(drag){if(drag.mosso){noClick=true;setTimeout(function(){noClick=false},60)}else if(!S.giro){clicca(e)}}
+  drag=null;vista.classList.remove('trascino')}
+vista.addEventListener('pointerup',fine);vista.addEventListener('pointercancel',fine);
+vista.addEventListener('wheel',function(e){if(e.target.closest('.vr-scheda'))return;e.preventDefault();via();
+  if(S.giro){scrubDelta((e.deltaY+e.deltaX)*0.006);return}
+  var r=vista.getBoundingClientRect();zoomA(Math.exp(-e.deltaY*0.0016),e.clientX-r.left,e.clientY-r.top)},{passive:false});
+vista.addEventListener('dblclick',function(e){if(S.giro||e.target.closest('button,.vr-scheda,.vr-eti'))return;var r=vista.getBoundingClientRect();
+  if(Vt.s>V.fit*2.5)intera();else zoomA(2,e.clientX-r.left,e.clientY-r.top)});
+document.querySelectorAll('.vr-zoom [data-z]').forEach(function(b){b.onclick=function(){via();var z=b.dataset.z;if(z==='in')zoomA(1.6);else if(z==='out')zoomA(1/1.6);else intera()}});
+function via(){$('#aiutoV').classList.add('via')}
+
+/* ======================= tappe ======================= */
+var nav=$('#tappe');
+TAPPE.forEach(function(t,i){var b=document.createElement('button');b.className='vr-t';b.dataset.i=i;
+  b.innerHTML='<img src="visita-reale/f-'+t.id+'-m.jpg" alt=""><span><span class="n">'+String(i+1).padStart(2,'0')+'</span>'+t.nome+'<small>'+t.sub+'</small></span>';
+  b.onclick=function(){vai(i)};nav.appendChild(b)});
+(function(){var b=document.createElement('button');b.className='vr-t giro';b.id='btGiro';b.innerHTML='<span class="ico">▶</span><span><span class="n">VIDEO</span>Passeggiate<small>'+GIRI.length+' giri nel negozio</small></span>';
+  b.onclick=function(){apriGiro()};nav.insertBefore(b,nav.firstChild)})();
+var caricaTok=0;
+function vai(i,opz){opz=opz||{};if(i<0||i>=TAPPE.length)return;chiudiScheda();
+  if(S.giro)chiudiGiro();
+  var cambio=i!==S.i||opz.forza;S.i=i;var t=tp();
+  vista.classList.add('cambio');var tok=++caricaTok;
+  setTimeout(function(){if(tok!==caricaTok)return;
+    foto.onload=function(){if(tok!==caricaTok)return;vista.classList.remove('cambio');
+      var big=new Image();big.onload=function(){if(tok===caricaTok)foto.src=big.src};big.src='visita-reale/f-'+t.id+'.jpg'};
+    foto.src='visita-reale/f-'+t.id+'-l.jpg';$('#sfondo').style.backgroundImage='url("visita-reale/f-'+t.id+'-l.jpg")';
+    misura();intera(true,true);
+    if(T){TAPPE.forEach(function(x){x.gr.visible=(x===t)});schermi.forEach(function(s){s.vis=false});t.oggetti.forEach(function(o){if(o.userData.schermo)o.userData.schermo.vis=true});
+      R.toneMappingExposure=t.exp||1;cv.style.filter=(t.filtro||'')+' blur(.3px)'}
+    creaEtichette();info();applicaTaglio();sporco=true;
+    if(!opz.noHash)try{history.replaceState(null,'','#tappa='+t.id)}catch(e){}
+  },cambio?180:0);
+  document.querySelectorAll('.vr-t').forEach(function(b){b.setAttribute('aria-pressed',String(+b.dataset.i===i&&!S.giro))});
+  var bt=document.querySelector('.vr-t[data-i="'+i+'"]');if(bt&&bt.scrollIntoView)try{bt.scrollIntoView({block:'nearest',inline:'nearest',behavior:'smooth'})}catch(e){}
+  $('#prec').disabled=i<=0;$('#succ').disabled=i>=TAPPE.length-1}
+$('#prec').onclick=function(){if(S.giro){vai(capCorrente().i);return}vai(S.i-1)};
+$('#succ').onclick=function(){if(S.giro){vai(capCorrente().i);return}vai(S.i+1)};
+document.addEventListener('keydown',function(e){if(e.target.closest&&e.target.closest('input,textarea'))return;
+  if(e.key==='ArrowRight'){e.preventDefault();if(S.giro)scrubDelta(0.5);else vai(S.i+1)}else if(e.key==='ArrowLeft'){e.preventDefault();if(S.giro)scrubDelta(-0.5);else vai(S.i-1)}
+  else if(e.key==='+'||e.key==='=')zoomA(1.4);else if(e.key==='-')zoomA(1/1.4);else if(e.key==='Escape')chiudiScheda()});
+
+function info(){var t=tp();
+  $('#info').innerHTML='<div class="dove">'+t.dove+'</div><h2><span>'+String(S.i+1).padStart(2,'0')+'</span>'+t.nome+'</h2>'+
+    '<p><b style="color:#2a1d12">Oggi.</b> '+t.prima+'</p><p><b>Con STORE // CRAFT.</b> '+t.dopo+'</p>';
+  var o=$('#ogg');o.innerHTML='';
+  if(!t.oggetti||!t.oggetti.length){o.innerHTML='<p style="margin:0;font-size:16px">Qui niente oggetti nuovi: '+(t.d2?'guarda la scheda del draghetto nella foto.':'solo la foto di oggi.')+'</p>'}
+  (t.oggetti||[]).forEach(function(x){var i=x.userData.info,b=document.createElement('button');b.innerHTML=i.nome+'<small>'+(i.mis||'')+'</small>';
+    b.onclick=function(){if(S.vista==='prima')impostaVista('dopo');apriScheda(x)};o.appendChild(b)});
+  var d=$('#dopo2d');if(t.d2){d.innerHTML='<img src="'+t.d2.img+'" alt=""><h3>'+t.d2.tit+'</h3><p>'+t.d2.txt+'</p>';d.classList.add('on')}else{d.classList.remove('on');d.innerHTML=''}
+  /* tappa del draghetto: niente comandi VISTA/GRAFICHE, al loro posto il banner blu verso la pagina del logo (sempre in DOPO) */
+  var ban=$('#bannerLogo');$('#boxVista').hidden=!!t.d2;ban.hidden=!t.d2;if(t.d2){ban.href=t.d2.link;if(S.vista!=='dopo')impostaVista('dopo')}}
+
+/* ======================= etichette e schede ======================= */
+var etis=[];
+function creaEtichette(){var bx=$('#etis');bx.innerHTML='';etis=[];if(!T)return;tp().oggetti.forEach(function(o){var i=o.userData.info,d=document.createElement('div');d.className='vr-eti';
+  d.innerHTML=i.nome+'<small>'+(i.mis||'').split(' · ')[0]+'</small>';d.onclick=function(ev){ev.stopPropagation();if(noClick)return;apriScheda(o)};bx.appendChild(d);etis.push({o:o,d:d})})}
+var bb,tmp;if(T){bb=new T.Box3();tmp=new T.Vector3()}
+function piazzaEtichette(){var fatti=[];
+  etis.map(function(e){bb.setFromObject(e.o);tmp.set((bb.min.x+bb.max.x)/2,bb.max.y+0.015,(bb.min.z+bb.max.z)/2);var v=tmp.clone().project(cam);
+    e.x=(v.x+1)/2*dimV.w;e.y=(1-v.y)/2*dimV.h;e.fuori=(v.x<-1.1||v.x>1.1||v.y<-1.1||v.y>1.15||v.z>1);return e})
+  .sort(function(a,b){return b.y-a.y}).forEach(function(e){if(e.fuori){e.d.style.display='none';return}e.d.style.display='';
+    var w=e.d.offsetWidth||160,h=e.d.offsetHeight||40,x=Math.max(w/2+6,Math.min(dimV.w-w/2-6,e.x)),y=e.y-26,k=0;
+    while(k<6&&fatti.some(function(r){return Math.abs(r.x-x)<(r.w+w)/2+4&&Math.abs(r.y-y)<(r.h+h)/2+4})){y-=h+6;k++}
+    fatti.push({x:x,y:y-h/2,w:w,h:h});e.d.style.setProperty('--gamba',Math.max(14,e.y-y)+'px');
+    e.d.style.transform='translate('+(x-w/2).toFixed(1)+'px,'+(y-h).toFixed(1)+'px)'})}
+var scheda=$('#scheda');
+function chiudiScheda(){scheda.hidden=true}
+function apriScheda(o){var i=o.userData.info,p=i.prezzoK?prezzo(i.prezzoK):null,img='';
+  if(i.slide){img=slideList(false)[0]||''}else if(i.slideV){img=slideList(true)[0]||''}else if(i.chiaveV)img=gv(i.chiaveV)||'';else if(i.chiave==='A4')img=grafA4()||'';else if(i.chiave)img=graf(i.chiave)||'';
+  var pz=p||i.prezzo;var h='<button class="x" aria-label="Chiudi">×</button><h3>'+i.nome+'</h3><div class="mis">'+(i.mis||'')+'</div>';
+  if(i.app){h+=anteprimaApp()+'<p style="margin:6px 0 0;font-size:16.5px">'+i.serve+'</p>'}else{h+='<div class="fig">'+(img?'<img src="'+img+'" alt="">':'')+'<p>'+i.serve+'</p></div>'}
+  h+='<h4>Vantaggi per te</h4><ul>'+i.pro.map(function(x){return'<li>'+x+'</li>'}).join('')+'</ul>';
+  if(i.proposta&&window.PropostaSchermo)h+=PropostaSchermo.html();else if(pz)h+='<div class="prezzo">Prezzo indicativo: <b>'+pz+'</b><br><small>da verificare al momento dell’ordine</small></div>';
+  h+='<div class="azioni">'+(i.app?'<a class="hbtn pri vr-big" href="../demo/demo-app-v2.html">Apri la demo completa</a>':'<button class="hbtn pri vr-big" data-come>Come si fa con STORE // CRAFT</button>')+'</div>';
+  if(i.come)h+='<div class="come"><ol>'+i.come.map(function(x){return'<li>'+x+'</li>'}).join('')+'</ol></div>';
+  scheda.innerHTML=h;scheda.hidden=false;
+  scheda.querySelector('.x').onclick=chiudiScheda;var cb=scheda.querySelector('[data-come]');if(cb)cb.onclick=function(){scheda.querySelector('.come').classList.toggle('on')};
+  if(i.proposta&&window.PropostaSchermo)PropostaSchermo.aggancia(scheda);
+  bb.setFromObject(o);var c=new T.Vector3();bb.getCenter(c);var v=c.project(cam),x=(v.x+1)/2*dimV.w,y=(1-v.y)/2*dimV.h;
+  var sw=Math.min(420,dimV.w-24),left=x>dimV.w/2?x-sw-50:x+50;left=Math.max(12,Math.min(dimV.w-sw-12,left));
+  scheda.style.left=left+'px';scheda.style.top='12px';scheda.style.setProperty('--ox',x>dimV.w/2?'100%':'0%');scheda.style.setProperty('--oy',Math.round(y)+'px');
+  scheda.style.animation='none';void scheda.offsetWidth;scheda.style.animation=''}
+function anteprimaApp(){var bars='';for(var i=0;i<46;i++){var b=((i*37+11)%5===0)?3:((i*13)%3===0?2:1);bars+='<rect x="'+(i*2.6)+'" y="0" width="'+(b*.9)+'" height="26"/>'}
+  return '<div class="vr-app"><div class="barra"><img src="../media/logo/marchi6/04-monocolo/04-monocolo-icona-notte.svg" alt="" onerror="this.remove()"><span>OTTICA MACRÌ</span>STORE // CRAFT</div>'+
+  '<div class="tess"><div>VENDO<small>scansiona e vendi</small></div><div>ARRIVA MERCE<small>carico + etichette</small></div><div>CERCO<small>marca, prezzo</small></div></div>'+
+  '<div class="eti"><div class="t">RAY-BAN RB2132<small>55□18 · nero lucido</small><b>€ 112</b></div><svg viewBox="0 0 120 34"><g fill="#111">'+bars+'</g><text x="14" y="33" font-size="7" font-family="monospace">8 053672 112004</text></svg></div>'+
+  '<div class="piede">Stampa: DYMO LabelWriter 450 (etichette 89×28 mm) · cartelli · vetrina digitale sul tablet</div></div>'}
+
+/* clic e passaggio sugli oggetti */
+var ray=T?new T.Raycaster():null,mouse=T?new T.Vector2():null;
+function colpito(e){if(!T)return null;var r=vista.getBoundingClientRect();mouse.set((e.clientX-r.left)/r.width*2-1,-((e.clientY-r.top)/r.height*2-1));
+  if(S.vista==='prima'||(S.vista==='confronta'&&(e.clientX-r.left)/r.width<S.taglio))return null;
+  ray.setFromCamera(mouse,cam);var h=ray.intersectObjects(tp().oggetti,true).filter(function(h){return !h.object.userData.ombra&&!h.object.isLine&&!(h.object.type==='LineSegments')})[0];
+  if(!h)return null;var o=h.object;while(o&&!o.userData.info)o=o.parent;return o}
+function clicca(e){if(noClick||e.target.closest('button,a,.vr-scheda,.vr-eti'))return;var o=colpito(e);
+  if(CAL){var r=vista.getBoundingClientRect(),px=((e.clientX-r.left)-V.tx)/V.s,py=((e.clientY-r.top)-V.ty)/V.s;$('#cal').textContent='px '+Math.round(px)+' · py '+Math.round(py);console.log('CAL',tp().id,Math.round(px),Math.round(py))}
+  if(o)apriScheda(o);else chiudiScheda()}
+var tHov=0;function hover(e){var now=performance.now();if(now-tHov<60)return;tHov=now;vista.classList.toggle('su-oggetto',!!colpito(e))}
+
+/* ======================= prima / dopo ======================= */
+function segna(sel,val,attr){document.querySelectorAll(sel).forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset[attr]===val))})}
+function impostaVista(v){S.vista=v;vista.classList.toggle('dopo',v!=='prima');vista.classList.toggle('prima',v==='prima');vista.classList.toggle('confronta',v==='confronta');
+  segna('[data-vista]',v,'vista');$('#badge').textContent=v==='prima'?'PRIMA · oggi':'DOPO · con STORE // CRAFT';if(v==='prima')chiudiScheda();applicaTaglio();sporco=true}
+document.querySelectorAll('[data-vista]').forEach(function(b){b.onclick=function(){if(S.giro)vai(capCorrente().i);impostaVista(b.dataset.vista)}});
+document.querySelectorAll('[data-graf]').forEach(function(b){b.onclick=function(){S.graf=b.dataset.graf;segna('[data-graf]',S.graf,'graf');salvaPref();aggiornaGrafiche()}});
+document.querySelectorAll('[data-eti]').forEach(function(b){b.onclick=function(){S.eti=b.dataset.eti==='1';segna('[data-eti]',S.eti?'1':'0','eti');vista.classList.toggle('vr-noeti',!S.eti);salvaPref()}});
+segna('[data-graf]',S.graf,'graf');segna('[data-eti]',S.eti?'1':'0','eti');vista.classList.toggle('vr-noeti',!S.eti);
+function applicaTaglio(){var c=S.vista==='confronta'?'inset(0 0 0 '+(S.taglio*100).toFixed(2)+'%)':'';$('#etis').style.clipPath=c;$('#taglio').style.left=(S.taglio*100)+'%';clipCanvas()}
+/* gli oggetti 3D si vedono solo sopra la foto (non sulle bande sfocate ai lati) e, in Confronta, solo a destra della tendina */
+function clipCanvas(){var t=tp(),l=Math.max(0,V.tx),a=Math.max(0,V.ty),r=Math.max(0,dimV.w-(V.tx+t.W*V.s)),b=Math.max(0,dimV.h-(V.ty+t.H*V.s));
+  if(S.vista==='confronta')l=Math.max(l,S.taglio*dimV.w);var c='inset('+a.toFixed(1)+'px '+r.toFixed(1)+'px '+b.toFixed(1)+'px '+l.toFixed(1)+'px)';cv.style.clipPath=c;cv.style.webkitClipPath=c}
+(function(){var t=$('#taglio span'),on=false;t.addEventListener('pointerdown',function(e){on=true;try{t.setPointerCapture(e.pointerId)}catch(_){}e.preventDefault();e.stopPropagation()});
+  t.addEventListener('pointermove',function(e){if(!on)return;var r=vista.getBoundingClientRect();S.taglio=Math.min(.98,Math.max(.02,(e.clientX-r.left)/r.width));applicaTaglio()});
+  t.addEventListener('pointerup',function(){on=false})})();
+
+/* ======================= passeggiata (video) ======================= */
+var giroT=0,giroTarget=0,giroPlay=false,videoPronto=false;
+/* 6/11: video leggeri (720p) e versione telefono (540p, -mobile) */
+var TELEFONO=matchMedia('(max-width:820px), (pointer:coarse) and (max-width:1100px)').matches;
+function srcVideo(g){return TELEFONO?g.src.replace('.mp4','-mobile.mp4'):g.src}
+var capBox=$('#capitoli'),giriBox=$('#giri');
+function faiCapitoli(){capBox.innerHTML='';GIRO.cap.forEach(function(c,k){var b=document.createElement('button');b.className='vr-cap';b.innerHTML=c.n+'<small>'+c.t.toFixed(1).replace('.',',')+' s</small>';
+  b.onclick=function(){pausa();giroTarget=c.t};b.ondblclick=function(){vai(TAPPE.findIndex(function(x){return x.id===c.tp}))};capBox.appendChild(b)})}
+GIRI.forEach(function(g,k){var b=document.createElement('button');b.className='vr-giro';b.dataset.k=k;b.innerHTML='<img src="'+g.poster+'" alt=""><span>'+g.nome+'<small>'+g.sub+' · '+Math.round(g.dur)+' s</small></span>';
+  b.onclick=function(){apriGiro(k)};giriBox.appendChild(b)});
+function scegliGiro(k){if(k==null||!GIRI[k])k=0;var cambia=GIRI[k]!==GIRO||!video.getAttribute('src');GIRO=GIRI[k];
+  giriBox.querySelectorAll('.vr-giro').forEach(function(b){b.setAttribute('aria-pressed',String(+b.dataset.k===k))});
+  if(cambia){pausa();videoPronto=false;giroT=giroTarget=0;video.poster=GIRO.poster;video.preload='auto';video.src=srcVideo(GIRO);video.load();$('#scrub').max=String(GIRO.dur);faiCapitoli()}}
+function capCorrente(){var k=0;GIRO.cap.forEach(function(c,j){if(giroT>=c.t-0.3)k=j});var c=GIRO.cap[k];return{k:k,c:c,i:TAPPE.findIndex(function(x){return x.id===c.tp})}}
+function apriGiro(k){chiudiScheda();S.giro=true;vista.classList.add('giro');$('#corpo').classList.add('giro');
+  if(typeof k!=='number')k=GIRI.indexOf(GIRO);scegliGiro(k);
+  document.querySelectorAll('.vr-t').forEach(function(b){b.setAttribute('aria-pressed','false')});$('#btGiro').setAttribute('aria-pressed','true');
+  $('#hud').textContent='PASSEGGIATA · '+GIRO.nome.toUpperCase();$('#aiutoV').textContent='Trascina a destra o a sinistra (o la rotella) per camminare avanti e indietro';$('#aiutoV').classList.remove('via');
+  $('#info').innerHTML='<div class="dove">Video · '+Math.round(GIRO.dur)+' secondi · '+(GIRI.indexOf(GIRO)+1)+' di '+GIRI.length+'</div><h2><span>▶</span>'+GIRO.nome+'</h2><p>'+GIRO.testo+' <b>Trascina col mouse</b> per camminare avanti e indietro, oppure premi <b>Cammina</b>.</p><p>Tocca un nome qui sotto il video per saltare lì; con le frecce grandi apri la foto di quel punto. Sotto il video ci sono anche le altre passeggiate.</p>';
+  $('#ogg').innerHTML='<p style="margin:0;font-size:16px">Per vedere gli oggetti nuovi apri una tappa (frecce grandi o la striscia in alto) e premi DOPO.</p>';$('#dopo2d').classList.remove('on');$('#boxVista').hidden=false;$('#bannerLogo').hidden=true;
+  try{history.replaceState(null,'',GIRO.id==='giro'?'#giro':'#giro='+GIRO.id)}catch(e){}}
+function chiudiGiro(){pausa();S.giro=false;vista.classList.remove('giro');$('#corpo').classList.remove('giro');$('#aiutoV').textContent='Tieni premuto e trascina per muoverti · rotella per avvicinare · clic su un oggetto per i dettagli'}
+function scrubDelta(dt){pausa();giroTarget=Math.max(0,Math.min((video.duration||GIRO.dur)-0.05,giroTarget+dt))}
+function pausa(){if(giroPlay){giroPlay=false;video.pause();$('#play').innerHTML='<span class="ic">▶</span>Cammina'}}
+$('#play').onclick=function(){if(giroPlay){pausa();return}if(video.currentTime>=(video.duration||GIRO.dur)-0.1){video.currentTime=0;giroTarget=0}
+  giroPlay=true;var p=video.play();if(p&&p.catch)p.catch(function(){giroPlay=false});$('#play').innerHTML='<span class="ic">❚❚</span>Ferma'};
+video.addEventListener('ended',function(){pausa()});
+video.addEventListener('loadedmetadata',function(){$('#scrub').max=String(video.duration.toFixed(2));videoPronto=true});
+$('#scrub').addEventListener('input',function(){pausa();giroTarget=+this.value});
+var seekIn=false;video.addEventListener('seeked',function(){seekIn=false});
+function passoGiro(){if(!S.giro)return;
+  if(giroPlay){giroT=video.currentTime;giroTarget=giroT}
+  else if(videoPronto){giroT+=(giroTarget-giroT)*0.35;if(Math.abs(giroTarget-giroT)<0.004)giroT=giroTarget;
+    if(!seekIn&&Math.abs(video.currentTime-giroT)>0.015){seekIn=true;video.currentTime=giroT;setTimeout(function(){seekIn=false},400)}}
+  $('#scrub').value=String(giroT);$('#tempo').textContent=giroT.toFixed(1).replace('.',',')+' s';
+  var c=capCorrente();capBox.querySelectorAll('.vr-cap').forEach(function(b,j){b.classList.toggle('on',j===c.k)});
+  $('#succ').disabled=false;$('#prec').disabled=false;$('#succ').title='Apri la foto: '+TAPPE[c.i].nome;$('#prec').title='Apri la foto: '+TAPPE[c.i].nome}
+
+/* ======================= ciclo ======================= */
+var sporco=true;
+new ResizeObserver(function(){var z=V.s/V.fit;misura();Vt.s=V.fit*z;limita(Vt);V.s=Vt.s;V.tx=Vt.tx;V.ty=Vt.ty;sporco=true}).observe(vista);
+function giro(now){requestAnimationFrame(giro);
+  if(S.giro){passoGiro();return}
+  /* inerzia + avvicinamento morbido */
+  if(!drag&&(Math.abs(iner.x)>0.05||Math.abs(iner.y)>0.05)){Vt.tx+=iner.x;Vt.ty+=iner.y;iner.x*=0.9;iner.y*=0.9;limita(Vt);sporco=true}
+  var k=0.22,ds=Vt.s-V.s,dx=Vt.tx-V.tx,dy=Vt.ty-V.ty;
+  if(Math.abs(ds)>1e-5||Math.abs(dx)>0.05||Math.abs(dy)>0.05){V.s+=ds*k;V.tx+=dx*k;V.ty+=dy*k;if(Math.abs(ds)<1e-5&&Math.abs(dx)<.05&&Math.abs(dy)<.05){V.s=Vt.s;V.tx=Vt.tx;V.ty=Vt.ty}sporco=true}
+  if(T&&S.vista!=='prima'&&aggiornaSchermi(now))sporco=true;
+  if(!sporco)return;sporco=false;applicaVista();
+  if(T){R.render(scena,cam);piazzaEtichette()}}
+function giroDaHash(h){var m=h.match(/giro=([\w-]+)/),k=m?GIRI.findIndex(function(g){return g.id===m[1]}):0;return k<0?0:k}
+var h=location.hash;var m=h.match(/tappa=([\w-]+)/);
+var i0=m?Math.max(0,TAPPE.findIndex(function(t){return t.id===m[1]})):0;
+misura();vai(i0,{forza:true,noHash:!m});if(/#giro/.test(h))setTimeout(function(){apriGiro(giroDaHash(h))},50);
+if(/[?&]vista=prima/.test(location.search))impostaVista('prima');
+if(CAL)document.body.classList.add('cal');
+window.addEventListener('hashchange',function(){var h=location.hash,m=h.match(/tappa=([\w-]+)/);
+  if(/#giro/.test(h)){var gk=giroDaHash(h);if(!S.giro||GIRI[gk]!==GIRO)apriGiro(gk)}else if(m){var k=TAPPE.findIndex(function(t){return t.id===m[1]});if(k>=0&&(k!==S.i||S.giro))vai(k,{noHash:true})}});
+requestAnimationFrame(giro);
+window.__vr={S:S,V:V,Vt:Vt,TAPPE:TAPPE,vai:vai,impostaVista:impostaVista,apriGiro:apriGiro,apriScheda:apriScheda,zoomA:zoomA,intera:intera,
+  giroTarget:function(t){giroTarget=t},video:video,pronta:function(){return foto.complete&&foto.naturalWidth>0&&!vista.classList.contains('cambio')}};
+})();
+</script>
+</body>
+</html>

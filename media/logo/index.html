@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Il tuo marchio · Ottica Macrì</title>
+<meta name="color-scheme" content="light">
+<link rel="icon" type="image/svg+xml" href="marchi6/04-monocolo/04-monocolo-icona-colori.svg">
+<link rel="stylesheet" href="../../tema-hud.css">
+<script src="../../tema-hud.js"></script>
+<style>
+.barra{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:space-between}
+.barra .link{display:flex;gap:10px;flex-wrap:wrap}
+.lead b{color:var(--h-text)}
+.num{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--h-mat2,#b5462c);color:#fff;font:700 15px var(--h-title);margin-right:8px;vertical-align:3px}
+.foto3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.foto3 figure{margin:0;background:#fffdf9;border:1px solid var(--h-line2);padding:10px}
+.foto3 img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block}
+.foto3 figcaption{font-size:14.5px;color:var(--h-mut);margin-top:8px;line-height:1.4}
+/* prima / dopo */
+.conf{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:22px;align-items:start}
+.cmp{position:relative;aspect-ratio:761/1000;width:100%;max-width:600px;margin:0 auto;overflow:hidden;background:#fffdf9;border:1px solid var(--h-line2);user-select:none;touch-action:none}
+.cmp img{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}
+.cmp .rest{background:#fffdf9}
+.cmp .rest.trasp{background:transparent;opacity:.6}
+.cmp .linea{position:absolute;top:0;bottom:0;width:2px;background:var(--h-blu);pointer-events:none;box-shadow:0 0 0 1px rgba(255,255,255,.7)}
+.cmp .pomo{position:absolute;top:50%;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;background:#fffdf9;border:2px solid var(--h-blu);display:grid;place-items:center;font:700 16px var(--h-title);color:var(--h-blu);pointer-events:none}
+.cmp .tag{position:absolute;top:10px;padding:3px 10px;font:500 12px var(--h-mono);letter-spacing:1.5px;text-transform:uppercase;background:rgba(255,253,249,.92);border:1px solid var(--h-line2);pointer-events:none}
+.cmp .tag.s{left:10px}.cmp .tag.d{right:10px}
+.ctrl{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:12px auto 0;max-width:600px}
+.ctrl input[type=range]{flex:1;min-width:160px;accent-color:#1f4e79}
+ul.fatto{margin:8px 0 0;padding-left:20px;color:var(--h-mut)} ul.fatto li{margin:7px 0} ul.fatto b{color:var(--h-text);font-weight:600}
+/* varianti */
+.var4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.vc{background:#fffdf9;border:1px solid var(--h-line2);display:flex;flex-direction:column;position:relative;transition:box-shadow .2s,outline-color .2s;outline:2px solid transparent;outline-offset:-2px}
+.vc .img{aspect-ratio:761/1000;display:grid;place-items:center;padding:14px;border-bottom:1px solid var(--h-line)}
+.vc .img img{width:100%;height:100%;object-fit:contain}
+.vc .txt{padding:12px 14px 14px;display:flex;flex-direction:column;gap:8px;flex:1}
+.vc h3{font-size:19px}
+.vc p{margin:0;font-size:14.5px;color:var(--h-mut);line-height:1.4}
+.vc .btn-sc{margin-top:auto}
+.vc.scelta{outline-color:var(--h-mat2,#b5462c);box-shadow:0 18px 36px -22px rgba(181,70,44,.55)}
+.vc .bollo{display:none;position:absolute;top:10px;left:10px;background:var(--h-mat2,#b5462c);color:#fff;font:600 11px var(--h-mono);letter-spacing:1.5px;text-transform:uppercase;padding:4px 9px}
+.vc.scelta .bollo{display:block}
+.vc .cons{position:absolute;top:10px;right:10px;font:500 11px var(--h-mono);letter-spacing:1.2px;text-transform:uppercase;color:var(--h-blu);background:#fff;border:1px solid var(--h-line2);padding:3px 8px}
+.scelto-info{margin-top:14px}
+/* colori della variante scelta */
+.colori{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.colori .vc .img{aspect-ratio:1}
+.colori .vc.scuro .img{background:#1f1a17}
+.colori .vc.tinta{grid-column:span 1}
+.dl{display:flex;flex-wrap:wrap;gap:6px}
+.dl a{font:500 12px var(--h-mono);letter-spacing:1px;padding:3px 8px;border:1px solid var(--h-line2);text-decoration:none;color:var(--h-blu);background:#fff}
+.dl a:hover{border-color:var(--h-blu)}
+.pal{display:flex;gap:4px;margin-top:2px}.pal i{width:18px;height:18px;border-radius:50%;border:1px solid rgba(0,0,0,.12);display:block}
+/* applicazioni */
+.app6{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.mock{background:#fffdf9;border:1px solid var(--h-line2);display:flex;flex-direction:column}
+.mock .scena{aspect-ratio:4/3;position:relative;overflow:hidden;display:grid;place-items:center}
+.mock .cap{padding:10px 14px 12px;font-size:14.5px;color:var(--h-mut);line-height:1.35}
+.mock .cap b{color:var(--h-text);display:block;font:650 17px var(--h-title);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px}
+.insegna{background:radial-gradient(ellipse at 50% 40%,#2c2220 0%,#120e0d 75%)}
+.insegna .box{width:86%;aspect-ratio:3.4/1;background:#1a1413;border:3px solid #3b302c;border-radius:6px;display:flex;align-items:center;gap:6%;padding:0 6%;box-shadow:0 0 40px rgba(255,120,80,.25),inset 0 0 30px rgba(0,0,0,.6)}
+.insegna .box img{width:22%;filter:drop-shadow(0 0 6px rgba(255,255,255,.85)) drop-shadow(0 0 18px rgba(255,150,110,.7))}
+.insegna .box span{font:700 clamp(18px,2.6vw,30px)/1 var(--h-title);letter-spacing:4px;color:#fff;text-shadow:0 0 8px rgba(255,255,255,.9),0 0 22px rgba(255,140,100,.8)}
+.insegna .box span small{display:block;font:500 .42em var(--h-mono);letter-spacing:3px;margin-top:6px;opacity:.85}
+.vetro{background:#4a4f55 url(restauro2/foto/vetrofania-porta.jpg) center 30%/cover}
+.vetro::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,.05))}
+.vetro .lastra{position:absolute;inset:8% 22%;border:2px solid rgba(220,225,230,.7);background:rgba(200,215,225,.22);backdrop-filter:blur(1px);display:grid;place-items:center}
+.vetro .lastra img{width:80%;opacity:.95}
+.biglietto{background:#e8dfd2}
+.biglietto .carta{width:78%;aspect-ratio:85/55;background:#fffdf9;box-shadow:0 14px 26px -12px rgba(60,40,20,.45);display:flex;align-items:center;gap:7%;padding:0 7%;transform:rotate(-3deg)}
+.biglietto .carta img{width:30%;flex:none}
+.biglietto .carta div{font:600 clamp(12px,1.5vw,16px)/1.25 var(--h-title);letter-spacing:1.5px;color:#2b211c;text-transform:uppercase}
+.biglietto .carta div small{display:block;font:400 10.5px/1.5 var(--h-mono);letter-spacing:.5px;text-transform:none;color:#6b5c4c;margin-top:6px}
+.biglietto .carta div i{display:block;width:34px;height:2px;background:#C63D2F;margin:6px 0}
+.cartellino{background:#d9cfc1}
+.cartellino .tag2{width:44%;aspect-ratio:3/4;background:#fff;border-radius:6px;box-shadow:0 12px 22px -12px rgba(60,40,20,.5);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6%;position:relative;padding:6%}
+.cartellino .tag2::before{content:"";position:absolute;top:6%;left:50%;width:10px;height:10px;margin-left:-5px;border-radius:50%;background:#d9cfc1;box-shadow:inset 0 1px 2px rgba(0,0,0,.3)}
+.cartellino .tag2 img{width:46%;margin-top:10%}
+.cartellino .tag2 .pz{font:700 clamp(18px,2.4vw,28px)/1 var(--h-title);color:#C63D2F}
+.cartellino .tag2 .ds{font:500 10px var(--h-mono);letter-spacing:1px;color:#6b5c4c;text-transform:uppercase;text-align:center}
+.icona{background:linear-gradient(160deg,#cfd8df,#9fb0bd)}
+.icona .tel{width:46%;aspect-ratio:9/16;border-radius:18px;background:#1b1716;padding:7px;box-shadow:0 14px 26px -12px rgba(0,0,0,.5);margin-top:24%}
+.icona .tel .sch{width:100%;height:100%;border-radius:12px;background:linear-gradient(180deg,#f3ece2,#e7dccd);display:grid;grid-template-columns:repeat(3,1fr);gap:8%;padding:12% 10%;align-content:start}
+.icona .tel .ic{aspect-ratio:1;border-radius:22%;background:#cbbfae}
+.icona .tel .ic.io{background:#fff7ec;display:grid;place-items:center;box-shadow:0 2px 6px rgba(0,0,0,.18)}
+.icona .tel .ic.io img{width:78%}
+.timbro{background:#efe8dc}
+.timbro svg{width:62%;height:auto}
+/* animazione */
+.anim{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.anim video{width:100%;display:block;background:#1f1a17;border:1px solid var(--h-line2)}
+.file{columns:2;font-size:14.5px;color:var(--h-mut)} .file code{color:var(--h-text);font-size:13.5px}
+@media (max-width:1000px){.var4{grid-template-columns:repeat(2,minmax(0,1fr))}.app6,.colori{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:820px){.conf,.anim{grid-template-columns:1fr}.foto3{grid-template-columns:1fr 1fr}.file{columns:1}}
+@media (max-width:520px){.var4,.app6,.colori,.foto3{grid-template-columns:1fr}}
+/* marchio definitivo (6/11/2026) */
+.def{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:18px;align-items:stretch}
+.def .tav{background:#fffdf9;border:1px solid var(--h-line2);display:flex;flex-direction:column}
+.def .tav .img{flex:1;display:grid;place-items:center;padding:28px}
+.def .tav .img img{width:100%;max-width:520px;height:auto;display:block}
+.def .tav.ic .img img{max-width:230px}
+.def .tav .txt{padding:12px 16px 14px;border-top:1px solid var(--h-line);font-size:14.5px;color:var(--h-mut);line-height:1.4}
+.def .tav .txt b{color:var(--h-text);display:block;font:650 18px var(--h-title);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px}
+.ver{grid-template-columns:repeat(4,minmax(0,1fr))}
+.colori.ver .vc .img{aspect-ratio:776/619}
+.ver .vc.q .img img{width:62%;height:62%}
+.ver .vc.rosso .img{background:#C63D2F}
+.colori.ver .vc.notte .img{background:#1f1a17}
+.ver .vc h3{font-size:16px}
+.insegna .box.ov{aspect-ratio:2.6/1;justify-content:center;gap:0;padding:3% 6%}
+.insegna .box.ov img{width:45%;height:auto;filter:drop-shadow(0 0 5px rgba(255,255,255,.55)) drop-shadow(0 0 16px rgba(255,150,110,.55))}
+.biglietto .carta.fr{position:absolute;width:56%;left:5%;top:12%;justify-content:center;padding:4%}
+.biglietto .carta.fr img{width:auto;height:100%}
+.biglietto .carta.re{position:absolute;width:42%;right:5%;bottom:10%;background:#C63D2F;transform:rotate(4deg);justify-content:center;padding:0}
+.biglietto .carta.re img{width:34%}
+.sezpart{margin-top:56px;padding-top:26px;border-top:2px solid var(--h-line2)}
+@media (max-width:1000px){.colori.ver{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:820px){.def{grid-template-columns:1fr}}
+@media (max-width:520px){.colori.ver{grid-template-columns:1fr}}
+</style>
+</head>
+<body class="hud">
+<div class="hud-pag">
+ <div class="barra">
+  <div class="link"><a class="hbtn piccolo" href="../../index.html">☰ Menu</a><a class="hbtn piccolo" href="storico/animazione/avvio.html">▶ Animazione</a></div>
+  <span class="eti">Ottica Macrì · il tuo marchio</span>
+ </div>
+
+ <header style="margin-top:28px">
+  <span class="eti">Il marchio definitivo</span>
+  <h1>Il tuo marchio</h1>
+  <p class="lead">Il draghetto della vetrofania, <b>restaurato</b> e messo dentro un <b>ovale da bottega</b> con il nome del negozio: è il marchio per insegna, carta intestata, cartelli e biglietti. Per le cose piccole (app, icona sul telefono, profilo social) c'è l'<b>icona OM</b>: le iniziali dentro un monocolo.</p>
+ </header>
+
+ <section style="margin-top:30px">
+  <div class="def">
+   <div class="tav"><div class="img"><img src="marchi6/06-ovale/06-ovale-colori.svg" alt="Marchio Ottica Macrì: ovale da bottega con il draghetto"></div><div class="txt"><b>Ovale da bottega</b>Marchio principale: insegna, carta, cartelli, intestazioni.</div></div>
+   <div class="tav ic"><div class="img"><img src="marchi6/04-monocolo/04-monocolo-icona-colori.svg" alt="Icona Ottica Macrì: monocolo OM"></div><div class="txt"><b>Icona OM</b>App, favicon, icone piccole, collegamenti.</div></div>
+  </div>
+ </section>
+
+ <section>
+  <span class="eti">Le versioni</span><h2>Un colore, due colori, su chiaro e su scuro</h2>
+  <div class="colori ver">
+   <div class="vc "><div class="img"><img src="marchi6/06-ovale/06-ovale-colori.svg" alt="Due colori"></div><div class="txt"><h3>Due colori</h3><p>Rosso del negozio e nero: la versione principale.</p><div class="dl"><a href="marchi6/06-ovale/06-ovale-colori.svg">SVG</a><a href="marchi6/06-ovale/png/06-ovale-colori-2000.png">PNG 2000</a></div></div></div>
+   <div class="vc "><div class="img"><img src="marchi6/06-ovale/06-ovale-rosso.svg" alt="Rosso"></div><div class="txt"><h3>Rosso</h3><p>Un colore: #C63D2F. Vetrofania, adesivi, sacchetti.</p><div class="dl"><a href="marchi6/06-ovale/06-ovale-rosso.svg">SVG</a><a href="marchi6/06-ovale/png/06-ovale-rosso-2000.png">PNG 2000</a></div></div></div>
+   <div class="vc "><div class="img"><img src="marchi6/06-ovale/06-ovale-nero.svg" alt="Nero"></div><div class="txt"><h3>Nero</h3><p>Timbri, fax, incisioni, stampa economica.</p><div class="dl"><a href="marchi6/06-ovale/06-ovale-nero.svg">SVG</a><a href="marchi6/06-ovale/png/06-ovale-nero-2000.png">PNG 2000</a></div></div></div>
+   <div class="vc rosso"><div class="img"><img src="marchi6/06-ovale/06-ovale-negativo.svg" alt="Bianco su rosso"></div><div class="txt"><h3>Bianco su rosso</h3><p>Per fondi rossi: biglietti, buste, social.</p><div class="dl"><a href="marchi6/06-ovale/06-ovale-negativo.svg">SVG</a><a href="marchi6/06-ovale/png/06-ovale-negativo-2000.png">PNG 2000</a></div></div></div>
+   <div class="vc notte"><div class="img"><img src="marchi6/06-ovale/06-ovale-notte.svg" alt="Su scuro"></div><div class="txt"><h3>Su scuro</h3><p>Insegna retroilluminata, foto, video.</p><div class="dl"><a href="marchi6/06-ovale/06-ovale-notte.svg">SVG</a><a href="marchi6/06-ovale/png/06-ovale-notte-2000.png">PNG 2000</a></div></div></div>
+   <div class="vc q"><div class="img"><img src="marchi6/04-monocolo/04-monocolo-icona-colori.svg" alt="Icona OM"></div><div class="txt"><h3>Icona OM</h3><p>App, favicon, collegamenti, profilo social.</p><div class="dl"><a href="marchi6/04-monocolo/04-monocolo-icona-colori.svg">SVG</a><a href="marchi6/04-monocolo/png/04-monocolo-icona-colori-512.png">PNG 512</a></div></div></div>
+   <div class="vc q rosso"><div class="img"><img src="marchi6/04-monocolo/04-monocolo-icona-negativo.svg" alt="Icona su rosso"></div><div class="txt"><h3>Icona su rosso</h3><p>Retro del biglietto, bollino, avatar.</p><div class="dl"><a href="marchi6/04-monocolo/04-monocolo-icona-negativo.svg">SVG</a><a href="marchi6/04-monocolo/png/04-monocolo-icona-negativo-512.png">PNG 512</a></div></div></div>
+   <div class="vc q notte"><div class="img"><img src="marchi6/04-monocolo/04-monocolo-icona-notte.svg" alt="Icona su scuro"></div><div class="txt"><h3>Icona su scuro</h3><p>Barre scure delle app e dei video.</p><div class="dl"><a href="marchi6/04-monocolo/04-monocolo-icona-notte.svg">SVG</a></div></div></div>
+  </div>
+ </section>
+
+ <section>
+  <span class="eti">Come sta</span><h2>Il marchio al lavoro</h2>
+  <div class="app6">
+   <div class="mock"><div class="scena insegna"><div class="box ov"><img src="marchi6/06-ovale/06-ovale-notte.svg" alt="Insegna di notte con l'ovale"></div></div><div class="cap"><b>Insegna di notte</b>Versione su scuro, retroilluminata.</div></div>
+   <div class="mock"><div class="scena vetro"><div class="lastra"><img src="marchi6/06-ovale/06-ovale-rosso.svg" alt="Ovale in vetrofania rossa"></div></div><div class="cap"><b>Vetrofania</b>Un colore, rosso: si taglia in pellicola al plotter.</div></div>
+   <div class="mock"><div class="scena biglietto"><div class="carta fr"><img src="marchi6/06-ovale/06-ovale-colori.svg" alt="Fronte del biglietto"></div><div class="carta re"><img src="marchi6/04-monocolo/04-monocolo-icona-negativo.svg" alt="Retro del biglietto"></div></div><div class="cap"><b>Biglietto da visita</b>Fronte con l'ovale, retro rosso con l'icona OM.</div></div>
+   <div class="mock"><div class="scena cartellino"><div class="tag2"><img src="marchi6/04-monocolo/04-monocolo-icona-colori.svg" alt="Icona OM"><div class="pz">€ 00,00</div><div class="ds">Montatura · esempio</div></div></div><div class="cap"><b>Cartellino prezzo</b>L'icona OM piccola sul cartellino (prezzo di esempio).</div></div>
+   <div class="mock"><div class="scena icona"><div class="tel"><div class="sch"><span class="ic io"><img src="marchi6/04-monocolo/04-monocolo-icona-colori.svg" alt="Icona"></span><span class="ic"></span><span class="ic"></span><span class="ic"></span><span class="ic"></span><span class="ic"></span></div></div></div><div class="cap"><b>Icona dell'app</b>Si riconosce anche minuscola.</div></div>
+   <div class="mock"><div class="scena timbro"><svg viewBox="0 0 200 200" aria-label="Timbro"><defs><path id="giro" d="M100 100m-76 0a76 76 0 1 1 152 0a76 76 0 1 1-152 0"/></defs><circle cx="100" cy="100" r="94" fill="none" stroke="#1f4e79" stroke-width="3"/><circle cx="100" cy="100" r="60" fill="none" stroke="#1f4e79" stroke-width="1.5"/><text font-family="Georgia,serif" font-size="15" letter-spacing="3" fill="#1f4e79"><textPath href="#giro" startOffset="2%">OTTICA MACRÌ · ROMA · OTTICA MACRÌ · ROMA ·</textPath></text><g transform="translate(62 62) scale(.76)" fill="#1f4e79" fill-rule="evenodd"><path d="M96 49.44C95.69 24.46 74.61 3.8 49.64 4C24.65 4.2 3.92 25.18 4 50.16C4.09 75.45 25.49 96.41 50.76 95.99C75.74 95.58 96.3 74.41 96 49.44ZM86.8 50.52C86.58 71.14 71.83 92.91 49.48 92.55C27.18 92.18 12.98 70.07 13.2 49.48C13.42 28.86 28.17 7.09 50.52 7.45C72.82 7.82 87.02 29.93 86.8 50.52Z"/><path d="M43.01 30.01 50.46 53.15 57.98 30.01H73.72V31.95H68.59V68.03H73.72V70H53.56V68.03H58.81V34.09L47.27 70H45.87L34.15 33.65V63.94Q34.15 66.45 34.78 67.24Q35.4 68.03 38.24 68.03H39.64V70H26.28V68.03H28.72Q31.05 68.03 31.56 67.25Q32.06 66.48 32.06 64.12V31.95H26.28V30.01Z"/></g></svg></div><div class="cap"><b>Timbro</b>Una tinta, per ricevute, buste e garanzie.</div></div>
+  </div>
+  <p class="nota">Sono prove di come starebbe: misure, scritte e materiali si decidono con Fabrice. Tutte le prove del marchio: <a href="marchi6/index.html">le sei proposte</a>.</p>
+ </section>
+
+ <div class="sezpart">
+  <span class="eti">Da dove siamo partiti</span>
+  <h2 style="margin-top:6px">Il draghetto storico, restaurato</h2>
+  <p class="lead" style="margin-top:0">Il draghetto rosso con gli occhiali da sole sta da anni sulla porta del negozio. <b>Non lo abbiamo reinventato</b>: lo abbiamo ricalcato dalle foto della vetrofania e ne abbiamo ripulito i tratti. È lo stesso che ora sta nell'ovale.</p>
+ </div>
+
+ <!-- 1 · ORIGINALE -->
+ <section style="margin-top:36px">
+  <span class="eti">Da dove partiamo</span><h2><span class="num">1</span>L'originale, com'è oggi</h2>
+  <div class="foto3">
+   <figure><img src="restauro2/foto/facciata.jpg" alt="La facciata di Ottica Macrì con l'insegna" loading="lazy"><figcaption><b>La facciata</b>, via Poggi d'Oro: il draghetto sta sulla porta a vetri dell'ingresso.</figcaption></figure>
+   <figure><img src="restauro2/foto/vetrofania-porta.jpg" alt="La porta d'ingresso con la vetrofania del draghetto" loading="lazy"><figcaption><b>La vetrofania</b> sulla porta: rosso per il personaggio, scuro per gli occhiali.</figcaption></figure>
+   <figure><img src="storico/confronto/foto-vetrofania-allineata.jpg" alt="La vetrofania fotografata da vicino e raddrizzata" loading="lazy"><figcaption><b>Da vicino</b>: la foto raddrizzata e girata come la si vede dalla strada. È la base del restauro.</figcaption></figure>
+  </div>
+  <p class="nota">Il disegno esiste solo come pellicola sul vetro: non c'era un file. Con gli anni i bordi si sono rovinati e alcune linee sono storte o di spessore irregolare.</p>
+ </section>
+
+ <!-- 2 · RESTAURO -->
+ <section>
+  <span class="eti">Prima / dopo</span><h2><span class="num">2</span>Il restauro: cosa abbiamo corretto</h2>
+  <div class="conf">
+   <div>
+    <div class="cmp" id="cmp" aria-label="Confronto tra la foto della vetrofania e il restauro">
+     <img src="storico/confronto/foto-vetrofania-allineata.jpg" alt="Foto della vetrofania">
+     <img class="rest" id="rest" src="restauro2/B-tratto-calibrato/draghetto-B-vetrofania.svg" alt="Draghetto restaurato">
+     <span class="tag s">Foto</span><span class="tag d" id="tagd">Restauro</span>
+     <div class="linea" id="linea"></div><div class="pomo" id="pomo" style="left:50%">⇆</div>
+    </div>
+    <div class="ctrl">
+     <label for="cur" style="font:500 13px var(--h-mono);letter-spacing:1px">CURSORE</label>
+     <input id="cur" type="range" min="0" max="100" value="50" aria-label="Sposta il confronto tra foto e restauro">
+     <button class="hbtn piccolo" type="button" id="trasp" aria-pressed="false">Sovrapponi</button>
+    </div>
+   </div>
+   <div class="pann">
+    <h3>Il personaggio resta quello</h3>
+    <p style="color:var(--h-mut);margin:6px 0 4px">Trascina il cursore o premi «Sovrapponi»: il restauro combacia con la vetrofania linea per linea. Abbiamo corretto solo i difetti:</p>
+    <ul class="fatto">
+     <li><b>Bordi puliti</b>: via le sbavature e i dentini della pellicola consumata.</li>
+     <li><b>Curve fluide</b>: le linee tremolanti (mascella, naso, cresta) ora scorrono continue.</li>
+     <li><b>Spessori coerenti</b>: il tratto non si gonfia e non si assottiglia a caso.</li>
+     <li><b>Chiusure e punte</b>: le punte della cresta e le estremità delle ciglia finiscono nette.</li>
+     <li><b>Occhiali ridisegnati</b>: montatura di spessore regolare, lenti simmetriche, stanghetta dritta.</li>
+     <li><b>File veri</b>: vettoriali per stampa, insegna, vetrofania, app e social, a qualsiasi misura.</li>
+    </ul>
+    
+   </div>
+  </div>
+ </section>
+
+ <!-- 6 · ANIMAZIONE -->
+ <section>
+  <span class="eti">Si accende</span><h2><span class="num">3</span>L'animazione d'avvio</h2>
+  <div class="anim">
+   <video controls muted playsinline loop preload="metadata" poster="storico/animazione/poster-chiaro-1920x1080.jpg"><source src="storico/animazione/draghetto-avvio-chiaro-1920x1080.mp4" type="video/mp4"></video>
+   <video controls muted playsinline loop preload="metadata" poster="storico/animazione/poster-scuro-1920x1080.jpg"><source src="storico/animazione/draghetto-avvio-scuro-1920x1080.mp4" type="video/mp4"></video>
+  </div>
+  <p class="nota">Il draghetto si disegna da solo e mette gli occhiali: per il tablet in vetrina, l'apertura dell'app, i video e i social. <a href="storico/animazione/avvio.html">Apri l'animazione a tutto schermo</a>.</p>
+ </section>
+
+ <!-- FILE -->
+ <section>
+  <span class="eti">Consegna</span><h2>I file</h2>
+  <div class="pann file">
+   <div><code>marchi6/06-ovale/</code> marchio principale: SVG + <code>png/</code> 1000 e 2000 px</div>
+   <div><code>marchi6/04-monocolo/</code> icona OM: SVG + PNG fino a 512 px</div>
+   <div><code>macri.ico</code> (cartella del progetto) icona per il computer</div>
+   <div><code>restauro2/</code> il draghetto restaurato (4 rifiniture) e le foto</div>
+   <div><code>storico/</code> primo restauro e animazione</div>
+  </div>
+ </section>
+ <p style="margin-top:40px"><a class="hbtn piccolo" href="../../index.html">☰ Menu</a></p>
+</div>
+<script>
+(function(){
+ var rest=document.getElementById('rest');
+ // cursore prima/dopo
+ var cmp=document.getElementById('cmp'),lin=document.getElementById('linea'),pomo=document.getElementById('pomo'),cur=document.getElementById('cur'),tb=document.getElementById('trasp');
+ function set(p){p=Math.max(0,Math.min(100,p));rest.style.clipPath=tb.getAttribute('aria-pressed')==='true'?'none':'inset(0 0 0 '+p+'%)';lin.style.left=p+'%';pomo.style.left=p+'%';cur.value=p;}
+ cur.addEventListener('input',function(){set(+cur.value)});
+ var drag=false;
+ function pos(e){var r=cmp.getBoundingClientRect();set((e.clientX-r.left)/r.width*100)}
+ cmp.addEventListener('pointerdown',function(e){drag=true;cmp.setPointerCapture(e.pointerId);pos(e)});
+ cmp.addEventListener('pointermove',function(e){if(drag)pos(e)});
+ cmp.addEventListener('pointerup',function(){drag=false});
+ tb.addEventListener('click',function(){var on=tb.getAttribute('aria-pressed')!=='true';tb.setAttribute('aria-pressed',on);rest.classList.toggle('trasp',on);lin.style.display=pomo.style.display=on?'none':'';tb.textContent=on?'Cursore':'Sovrapponi';set(+cur.value)});
+ set(50);
+})();
+</script>
+<script src="../../nascondi-note.js"></script>
+</body>
+</html>

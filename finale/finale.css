@@ -1,0 +1,107 @@
+/* =====================================================================
+   OTTICA MACRÌ · FINALE OLOGRAFICO — cornice-schermo nello stile «HUD di giorno» (tema-hud.css)
+   Il canvas (finale.js) fa il CRT; qui: cornice, etichette, testo finale, ripieghi e stampa.
+   ===================================================================== */
+.fo{--fo-blu:#1f4e79;--fo-mat:#b5462c;--fo-crema:#fff4df;--fo-ambra:#d9a85c;--fo-notte:#0b1624;
+  --fo-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;--fo-titolo:"Rajdhani","Chakra Petch","Segoe UI",-apple-system,sans-serif;
+  position:relative;width:100%;max-width:560px;margin:0 auto;color:#2b2118}
+.fo-fig{margin:0}
+.fo-cornice{position:relative;padding:12px 12px 10px;transform-style:preserve-3d;will-change:transform;
+  background:linear-gradient(180deg,#fffdf9,#efe6d8 70%,#e6dac6);
+  border:1px solid rgba(110,92,72,.42);
+  clip-path:polygon(18px 0,calc(100% - 18px) 0,100% 18px,100% calc(100% - 18px),calc(100% - 18px) 100%,18px 100%,0 calc(100% - 18px),0 18px);
+  box-shadow:0 30px 60px -30px rgba(92,68,44,.55)}
+/* staffe agli angoli (come le schede HUD) */
+.fo-cornice::before,.fo-cornice::after{content:"";position:absolute;width:26px;height:26px;pointer-events:none;z-index:3}
+.fo-cornice::before{left:6px;top:6px;border-left:2px solid var(--fo-mat);border-top:2px solid var(--fo-mat)}
+.fo-cornice::after{right:6px;bottom:6px;border-right:2px solid var(--fo-blu);border-bottom:2px solid var(--fo-blu)}
+
+.fo-eti{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:2px 10px 8px;
+  font:500 10.5px/1.2 var(--fo-mono);letter-spacing:1.6px;text-transform:uppercase;color:#5e4f41;white-space:nowrap;overflow:hidden}
+.fo-basso{padding:8px 10px 2px}
+.fo-brand{font:700 12px var(--fo-titolo);letter-spacing:2.6px;color:var(--fo-mat)}
+.fo-canale{overflow:hidden;text-overflow:ellipsis;color:var(--fo-blu)}
+.fo-stato{display:inline-flex;align-items:center;gap:6px;color:#3d7748}
+.fo-stato i{width:7px;height:7px;border-radius:50%;background:#3d7748;box-shadow:0 0 0 3px rgba(61,119,72,.15);animation:fo-batti 2.4s ease-in-out infinite}
+.fo-segnale{display:inline-flex;align-items:flex-end;gap:2px;height:11px}
+.fo-segnale i{width:3px;background:var(--fo-blu);opacity:.85}
+.fo-segnale i:nth-child(1){height:30%}.fo-segnale i:nth-child(2){height:55%}.fo-segnale i:nth-child(3){height:80%}.fo-segnale i:nth-child(4){height:100%;animation:fo-batti 3.1s steps(2) infinite}
+@keyframes fo-batti{50%{opacity:.35}}
+
+/* lo schermo: vetro scuro del tubo, angoli arrotondati da CRT */
+.fo-schermo{position:relative;aspect-ratio:4/5;overflow:hidden;border-radius:22px/26px;background:#081018;isolation:isolate;
+  box-shadow:0 0 0 1px rgba(43,33,24,.65),0 0 0 5px #2b2118,0 0 0 6px rgba(195,154,78,.7),inset 0 0 40px rgba(0,0,0,.6)}
+@supports not (aspect-ratio:1){.fo-schermo{height:0;padding-bottom:125%}}
+.fo-canvas,.fo-statica,.fo-css,.fo-vetro{position:absolute;inset:0;width:100%;height:100%;display:block}
+.fo-statica{object-fit:cover;opacity:0;transition:opacity .4s}
+.fo-canvas{z-index:1}
+/* senza WebGL / movimento ridotto: velo CSS con scanline e vignettatura */
+.fo-css{z-index:2;pointer-events:none;opacity:0}
+.fo-2d .fo-css,.fo-fermo .fo-css{opacity:1;background:
+  repeating-linear-gradient(0deg,rgba(0,0,0,.16) 0 1px,transparent 1px 3px),
+  radial-gradient(120% 100% at 50% 50%,transparent 55%,rgba(5,10,16,.55) 100%)}
+.fo-fermo .fo-statica{opacity:1}
+.fo-fermo .fo-canvas{display:none}
+/* riflesso del vetro bombato */
+.fo-vetro{z-index:4;pointer-events:none;border-radius:inherit;background:
+  radial-gradient(70% 38% at 28% 8%,rgba(255,250,240,.13),transparent 70%),
+  linear-gradient(115deg,transparent 42%,rgba(255,255,255,.035) 48%,transparent 56%);
+  box-shadow:inset 0 0 0 1px rgba(255,240,215,.06),inset 0 0 70px rgba(0,0,0,.45)}
+
+/* testo finale: lo strato più vicino, appoggiato sul bancone */
+.fo-testo{position:absolute;left:0;right:0;bottom:0;z-index:3;padding:0 7% 7.5%;text-align:center;pointer-events:none;
+  color:var(--fo-crema);opacity:0;transition:opacity .9s ease .2s}
+.fo-acceso .fo-testo{opacity:1}
+.fo-benv{margin:0;font:600 clamp(19px,4.6vw,30px)/1.12 var(--fo-titolo);letter-spacing:.6px;
+  text-shadow:-1px 0 rgba(181,70,44,.75),1px 0 rgba(44,106,160,.75),0 0 14px rgba(255,214,150,.45),0 0 2px rgba(255,244,223,.8)}
+.fo-nome{display:inline-block;margin-top:.12em;font-size:1.32em;letter-spacing:1.5px;color:#fff4df}
+.fo-benv b{font-weight:700;letter-spacing:2px;color:#ffd9a0;white-space:nowrap}
+.fo-firma{margin:.55em 0 0;font:500 clamp(11px,2.6vw,13.5px)/1.2 var(--fo-mono);letter-spacing:2.4px;text-transform:uppercase;color:rgba(255,244,223,.86);
+  text-shadow:0 0 8px rgba(255,214,150,.35)}
+.fo-firma span{color:var(--fo-mat)}
+.fo-firma em{font-style:normal;color:#9cc3e6}
+/* comparsa a righe (come una riga del tubo che si scrive) */
+.fo-acceso .fo-benv{animation:fo-scrivi 1.1s steps(14,end) .15s both}
+.fo-acceso .fo-firma{animation:fo-scrivi .8s steps(10,end) 1s both}
+@keyframes fo-scrivi{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+/* scossa sincronizzata con i glitch forti */
+.fo-scossa .fo-testo{animation:fo-scossa .18s steps(3) 1}
+@keyframes fo-scossa{0%{transform:translate3d(-5px,0,0);filter:blur(.4px)}40%{transform:translate3d(4px,1px,0)}70%{transform:translate3d(-2px,0,0)}100%{transform:none}}
+
+/* pulsante per il giroscopio (iPhone chiede il permesso) */
+.fo-giro{position:absolute;left:50%;top:52px;transform:translateX(-50%);z-index:6;padding:8px 14px;min-height:40px;
+  font:600 12px var(--fo-titolo);letter-spacing:1.6px;text-transform:uppercase;color:#fffdf9;cursor:pointer;
+  background:rgba(31,78,121,.86);border:1px solid rgba(255,244,223,.5);border-radius:2px;backdrop-filter:blur(4px)}
+.fo-giro[hidden]{display:none}
+
+@media (max-width:420px){
+  .fo-cornice{padding:9px 8px 8px}
+  .fo-eti{font-size:9px;letter-spacing:1.1px;padding:2px 6px 7px}
+  .fo-basso{padding:7px 6px 2px}
+  .fo-canale{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .fo-stato i,.fo-segnale i{animation:none}
+  .fo-acceso .fo-benv,.fo-acceso .fo-firma{animation:none}
+  .fo-cornice{transform:none!important}
+}
+
+/* stampa: immagine ferma, cornice sottile, niente effetti */
+@media print{
+  .fo{max-width:11cm;break-inside:avoid;page-break-inside:avoid}
+  .fo-cornice{transform:none!important;clip-path:none;box-shadow:none;background:#fff!important;border:1px solid #b8863b!important;padding:6px}
+  .fo-cornice::before,.fo-cornice::after,.fo-giro,.fo-canvas,.fo-css,.fo-vetro,.fo-segnale{display:none!important}
+  .fo-schermo{box-shadow:none;border-radius:8px}
+  .fo-statica{opacity:1!important}
+  .fo-testo{opacity:1!important;transform:none!important}
+  .fo-benv,.fo-firma{animation:none!important;clip-path:none!important}
+  .fo-eti{color:#555!important;font-size:7pt}
+  .fo-canale,.fo-stato{display:none!important}
+  body .fo .fo-testo,body .fo .fo-testo *{color:#fff4df!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body .fo .fo-benv{font-size:13pt!important;text-shadow:none!important}
+  body .fo .fo-benv b{color:#ffd9a0!important}
+  body .fo .fo-firma{font-size:7pt!important}
+  body .fo .fo-firma span{color:#b5462c!important}
+  body .fo .fo-firma em{color:#9cc3e6!important}
+  .fo-statica{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}

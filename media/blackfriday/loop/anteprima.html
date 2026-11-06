@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8">
+<link rel="icon" type="image/svg+xml" href="../../../media/logo/marchi6/04-monocolo/04-monocolo-icona-colori.svg">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes">
+<title>Loop vetrina · Black Friday</title>
+<style>
+:root{--bg:#0b0a09;--tx:#f6efe4;--gold:#d4a373}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);overflow:hidden;font:500 13px "Segoe UI",system-ui,sans-serif;color:var(--tx);cursor:none}
+#scena{position:fixed;inset:0}
+.sl{position:absolute;inset:0;opacity:0;transition:opacity 1.4s ease;overflow:hidden}
+.sl.on{opacity:1}
+.sl img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;transform-origin:var(--ox,50%) var(--oy,50%)}
+.sl.on img{animation:kb var(--dur,8s) linear forwards}
+@keyframes kb{from{transform:scale(1)}to{transform:scale(1.06)}}
+#barra{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);display:flex;gap:8px;padding:8px;background:rgba(20,18,17,.82);border:1px solid rgba(212,163,115,.35);opacity:0;transition:opacity .4s;cursor:auto;z-index:5}
+body.ui #barra{opacity:1} body.ui{cursor:auto}
+#barra button{background:none;border:1px solid rgba(212,163,115,.4);color:var(--tx);padding:8px 12px;font:inherit;letter-spacing:1px;cursor:pointer}
+#barra button.on{background:var(--gold);color:#1a1512;border-color:var(--gold)}
+#back{position:fixed;left:14px;top:12px;color:var(--gold);text-decoration:none;opacity:0;transition:opacity .4s;z-index:5}
+body.ui #back{opacity:1}
+#msg{position:fixed;inset:0;display:grid;place-items:center;text-align:center;padding:24px;color:var(--gold)}
+</style></head>
+<body>
+<a id="back" href="../../../index.html">← Torna al portale</a>
+<div id="scena"></div>
+<div id="msg">Caricamento…</div>
+<div id="barra">
+ <button data-t="scuro">Scuro</button><button data-t="chiaro">Chiaro</button><button data-t="alterna">Alterna</button>
+ <button data-o="auto">Auto</button><button data-o="h">Orizz.</button><button data-o="v">Vert.</button>
+ <button id="fs">Schermo intero</button>
+</div>
+<script src="../bf-loop-data.js"></script>
+<script>
+(function(){
+  var D = window.BF_LOOP, DUR = 8000;
+  var msg = document.getElementById('msg');
+  if(!D){ msg.textContent = 'Manca bf-loop-data.js'; return; }
+  msg.remove();
+  function get(k,d){ try{ return localStorage.getItem('bfloop-'+k) || d; }catch(e){ return d; } }
+  function set(k,v){ try{ localStorage.setItem('bfloop-'+k,v); }catch(e){} }
+  var q = new URLSearchParams(location.search);
+  var tema = q.get('tema') || get('tema','alterna'), ori = q.get('o') || get('o','auto');
+  var scena = document.getElementById('scena'), i = 0, giro = 0, cur = null, timer;
+  function verticale(){ return ori==='v' || (ori==='auto' && innerHeight > innerWidth); }
+  function lista(){
+    var t = tema==='alterna' ? (giro%2 ? 'chiaro' : 'scuro') : tema;
+    var k = (t==='scuro' ? 'scure' : 'chiare') + (verticale() ? 'V' : '');
+    return D[k];
+  }
+  function mostra(){
+    var L = lista(); if(i >= L.length){ i = 0; giro++; L = lista(); }
+    var el = document.createElement('div'); el.className = 'sl';
+    var img = new Image(); img.src = L[i]; img.alt = '';
+    el.style.setProperty('--ox', (35 + Math.random()*30)+'%');
+    el.style.setProperty('--oy', (35 + Math.random()*30)+'%');
+    el.style.setProperty('--dur', (DUR/1000+1.5)+'s');
+    el.appendChild(img); scena.appendChild(el);
+    var vecchio = cur; cur = el;
+    var go = function(){ requestAnimationFrame(function(){ el.classList.add('on'); }); if(vecchio){ vecchio.classList.remove('on'); setTimeout(function(){ vecchio.remove(); }, 1600); } };
+    if(img.decode) img.decode().then(go, go); else go();
+    i++; clearTimeout(timer); timer = setTimeout(mostra, DUR);
+  }
+  function aggiorna(){
+    document.querySelectorAll('#barra [data-t]').forEach(function(b){ b.classList.toggle('on', b.dataset.t===tema); });
+    document.querySelectorAll('#barra [data-o]').forEach(function(b){ b.classList.toggle('on', b.dataset.o===ori); });
+  }
+  document.querySelectorAll('#barra [data-t]').forEach(function(b){ b.onclick = function(){ tema = b.dataset.t; set('tema',tema); i = 0; aggiorna(); mostra(); }; });
+  document.querySelectorAll('#barra [data-o]').forEach(function(b){ b.onclick = function(){ ori = b.dataset.o; set('o',ori); i = 0; aggiorna(); mostra(); }; });
+  document.getElementById('fs').onclick = function(){ var e = document.documentElement; (e.requestFullscreen || e.webkitRequestFullscreen || function(){}).call(e); };
+  var uiT; function ui(){ document.body.classList.add('ui'); clearTimeout(uiT); uiT = setTimeout(function(){ document.body.classList.remove('ui'); }, 3000); }
+  addEventListener('mousemove', ui); addEventListener('touchstart', ui, {passive:true});
+  addEventListener('keydown', function(e){ if(e.key==='ArrowRight' || e.key===' ') mostra(); if(e.key==='f') document.getElementById('fs').click(); });
+  var lastV = verticale(); addEventListener('resize', function(){ if(verticale()!==lastV){ lastV = verticale(); i = 0; mostra(); } });
+  // tiene lo schermo acceso dove possibile (tablet)
+  if(navigator.wakeLock){ var wl = function(){ navigator.wakeLock.request('screen').catch(function(){}); }; wl(); document.addEventListener('visibilitychange', function(){ if(!document.hidden) wl(); }); }
+  aggiorna(); mostra();
+})();
+</script>
+</body></html>

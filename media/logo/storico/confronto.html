@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Draghetto storico restaurato · Ottica Macrì</title>
+<meta name="color-scheme" content="light">
+<link rel="stylesheet" href="../../../tema-hud.css">
+<script src="../../../tema-hud.js"></script>
+<style>
+.barra{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:space-between}
+.barra .link{display:flex;gap:10px;flex-wrap:wrap}
+.eti{font:500 13px var(--h-mono);letter-spacing:2.6px;color:var(--h-gold);text-transform:uppercase}
+h1{margin:8px 0 6px;font:700 clamp(34px,5vw,64px)/1.02 var(--h-title);letter-spacing:2px;text-transform:uppercase;color:var(--h-ice)}
+h2{margin:6px 0 12px;font:700 clamp(26px,3.2vw,40px)/1.05 var(--h-title);letter-spacing:1.6px;text-transform:uppercase;color:var(--h-ice)}
+h3{margin:0;font:650 20px/1.15 var(--h-title);letter-spacing:1.2px;text-transform:uppercase;color:var(--h-ice)}
+.lead{font-size:19px;color:var(--h-mut);max-width:760px;margin:0}
+section{margin-top:54px}
+.pann{background:var(--h-panel);border:1px solid var(--h-line2);padding:20px;box-shadow:var(--h-ombra)}
+.nota{background:#fffdf9;border-left:4px solid var(--h-mat2);padding:12px 16px;color:var(--h-mut);font-size:16px;margin:14px 0}
+/* confronto con cursore */
+.conf{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:22px;align-items:start}
+.cmp{position:relative;aspect-ratio:761/1000;width:100%;max-width:620px;margin:0 auto;overflow:hidden;background:#fffdf9;border:1px solid var(--h-line2);user-select:none;touch-action:none}
+.cmp img{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}
+.cmp .rest{background:#fffdf9}
+.cmp .rest.trasp{background:transparent;opacity:.62}
+.cmp .linea{position:absolute;top:0;bottom:0;width:2px;background:var(--h-blu);pointer-events:none;box-shadow:0 0 0 1px rgba(255,255,255,.7)}
+.cmp .pomo{position:absolute;top:50%;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;background:#fffdf9;border:2px solid var(--h-blu);display:grid;place-items:center;font:700 16px var(--h-title);color:var(--h-blu);pointer-events:none}
+.cmp .tag{position:absolute;top:10px;padding:3px 10px;font:500 12px var(--h-mono);letter-spacing:1.5px;text-transform:uppercase;background:rgba(255,253,249,.92);border:1px solid var(--h-line2);pointer-events:none}
+.cmp .tag.s{left:10px}.cmp .tag.d{right:10px}
+.ctrl{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:12px;max-width:620px;margin-left:auto;margin-right:auto}
+.ctrl input[type=range]{flex:1;min-width:180px;accent-color:#1f4e79}
+.prove{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.prove figure{margin:0;background:#fffdf9;border:1px solid var(--h-line2);padding:10px}
+.prove img{width:100%;display:block;aspect-ratio:3/4;object-fit:cover}
+.prove figcaption{font-size:14.5px;color:var(--h-mut);margin-top:8px;line-height:1.4}
+ul.fatto{margin:8px 0 0;padding-left:20px;color:var(--h-mut)} ul.fatto li{margin:6px 0} ul.fatto b{color:var(--h-text);font-weight:600}
+/* varianti */
+.griglia{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.var{background:#fffdf9;border:1px solid var(--h-line2);display:flex;flex-direction:column}
+.var .img{aspect-ratio:1;display:grid;place-items:center;padding:22px;border-bottom:1px solid var(--h-line)}
+.var .img img{max-width:100%;max-height:100%}
+.var.scuro .img{background:#1f1a17}
+.var .txt{padding:12px 14px 14px;display:flex;flex-direction:column;gap:6px}
+.var p{margin:0;font-size:15px;color:var(--h-mut);line-height:1.4}
+.dl{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.dl a{font:500 12px var(--h-mono);letter-spacing:1px;padding:3px 8px;border:1px solid var(--h-line2);text-decoration:none;color:var(--h-blu);background:#fff}
+.dl a:hover{border-color:var(--h-blu)}
+.var.pref{outline:2px solid var(--h-mat2);outline-offset:-2px}
+.logo2{display:grid;grid-template-columns:1.7fr 1fr;gap:16px}
+.logo2 .var .img{aspect-ratio:auto;min-height:220px}
+/* animazione */
+.anim{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.anim video{width:100%;display:block;background:#1f1a17}
+.anim .gif{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.anim .gif img{width:100%;display:block;border:1px solid var(--h-line2)}
+/* alternativa */
+.alt{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:stretch}
+.alt .var .img{aspect-ratio:4/3}
+.alt .var .img img{max-height:260px}
+.file{columns:2;font-size:14.5px;color:var(--h-mut)} .file code{color:var(--h-text);font-size:13.5px}
+@media (max-width:900px){.conf,.anim,.alt,.logo2{grid-template-columns:1fr}.griglia{grid-template-columns:repeat(2,minmax(0,1fr))}.file{columns:1}}
+@media (max-width:520px){.griglia,.prove{grid-template-columns:1fr}.anim .gif{grid-template-columns:1fr}}
+</style>
+</head>
+<body class="hud">
+<div class="hud-pag">
+ <div class="barra">
+  <div class="link"><a class="hbtn piccolo" href="../../../index.html">☰ Menu</a><a class="hbtn piccolo" href="../index.html">← Scegli la versione restaurata</a></div>
+  <span class="eti">Ottica Macrì · identità · restauro</span>
+ </div>
+
+ <header style="margin-top:28px">
+  <span class="eti">Il marchio di sempre</span>
+  <h1>Il draghetto storico, restaurato</h1>
+  <p class="lead">È il draghetto rosso con gli occhiali da sole che sta da anni sulla porta del negozio. Non l'abbiamo reinventato: l'abbiamo <b>ricalcato dalle foto della vetrofania</b>, pulito e messo in vettoriale. Stesso personaggio, stessa posa, stesso occhiolino: chi passa davanti al negozio lo riconosce subito.</p>
+ </header>
+
+ <section style="margin-top:34px">
+  <span class="eti">Prima / dopo</span><h2>La foto accanto al restauro</h2>
+  <div class="conf">
+   <div>
+    <div class="cmp" id="cmp" aria-label="Confronto: foto della vetrofania e restauro">
+     <img src="confronto/foto-vetrofania-allineata.jpg" alt="Foto della vetrofania sulla porta del negozio">
+     <img class="rest" id="rest" src="draghetto-storico-restaurato.svg" alt="Draghetto storico restaurato">
+     <span class="tag s">Foto</span><span class="tag d">Restauro</span>
+     <div class="linea" id="linea"></div><div class="pomo" id="pomo" style="left:50%">⇆</div>
+    </div>
+    <div class="ctrl">
+     <label for="cur" style="font:500 13px var(--h-mono);letter-spacing:1px">CURSORE</label>
+     <input id="cur" type="range" min="0" max="100" value="50" aria-label="Sposta il confronto tra foto e restauro">
+     <button class="hbtn piccolo" type="button" id="trasp" aria-pressed="false">Sovrapponi in trasparenza</button>
+    </div>
+    <p class="nota">La foto è stata scattata <b>da dentro</b> il negozio, quindi qui è girata come uno specchio per combaciare con il disegno visto <b>dalla strada</b>. Il bordo sinistro, tagliato nella foto, è stato completato con un secondo fotogramma dello stesso video.</p>
+   </div>
+   <div>
+    <div class="prove">
+     <figure><img src="confronto/foto-dalla-strada.jpg" alt="La vetrofania vista dall'ingresso"><figcaption><b>Dalla strada</b> il draghetto guarda a sinistra: è il verso giusto, quello del restauro.</figcaption></figure>
+     <figure><img src="confronto/murale-colorize.jpg" alt="Il draghetto dipinto nel murale accanto al negozio"><figcaption><b>Nel murale</b> «Colorize» c'è lo stesso personaggio, dipinto a mano a parte: stessa cresta, occhiali in fronte, occhiolino. È una sua variante artistica, non il logo.</figcaption></figure>
+    </div>
+    <div class="pann" style="margin-top:16px">
+     <h3>Cosa abbiamo sistemato</h3>
+     <ul class="fatto">
+      <li><b>Raddrizzato</b>: muso a sinistra come si vede dalla strada (c'è anche il file specchiato).</li>
+      <li><b>Bordi puliti</b>: tolti i morsi dei riflessi e le sbavature del taglio; curve morbide, spigoli vivi solo dove c'erano (punte della cresta, mento, spine).</li>
+      <li><b>Cresta</b>: la punta, rovinata dalla luce del lampione, è tornata appuntita.</li>
+      <li><b>Occhiali</b>: ridisegnati sulle linee bianche del ritaglio: montatura, ponte tondo, lenti, astina e i due segnetti delle cerniere.</li>
+      <li><b>Stacco occhiali/rosso</b> costante (come il filo chiaro della vetrofania), così si stampano e si tagliano bene.</li>
+      <li><b>Proporzioni</b>: non toccate. Pose, spessori e forme sono quelli dell'adesivo.</li>
+      <li><b>Colore</b>: rosso misurato sulla foto, #C63D2F; occhiali #161413.</li>
+     </ul>
+    </div>
+   </div>
+  </div>
+ </section>
+
+ <section>
+  <span class="eti">Varianti</span><h2>Lo stesso draghetto, in sei versioni</h2>
+  <div class="griglia" id="varianti"></div>
+  <p class="nota">Per la tipografia o il taglio vinile usare SVG, PDF o EPS: sono vettoriali e si ingrandiscono senza perdere qualità (il PDF si apre anche con Illustrator). I PNG hanno lo sfondo trasparente; le versioni «su bianco», «su scuro» e i JPG hanno il fondo pieno.</p>
+ </section>
+
+ <section>
+  <span class="eti">Composizioni</span><h2>Draghetto + Ottica Macrì</h2>
+  <div class="logo2" id="logotipi"></div>
+ </section>
+
+ <section>
+  <span class="eti">In movimento</span><h2>Animazione d'avvio</h2>
+  <p class="lead" style="margin-bottom:14px">Circa 4,6 secondi: il contorno rosso si disegna da solo, gli occhiali scendono sulla fronte, l'occhiolino, un riflesso sulle lenti e una scintilla nell'occhio, poi compare la scritta. Si chiude ferma sul logo.</p>
+  <div class="anim">
+   <div class="pann"><video controls muted playsinline loop preload="metadata" poster="animazione/poster-chiaro-1920x1080.jpg" src="animazione/draghetto-avvio-chiaro-1920x1080.mp4"></video><div class="dl" style="margin-top:10px"><a href="animazione/draghetto-avvio-chiaro-1920x1080.mp4" download>MP4 16:9</a><a href="animazione/draghetto-avvio-chiaro-1080x1080.mp4" download>MP4 1:1</a><a href="animazione/draghetto-avvio-chiaro-1920x1080-alfa.mov" download>MOV alfa</a><a href="animazione/draghetto-avvio-chiaro-1920x1080.avi" download>AVI</a></div></div>
+   <div class="pann"><video controls muted playsinline loop preload="metadata" poster="animazione/poster-scuro-1920x1080.jpg" src="animazione/draghetto-avvio-scuro-1920x1080.mp4"></video><div class="dl" style="margin-top:10px"><a href="animazione/draghetto-avvio-scuro-1920x1080.mp4" download>MP4 16:9</a><a href="animazione/draghetto-avvio-scuro-1080x1080.mp4" download>MP4 1:1</a><a href="animazione/draghetto-avvio-scuro-1920x1080-alfa.mov" download>MOV alfa</a><a href="animazione/draghetto-avvio-scuro-1920x1080.avi" download>AVI</a></div></div>
+  </div>
+  <div class="pann" style="margin-top:16px">
+   <h3 style="margin-bottom:10px">GIF animate (600 px)</h3>
+   <div class="anim gif" style="grid-template-columns:repeat(4,minmax(0,1fr))">
+    <img src="animazione/draghetto-avvio-chiaro-16x9-600.gif" alt="GIF chiara 16:9" loading="lazy">
+    <img src="animazione/draghetto-avvio-scuro-16x9-600.gif" alt="GIF scura 16:9" loading="lazy">
+    <img src="animazione/draghetto-avvio-chiaro-quadrato-600.gif" alt="GIF chiara quadrata" loading="lazy">
+    <img src="animazione/draghetto-avvio-scuro-quadrato-600.gif" alt="GIF scura quadrata" loading="lazy">
+   </div>
+   <div class="dl" style="margin-top:12px"><a class="hbtn piccolo" style="font:600 14px var(--h-title)" href="animazione/avvio.html">▶ Versione leggera per l'app (HTML/SVG)</a></div>
+  </div>
+ </section>
+
+
+ <section>
+  <span class="eti">Consegna</span><h2>File nella cartella</h2>
+  <div class="pann file">
+   <div><code>*.svg</code> vettoriali (cartella <code>storico/</code>)</div>
+   <div><code>png/</code> 2000 px e <code>-4000</code> px, trasparenti + «su bianco/su scuro»</div>
+   <div><code>jpg/</code> 2000 px su fondo pieno</div>
+   <div><code>pdf/</code> vettoriali (si aprono con Illustrator)</div>
+   <div><code>eps/</code> vettoriali EPS (senza la velatura lenti della versione migliorata)</div>
+   <div><code>animazione/</code> MP4, MOV con canale alfa (ProRes 4444), AVI, GIF, <code>avvio.html</code> e <code>draghetto-avvio.js</code></div>
+   <div><code>confronto/</code> ritagli delle foto usate per il confronto</div>
+  </div>
+ </section>
+ <p style="margin-top:40px"><a class="hbtn piccolo" href="../../../index.html">☰ Menu</a></p>
+</div>
+<script>
+(function(){
+ var V=[
+  ['draghetto-storico-restaurato','Restaurato · fedele','La versione principale: rosso del negozio e occhiali neri.',0,1],
+  ['draghetto-storico-mono-nero','Monocromo nero','Per timbri, fax, incisioni, stampa a un colore.',0,0],
+  ['draghetto-storico-bianco','Bianco su scuro','Per fondi scuri, foto, social.',1,0],
+  ['draghetto-storico-contorno','Solo contorno · vetrofania','Un solo colore, occhiali a filo: si taglia al plotter in un pezzo.',0,0],
+  ['draghetto-storico-migliorato','Migliorato','Curve ancora più morbide, lenti fumé e riflessi. Sempre lui.',0,0],
+  ['draghetto-storico-verso-destra','Specchiato · muso a destra','Come si vede da dentro il negozio e nel murale.',0,0]];
+ var L=[
+  ['ottica-macri-storico-orizzontale','Orizzontale',0],['ottica-macri-storico-verticale','Verticale',0],
+  ['ottica-macri-storico-orizzontale-bianco','Orizzontale · bianco',1],['ottica-macri-storico-verticale-bianco','Verticale · bianco',1]];
+ function dl(n,scuro){var f=scuro?'su-scuro':'su-bianco';
+  return '<div class="dl"><a href="'+n+'.svg" download>SVG</a><a href="png/'+n+'.png" download>PNG 2000</a><a href="png/'+n+'-4000.png" download>PNG 4000</a><a href="png/'+n+'-'+f+'.png" download>PNG '+(scuro?'su scuro':'su bianco')+'</a><a href="jpg/'+n+'.jpg" download>JPG</a><a href="pdf/'+n+'.pdf" download>PDF</a><a href="eps/'+n+'.eps" download>EPS</a></div>';}
+ document.getElementById('varianti').innerHTML=V.map(function(v){return '<div class="var'+(v[3]?' scuro':'')+(v[4]?' pref':'')+'"><div class="img"><img src="'+v[0]+'.svg" alt="'+v[1]+'"></div><div class="txt"><h3>'+v[1]+'</h3><p>'+v[2]+'</p>'+dl(v[0],v[3])+'</div></div>';}).join('');
+ document.getElementById('logotipi').innerHTML=L.map(function(v){return '<div class="var'+(v[2]?' scuro':'')+'"><div class="img" style="'+(v[2]?'background:#1f1a17':'')+'"><img src="'+v[0]+'.svg" alt="'+v[1]+'" style="max-height:'+(v[0].indexOf('verticale')>0?'300px':'200px')+'"></div><div class="txt"><h3>'+v[1]+'</h3>'+dl(v[0],v[2])+'</div></div>';}).join('');
+ // cursore prima/dopo
+ var cmp=document.getElementById('cmp'),rest=document.getElementById('rest'),lin=document.getElementById('linea'),pomo=document.getElementById('pomo'),cur=document.getElementById('cur'),tb=document.getElementById('trasp');
+ function set(p){p=Math.max(0,Math.min(100,p));rest.style.clipPath=tb.getAttribute('aria-pressed')==='true'?'none':'inset(0 0 0 '+p+'%)';lin.style.left=p+'%';pomo.style.left=p+'%';cur.value=p;}
+ cur.addEventListener('input',function(){set(+cur.value)});
+ var drag=false;
+ function pos(e){var r=cmp.getBoundingClientRect();set((e.clientX-r.left)/r.width*100)}
+ cmp.addEventListener('pointerdown',function(e){drag=true;cmp.setPointerCapture(e.pointerId);pos(e)});
+ cmp.addEventListener('pointermove',function(e){if(drag)pos(e)});
+ cmp.addEventListener('pointerup',function(){drag=false});
+ tb.addEventListener('click',function(){var on=tb.getAttribute('aria-pressed')!=='true';tb.setAttribute('aria-pressed',on);rest.classList.toggle('trasp',on);lin.style.display=pomo.style.display=on?'none':'';set(+cur.value)});
+ set(50);
+})();
+</script>
+<script src="../../../nascondi-note.js"></script>
+</body>
+</html>

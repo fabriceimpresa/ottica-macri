@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Ottica Macrì · La stretta di mano</title>
+<meta name="color-scheme" content="light">
+<link rel="icon" href="../macri.ico">
+<link rel="stylesheet" href="../tema-hud.css">
+<link rel="stylesheet" href="finale.css">
+<style>
+/* pagina a tutto schermo: solo lo schermo olografico, centrato */
+html,body{height:100%}
+body.hud{min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:58px 16px 22px;overflow-x:hidden}
+.fs-menu{position:fixed;left:14px;top:12px;z-index:10;display:inline-flex;align-items:center;gap:8px;padding:9px 14px;min-height:42px;
+  font:600 14px/1 var(--h-title);letter-spacing:1.6px;text-transform:uppercase;color:var(--h-blu);text-decoration:none;
+  background:rgba(255,253,249,.88);border:1px solid var(--h-line2)}
+.fs-menu:hover{color:var(--h-mat2)}
+.fs-eti{position:fixed;right:16px;top:20px;font:500 11px var(--h-mono);letter-spacing:2px;text-transform:uppercase;color:var(--h-dim)}
+.fs-schermo{width:min(100%,calc((100svh - 200px) * .8 + 26px),640px)}
+.fs-schermo .fo{max-width:none}
+.fs-nota{margin:16px 0 0;font:400 13px var(--h-mono);letter-spacing:1.4px;color:var(--h-dim);text-align:center;text-transform:uppercase}
+@media (max-width:520px){.fs-eti{display:none}body.hud{padding:62px 12px 16px}}
+@media print{.fs-menu,.fs-eti,.fs-nota{display:none}body.hud{display:block;padding:0}}
+</style>
+</head>
+<body class="hud">
+<a class="fs-menu" href="../index.html">☰ Menu</a>
+<div class="fs-eti" aria-hidden="true">OM · FINALE</div>
+<main class="fs-schermo">
+  <h1 class="fo-solo-lettori" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">La stretta di mano · Ottica Macrì e STORE // CRAFT</h1>
+  <div data-ologramma data-ologramma-testo="Benvenuto in STORE // CRAFT, Aldo." data-ologramma-firma="Fabrice"></div>
+  <p class="fs-nota" aria-hidden="true">Inclini il telefono · o muova il mouse</p>
+</main>
+<script src="finale-data.js"></script>
+<script src="finale.js"></script>
+</body>
+</html>

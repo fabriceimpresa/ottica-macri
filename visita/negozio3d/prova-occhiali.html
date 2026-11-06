@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prova occhiali 3D</title>
+<style>html,body{margin:0;height:100%;background:#2a2118;overflow:hidden}canvas{display:block}#t{position:fixed;left:10px;top:8px;color:#f3e6d0;font:600 14px Segoe UI,sans-serif}</style></head>
+<body><div id="t">Prova occhiali.js · trascina per girare · ?vista=lato|alto|lontano</div>
+<script src="../../vendor/three/three-bundle.js"></script>
+<script src="occhiali.js"></script>
+<script>
+(function(){
+const T=THREE,O=window.OCCHIALI,q=new URLSearchParams(location.search);
+const r=new T.WebGLRenderer({antialias:true});r.setPixelRatio(Math.min(devicePixelRatio,1.5));r.setSize(innerWidth,innerHeight);document.body.appendChild(r.domElement);
+r.toneMapping=T.ACESFilmicToneMapping;r.outputColorSpace=T.SRGBColorSpace;r.shadowMap.enabled=true;r.shadowMap.type=T.PCFSoftShadowMap;
+const sc=new T.Scene();sc.background=new T.Color(0xd7b45c);const pm=new T.PMREMGenerator(r);sc.environment=pm.fromScene(new T.RoomEnvironment(),.04).texture;sc.environmentIntensity=.45;r.toneMappingExposure=.8;
+const cam=new T.PerspectiveCamera(30,innerWidth/innerHeight,.01,20);
+const piano=new T.Mesh(new T.PlaneGeometry(4,4),new T.MeshStandardMaterial({color:0xd9bb7a,roughness:.7}));piano.rotation.x=-Math.PI/2;piano.receiveShadow=true;sc.add(piano);
+sc.add(new T.HemisphereLight(0xfff1dc,0x5a4128,.6));const sp=new T.SpotLight(0xffe2b8,30,4,.6,.6,1.5);sp.position.set(.3,1.2,.8);sp.castShadow=true;sp.shadow.mapSize.set(1024,1024);sp.shadow.radius=5;sp.shadow.bias=-.0002;sc.add(sp);
+const L=new O.Lotto('prova');
+const lista=[['wayfarer',{finitura:'nero',lente:'g15'}],['clubmaster',{finitura:'tartaruga',metallo:'oro',lente:'verdePolar'}],['aviator',{finitura:'oro',lente:'g15',punta:'tartaruga'}],['rotondo',{finitura:'havanaMiele',lente:'sfumataMarr'}],['rotondoMet',{finitura:'argento',lente:'chiara'}],
+ ['cateye',{finitura:'bordeaux',lente:'sfumata'}],['rettangolare',{finitura:'cristallo',lente:'chiara'}],['pantos',{finitura:'tartaruga',lente:'chiara'}],['sport',{finitura:'neroOpaco',lente:'specchioBlu'}],['sportRett',{finitura:'rossoSport',lente:'specchioOro'}],
+ ['wayfarer',{finitura:'tartaruga',lente:'marrone',piegate:true}],['aviator',{finitura:'argento',lente:'specchioArg'}]];
+lista.forEach((m,i)=>{const x=((i%6)-2.5)*.17,z=Math.floor(i/6)*-.2;L.aggiungi(m[0],m[1],O.posa(x,-O.base(m[0]),z,0,0,0))});
+sc.add(L.costruisci({senzaLod:q.has('lod')?false:true}));
+if(q.has('lod')){const g=O.LOTTI[0].userData.lod;g.hi.visible=false;g.lo.visible=true}
+const v=q.get('vista')||'fronte';const P={fronte:[0,.09,.55],lato:[.55,.12,.3],alto:[0,.6,.25],lontano:[0,.3,2.2],tutto:[0,.32,1.05]}[v];cam.position.set(...P);cam.lookAt(0,.02,-.1);
+let ax=0,dn=null;addEventListener('pointerdown',e=>dn=e.clientX);addEventListener('pointerup',()=>dn=null);addEventListener('pointermove',e=>{if(dn==null)return;ax+=(e.clientX-dn)*.01;dn=e.clientX;const R=Math.hypot(P[0],P[2]);cam.position.set(Math.sin(ax)*R,P[1],Math.cos(ax)*R);cam.lookAt(0,.02,-.1)});
+(function f(){requestAnimationFrame(f);r.render(sc,cam)})();
+window.__ok=true;
+})();
+</script></body></html>
+

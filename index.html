@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ottica Macrì · Portale</title>
+<link rel="icon" type="image/svg+xml" href="media/logo/marchi6/04-monocolo/04-monocolo-icona-colori.svg">
+<link rel="icon" type="image/png" sizes="48x48" href="media/logo/marchi6/04-monocolo/png/04-monocolo-icona-colori-48.png">
+<meta name="color-scheme" content="light">
+<link rel="stylesheet" href="tema-hud.css">
+<link rel="stylesheet" href="materiali.css">
+<script src="tema-hud.js"></script>
+<style>
+/* solo per il portale */
+.hero{--h-cut:22px;display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:28px;align-items:center;margin-top:22px;padding:44px 44px 40px;overflow:hidden}
+.hero .eti{font:500 13px var(--h-mono);letter-spacing:2.6px;color:var(--h-cyan);text-transform:uppercase}
+.hero h2{margin:14px 0 12px;font:700 clamp(40px,5.2vw,74px)/1.02 var(--h-title);letter-spacing:2px;text-transform:uppercase;color:var(--h-ice) }
+.hero h2 .oro{color:var(--h-gold) }
+.hero .hud-lead{margin:0 0 26px}
+.hero .azioni{display:flex;gap:12px;flex-wrap:wrap}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:30px}
+.stat{position:relative;padding:14px 16px;background:linear-gradient(135deg,rgba(31,78,121,.07),rgba(31,78,121,.015));border:1px solid var(--h-line);
+  clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px))}
+.stat::after{content:"";position:absolute;right:10px;top:10px;width:14px;height:14px;border-top:1px solid var(--h-cyan);border-right:1px solid var(--h-cyan);opacity:.6}
+.stat b{display:block;font:400 34px/1 var(--h-mono);color:var(--h-ice) ;font-variant-numeric:tabular-nums}
+.stat em{display:block;margin-top:8px;font:600 12.5px var(--h-title);font-style:normal;letter-spacing:2px;text-transform:uppercase;color:var(--h-mut)}
+.stat.oro b{color:#9e3b25 }
+.lente-hero{position:relative;justify-self:center;width:min(400px,100%);aspect-ratio:1}
+.lente-hero svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.lente-hero .g1{transform-origin:200px 200px;animation:hud-rot 160s linear infinite}
+.lente-hero .g2{transform-origin:200px 200px;animation:hud-rot 110s linear infinite reverse}
+.lente-hero .g3{transform-origin:200px 200px;animation:hud-rot 48s linear infinite}
+.lente-hero .occhiali.w3d{position:absolute;left:50%;top:50%;width:78%;aspect-ratio:16/9;transform:translate(-50%,-50%);pointer-events:none}
+.w3d canvas{width:100%;height:100%;display:block}
+.w3d-cred{position:absolute;left:46px;bottom:12px;white-space:nowrap;font:500 8.5px/1 var(--h-mono,monospace);letter-spacing:.6px;color:rgba(80,70,60,.45);pointer-events:none}
+.hero{position:relative}
+.hero .azioni .hbtn{min-height:58px;padding:16px 28px;font-size:17px;letter-spacing:2px}
+.w3d-ctrl{position:absolute;left:50%;bottom:-74%;transform:translateX(-50%);display:flex;gap:8px;pointer-events:auto}
+.wc{cursor:pointer;min-width:38px;height:30px;padding:0 10px;display:grid;place-items:center;font:700 14px/1 var(--h-mono,monospace);color:#1f4e79;background:rgba(255,253,249,.75);border:1px solid rgba(31,78,121,.45);clip-path:polygon(7px 0,100% 0,100% calc(100% - 7px),calc(100% - 7px) 100%,0 100%,0 7px);transition:background .2s,color .2s,box-shadow .2s}
+.wc:hover{background:#1f4e79;color:#fffaf2;box-shadow:0 0 12px rgba(31,78,121,.4)}
+#bLievita{font-size:10px;letter-spacing:-1px;min-width:46px}
+.w3d-nome{position:absolute;left:0;right:0;bottom:-46%;text-align:center;font:600 10px/1 var(--h-mono,monospace);letter-spacing:2px;color:#1f4e79;text-transform:uppercase}
+.w3d-scan{position:absolute;inset:8% 6%;background:repeating-linear-gradient(0deg,rgba(255,255,255,.07) 0 1px,transparent 1px 3px);mix-blend-mode:overlay;border-radius:40%;animation:hoFlicker 8s steps(1) infinite;opacity:.8}
+.w3d .ho-base{position:absolute;left:24%;right:24%;bottom:-14%;height:12%;border-radius:50%;background:radial-gradient(closest-side,rgba(0,0,0,.28),transparent);animation:hoBase 6s ease-in-out infinite;filter:blur(3px)}
+.lente-hero .occhiali.ologramma{position:absolute;left:50%;top:50%;width:62%;aspect-ratio:200/72;transform:translate(-50%,-50%);perspective:700px;pointer-events:none}
+.ho-rot{position:absolute;inset:0;transform-style:preserve-3d;animation:hoGira 10s ease-in-out infinite alternate,hoFlut 6s ease-in-out infinite}
+.ho-l{position:absolute;inset:0;transform:translateZ(calc(var(--z,0)*1px))}
+.ho-s{width:100%;height:100%;display:block;overflow:visible}
+.ho-l:not(.ho-top) .ho-s{fill:#111;opacity:.16}
+.ho-top .fr{fill:url(#hoG)}.ho-top .le{fill:url(#hoL)}.ho-top .sc{fill:url(#hoSc);mix-blend-mode:screen;animation:hoScan 2.4s linear infinite}
+.ho-top .ri{fill:#d8d8d8}.ho-top .riflesso{fill:none;stroke:#fff;stroke-width:1.2;stroke-linecap:round;opacity:.55}
+.ho-top{filter:drop-shadow(0 0 5px rgba(0,0,0,.3)) drop-shadow(0 6px 10px rgba(0,0,0,.22));animation:hoFlicker 7s steps(1) infinite}
+.ho-base{position:absolute;left:18%;right:18%;bottom:-38%;height:16%;border-radius:50%;background:radial-gradient(closest-side,rgba(0,0,0,.25),transparent);animation:hoBase 6s ease-in-out infinite;filter:blur(2px)}
+@keyframes hoGira{from{transform:rotateY(-24deg) rotateX(6deg)}to{transform:rotateY(24deg) rotateX(-4deg)}}
+@keyframes hoFlut{0%,100%{translate:0 -3%}50%{translate:0 4%}}
+@keyframes hoBase{0%,100%{opacity:.55;transform:scaleX(.85)}50%{opacity:.9;transform:scaleX(1)}}
+@keyframes hoScan{from{transform:translateY(0)}to{transform:translateY(6px)}}
+@keyframes hoFlicker{0%,91%,94%,100%{opacity:1;transform:none}92%{opacity:.55;transform:translateX(2px) skewX(-6deg)}93%{opacity:.85;transform:translateX(-1px)}}
+@media (prefers-reduced-motion:reduce){.ho-rot,.ho-top,.ho-base,.ho-top .sc{animation:none}}
+.lente-hero .lab{position:absolute;font:500 11px var(--h-mono);letter-spacing:1.6px;color:#6b5c4c;white-space:nowrap}
+.lente-hero .lab.l1{left:2%;top:8%}.lente-hero .lab.l2{right:0;bottom:10%;color:#9e3b25}
+.ticker{display:flex;align-items:center;gap:8px;width:66%;pointer-events:none}
+.tk-tit{flex:none;font:700 10.5px/1 var(--h-mono);letter-spacing:1.6px;color:#b5462c;display:flex;align-items:center;gap:5px}
+.tk-tit.notifica::before{content:"";width:7px;height:7px;border-radius:50%;background:#b5462c;box-shadow:0 0 0 0 rgba(181,70,44,.6);animation:tkPing 1.2s ease-out infinite}
+@keyframes tkPing{to{box-shadow:0 0 0 7px rgba(181,70,44,0)}}
+.tk-vp{position:relative;flex:1;min-width:0;height:14px;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent)}
+.tk-txt{position:absolute;left:0;top:0;white-space:nowrap;font:500 11px/14px var(--h-mono);letter-spacing:.8px;color:#7a6b5b;will-change:transform}
+.card-pdf{display:flex;gap:10px;flex-wrap:wrap}
+.card-mini{display:block;height:120px;margin:2px 0 4px;background:rgba(255,253,249,.75);border:1px solid var(--h-line)}
+.card-mini img{display:block;width:100%;height:100%;object-fit:contain;padding:10px;box-sizing:border-box}
+/* ---- 6/11 SEZIONI APRIBILI: chiuse di default, freccina nell'angolo rosso (stato in sessionStorage) ---- */
+.sez{margin-top:40px}
+.sez-testa{--h-cut:14px;display:flex;align-items:center;gap:16px;width:100%;min-height:76px;padding:16px 92px 16px 24px;text-align:left;cursor:pointer;
+  font:inherit;color:inherit;transition:border-color .25s,box-shadow .25s,background .25s}
+.sez-testa .hud-sect{margin:0;flex:1;min-width:0}
+.sez-testa .sez-sotto{flex:none;font:400 12.5px var(--h-mono);letter-spacing:1.4px;color:var(--h-mut);text-transform:uppercase}
+.sez-angolo{position:absolute!important;right:0;bottom:0;width:62px;height:62px;z-index:3!important;pointer-events:none;
+  background:var(--h-mat2);clip-path:polygon(100% 0,100% 100%,0 100%);transform-origin:100% 100%;
+  transition:transform .28s cubic-bezier(.3,.7,.3,1),background .25s,filter .25s}
+.sez-angolo::after{content:"";position:absolute;right:-1px;bottom:-1px;width:100%;height:100%;
+  background:linear-gradient(135deg,transparent 49%,rgba(255,255,255,.55) 49.5%,transparent 52%)}
+.sez-freccia{position:absolute;right:9px;bottom:6px;font:700 22px/1 var(--h-mono);color:#fff;transition:transform .3s cubic-bezier(.3,.7,.3,1)}
+.sez-testa:hover,.sez-testa:focus-visible{border-color:var(--h-mat2);background:linear-gradient(90deg,rgba(181,70,44,.10),rgba(255,253,249,.95) 55%);
+  box-shadow:0 0 0 1px rgba(181,70,44,.35),0 8px 26px -10px rgba(181,70,44,.55)}
+.sez-testa:hover .hud-sect,.sez-testa:focus-visible .hud-sect{color:var(--h-mat)}
+.sez-testa:hover .sez-angolo,.sez-testa:focus-visible .sez-angolo{transform:scale(1.32);background:#c9502f;filter:drop-shadow(0 0 8px rgba(181,70,44,.6))}
+.sez-testa:hover .sez-freccia,.sez-testa:focus-visible .sez-freccia{transform:translateY(3px)}
+.sez-testa:focus-visible{outline:2px solid var(--h-mat2);outline-offset:3px}
+.sez.aperta .sez-freccia{transform:rotate(180deg)}
+.sez.aperta .sez-testa:hover .sez-freccia{transform:rotate(180deg) translateY(3px)}
+.sez-corpo{max-height:0;overflow:hidden;opacity:0;transform:translateY(-8px);visibility:hidden;
+  transition:max-height .45s cubic-bezier(.4,0,.2,1),opacity .3s,transform .35s,visibility 0s linear .45s}
+.sez.aperta .sez-corpo{opacity:1;transform:none;visibility:visible;transition:max-height .45s cubic-bezier(.4,0,.2,1),opacity .35s .05s,transform .35s,visibility 0s}
+.sez-corpo>.sez-dentro{padding-top:18px}
+.sez-corpo .mat{margin-top:0}
+@media (prefers-reduced-motion:reduce){.sez-corpo,.sez-angolo,.sez-freccia{transition:none!important}}
+@media (max-width:700px){.sez-testa{padding:14px 74px 14px 16px;min-height:66px}.sez-testa .sez-sotto{display:none}.sez-angolo{width:52px;height:52px}.sez-freccia{font-size:19px;right:7px;bottom:5px}}
+@media print{.sez-corpo{max-height:none!important;opacity:1!important;transform:none!important;visibility:visible!important;overflow:visible!important}.sez-angolo{display:none!important}}
+/* ---- 6/11 tasto rosso «Tutto il materiale» + pannello a tutto schermo ---- */
+.piede-dx{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.tasto-mat{display:inline-flex;align-items:center;gap:9px;padding:9px 16px 9px 13px;cursor:pointer;border:1px solid #9e3b25;
+  background:#b5462c;color:#fffaf2;font:600 13px var(--h-title);letter-spacing:2px;text-transform:uppercase;
+  clip-path:polygon(0 0,calc(100% - 9px) 0,100% 9px,100% 100%,9px 100%,0 calc(100% - 9px));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.25);transition:background .2s,transform .2s,box-shadow .2s}
+.tasto-mat svg{width:15px;height:15px;fill:none;stroke:#fffaf2;stroke-width:1.8}
+.tasto-mat:hover,.tasto-mat:focus-visible{background:#c9502f;transform:translateY(-1px);box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 6px 18px -6px rgba(181,70,44,.7)}
+.tasto-mat:focus-visible{outline:2px solid #1f4e79;outline-offset:3px}
+.mat-over{position:fixed;inset:0;z-index:900;background:rgba(60,44,30,.42);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);
+  overflow-y:auto;overscroll-behavior:contain;opacity:0;transition:opacity .25s}
+.mat-over[hidden]{display:none}
+.mat-over.su{opacity:1}
+.mat-over-in{position:relative;max-width:1260px;margin:0 auto;padding:22px 24px 40px;transform:translateY(14px);transition:transform .3s cubic-bezier(.3,.7,.3,1)}
+.mat-over.su .mat-over-in{transform:none}
+.mat-over .mat{margin-top:0}
+.mat-chiudi{position:sticky;top:10px;float:right;z-index:5;margin:0 6px -46px 0;width:40px;height:40px;cursor:pointer;
+  background:#b5462c;color:#fffaf2;border:1px solid #9e3b25;font:700 18px/1 var(--h-mono);transition:background .2s,transform .2s}
+.mat-chiudi:hover,.mat-chiudi:focus-visible{background:#c9502f;transform:scale(1.06)}
+body.mat-aperto{overflow:hidden}
+@media (max-width:700px){.mat-over-in{padding:12px 10px 30px}.mat-over .mat{padding:20px 16px 18px}}
+@media (prefers-reduced-motion:reduce){.mat-over,.mat-over-in{transition:none}}
+@media print{.tasto-mat,.mat-over{display:none!important}}
+/* area sviluppo */
+.dev-tasto{display:flex;align-items:center;gap:10px;margin:64px auto 0;background:none;border:1px dashed rgba(110,92,72,.22);color:var(--h-dim);padding:9px 16px;cursor:pointer;
+  font:500 12px var(--h-mono);letter-spacing:2.2px;text-transform:uppercase;transition:.2s}
+.dev-tasto:hover,.dev-tasto[aria-expanded="true"]{color:var(--h-mut);border-color:var(--h-line2)}
+.dev-tasto .lucch{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8}
+.dev{--h-cut:12px;margin-top:16px;padding:22px 24px 18px}
+.dev[hidden]{display:none}
+.dev .hud-sect{margin:0 0 14px;font-size:12.5px}
+.dev-lista{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 22px}
+.dev-lista a{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;align-items:baseline;padding:10px 12px;text-decoration:none;color:var(--h-text);border-left:2px solid var(--h-line2);background:rgba(31,78,121,.03);transition:.15s}
+.dev-lista a:hover{border-left-color:var(--h-cyan);background:rgba(31,78,121,.09)}
+.dev-lista .k{font:500 11.5px var(--h-mono);color:var(--h-cyan);letter-spacing:1px}
+.dev-lista .t{font:600 15.5px var(--h-title);letter-spacing:1px;text-transform:uppercase}
+.dev-lista .d{grid-column:2;font-size:14px;color:var(--h-mut);line-height:1.4}
+.dev .avv{margin:14px 0 0;font:400 12px var(--h-mono);color:var(--h-dim);letter-spacing:.5px}
+.piede-firma{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-top:34px;padding:16px 4px 0;border-top:1px solid var(--h-line)}
+.piede-firma .chi{font:600 16px var(--h-title);letter-spacing:2px;text-transform:uppercase;color:var(--h-mut)}
+.piede-firma .chi b{color:var(--h-gold);font-family:var(--h-mono);font-weight:700}
+@media (max-width:1100px){.hud-card.largo2{grid-column:span 2}}
+@media (max-width:900px){.hero{grid-template-columns:1fr;padding:32px 26px}.lente-hero{width:min(300px,80%);order:-1;margin:-10px 0 -10px}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:700px){.hud-card.largo2{grid-column:auto}.hero{padding:26px 20px 24px;margin-top:14px}.lente-hero{width:62%}.dev-lista{grid-template-columns:1fr}.stat b{font-size:28px}}
+</style>
+</head>
+<body class="hud" data-avvio="pieno">
+<script>
+window.HUD_AVVIO={
+  titolo:'OTTICA MACRÌ',
+  sotto:'IL NEGOZIO DI DOMANI · PER ALDO',
+  righe:[
+    ['OTTICA MACRÌ · VIA POGGI D’ORO 23 · ROMA',''],
+    ['APRO LA VETRINA E IL NEGOZIO IN 3D','OK'],
+    ['ACCENDO LA DEMO DELL’APP','OK'],
+    ['PREPARO I PREVENTIVI · PIANO A · PIANO B','OK'],
+    ['STORE // CRAFT · COOL · EASY · SMART','PRONTO']
+  ]
+};
+</script>
+
+<div class="hud-pag">
+
+  <header class="hud-top glass hud-entra">
+    <a class="hud-brand" href="index.html" aria-label="Ottica Macrì, portale">
+      <span class="hud-logo">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#1f4e79" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="6.5" cy="13.5" r="4"/><circle cx="17.5" cy="13.5" r="4"/><path d="M10.4 12.6c1-.9 2.2-.9 3.2 0M2.6 12.4 1.6 8.6M21.4 12.4l1-3.8"/></svg>
+        <svg class="rings" viewBox="0 0 100 100" aria-hidden="true">
+          <g class="r3"><circle cx="50" cy="50" r="48" fill="none" stroke="rgba(31,78,121,.55)" stroke-width=".7" stroke-dasharray="1 3.2"/></g>
+          <g class="r1"><circle cx="50" cy="50" r="44" fill="none" stroke="rgba(31,78,121,.8)" stroke-width="1.2" stroke-dasharray="46 8 12 8 70 12 20 100"/><path d="M50 3.5 l2.4 3.6 h-4.8z" fill="#1f4e79"/></g>
+          <g class="r2"><circle cx="50" cy="50" r="39.5" fill="none" stroke="#b5462c" stroke-width="2.4" stroke-dasharray="22 6 6 6 40 30 10 200" opacity=".9"/></g>
+        </svg>
+      </span>
+      <span><h1 data-crt>OTTICA <span>MACRÌ</span></h1><small>Via Poggi D'Oro 23 · Roma</small></span>
+    </a>
+    <div class="hud-vitals">
+      <div class="vital"><b><span class="dot ok"></span>ONLINE</b><em>Sistema</em></div>
+      <div class="vital gold"><b>STORE // CRAFT</b><em>by Fabrice</em></div>
+      <div class="vital clock"><b data-ora>--:--</b><em data-data>&nbsp;</em></div>
+    </div>
+  </header>
+
+  <!-- ===================== PER ALDO ===================== -->
+  <section class="hero glass hud-entra" aria-labelledby="titolo">
+    <div>
+      <div class="eti">// Per Aldo · <span data-data></span></div>
+      <h2 id="titolo" data-crt><span data-saluto>Buongiorno</span>, <span class="oro">Aldo.</span></h2>
+      <p class="hud-lead">Ecco Ottica Macrì vista con gli occhi di domani. Qui sotto c'è tutto quello che abbiamo preparato per te: basta toccare un riquadro.</p>
+      <div class="azioni">
+        <a class="hbtn pri" href="visita/index.html" data-mirino="AVVIA · VISITA" data-mirino-oro>▶ Cominciamo dalla visita</a>
+        <a class="hbtn" href="demo/demo-app-v2.html" data-mirino="AVVIA · DEMO">Prova l'app</a>
+      </div>
+      <div class="stats">
+        <div class="stat"><b data-conta="8">8</b><em>Cose da vedere</em></div>
+        <div class="stat"><b data-conta="3">3</b><em>Visite del negozio</em></div>
+        <div class="stat"><b data-conta="1">1</b><em>Riepilogo PDF</em></div>
+        <div class="stat oro"><b data-conta="2">2</b><em>Piani a scelta</em></div>
+      </div>
+    </div>
+    <div class="lente-hero" aria-hidden="true">
+      <svg viewBox="0 0 400 400">
+        <g class="g1"><circle cx="200" cy="200" r="194" fill="none" stroke="rgba(31,78,121,.35)" stroke-width="1" stroke-dasharray="2 6"/>
+          <circle cx="200" cy="200" r="182" fill="none" stroke="rgba(31,78,121,.55)" stroke-width="1.4" stroke-dasharray="120 18 30 18 240 40 60 600"/></g>
+        <g class="g2"><circle cx="200" cy="200" r="160" fill="none" stroke="#b5462c" stroke-width="3" stroke-dasharray="60 14 14 14 120 80 30 800" opacity=".85"/>
+          <circle cx="200" cy="200" r="146" fill="none" stroke="rgba(31,78,121,.25)" stroke-width="8" stroke-dasharray="1 5"/></g>
+        <g class="g3"><circle cx="200" cy="200" r="118" fill="none" stroke="rgba(31,78,121,.6)" stroke-width="1" stroke-dasharray="300 40 80 400"/>
+          <path d="M200 70v14M200 316v14M70 200h14M316 200h14" stroke="#1f4e79" stroke-width="2"/></g>
+        <circle cx="200" cy="200" r="98" fill="url(#vetro)" stroke="rgba(31,78,121,.5)" stroke-width="1"/>
+        <defs><radialGradient id="vetro" cx="40%" cy="35%" r="75%"><stop offset="0" stop-color="rgba(31,78,121,.22)"/><stop offset=".6" stop-color="rgba(31,78,121,.05)"/><stop offset="1" stop-color="rgba(31,78,121,0)"/></radialGradient></defs>
+      </svg>
+      <div class="occhiali w3d" aria-hidden="true"><canvas id="wayfarer3d"></canvas><div class="w3d-ctrl"><button type="button" class="wc" id="wPrev" aria-label="Occhiale precedente">‹</button><button type="button" class="wc" id="bLievita" aria-pressed="true" aria-label="Pausa">❚❚</button><button type="button" class="wc" id="wNext" aria-label="Occhiale successivo">›</button></div><div class="w3d-scan"></div><div class="ho-base"></div></div>
+      <div class="lab l1 ticker" id="ticker" aria-live="polite"><b class="tk-tit" id="tkTit">BUONGIORNO</b><span class="tk-vp"><span class="tk-txt" id="tkTxt"></span></span></div>
+      <span class="lab l2" id="wNome">WAYFARER · 1/8</span>
+    </div>
+    <span class="w3d-cred" id="wCred">CREDITS · «Wayfarer sunglasses» di SusanKing · CC BY 4.0</span>
+  </section>
+
+  <section class="sez" id="sez-aldo" data-sez="aldo" aria-label="Per Aldo">
+  <button type="button" class="sez-testa glass" aria-expanded="false" aria-controls="sez-aldo-corpo">
+    <span class="hud-sect">Per Aldo <span class="cod">· 08 sezioni</span></span>
+    <span class="sez-sotto">Tocca per aprire</span>
+    <span class="sez-angolo" aria-hidden="true"><span class="sez-freccia">▾</span></span>
+  </button>
+  <div class="sez-corpo" id="sez-aldo-corpo"><div class="sez-dentro">
+  <!-- 6/11 FASE 1: sezioni per Aldo nell'ordine dell'esperienza (prima: index.prima-fase1.html) -->
+  <div class="hud-griglia">
+    <a class="hud-card largo glass hud-entra" href="visita/index.html" data-mirino="01 · LE TRE VISITE">
+      <span class="testa"><span class="ico"><svg viewBox="0 0 24 24"><path d="M3 9.5 4.6 4h14.8L21 9.5M3 9.5h18M3 9.5a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0M5 12.5V20h14v-7.5M10 20v-5h4v5"/></svg></span><span class="nn">01</span></span>
+      <span class="tag-sopra">Foto vere · 3D · Street View</span>
+      <h3>Visita del tuo negozio</h3>
+      <p>Il menu con <b>le tre visite</b>: <b>1 · Il tuo negozio oggi</b> (foto e video veri · leggera, va ovunque) — <b>2 · Negozio in 3D</b> (ci si muove dove si vuole) — <b>3 · Vetrina aumentata</b> (Street View di Google · serve internet).</p>
+      <span class="piede"><span class="vai">Entra</span></span>
+    </a>
+    <a class="hud-card glass hud-entra" href="demo/demo-app-v2.html" data-mirino="02 · DEMO DELL'APP">
+      <span class="testa"><span class="ico"><svg viewBox="0 0 24 24"><rect x="2.5" y="4" width="19" height="14" rx="1"/><path d="M2.5 8h19M7 4v14M9.5 11h9M9.5 14h6M9 21h6"/></svg></span><span class="nn">02</span></span>
+      <span class="tag-sopra">Da provare · come il vero StoreCraft</span>
+      <h3>La demo dell'app</h3>
+      <p>L'app STORE // CRAFT fatta per Ottica Macrì: vetrina digitale, cartelli, etichette, magazzino, clienti e social.</p>
+      <span class="piede"><span class="vai">Prova</span></span>
+    </a>
+    <a class="hud-card oro glass hud-entra" href="preventivo-a.html" data-mirino="03 · PREVENTIVO A" data-mirino-oro>
+      <span class="testa"><span class="ico"><svg viewBox="0 0 24 24"><path d="M6 2.5h9l4 4v15H6z"/><path d="M15 2.5v4h4M14.6 11.2a3 3 0 1 0 0 5.2M9.6 13.1h4.2M9.6 14.6h4.2"/></svg></span><span class="nn">03</span></span>
+      <span class="tag-sopra">Completo</span>
+      <h3>Preventivo Piano A</h3>
+      <p>Tutto il negozio in un'unica app: grafica, magazzino, clienti, social e vetrina digitale.</p>
+      <span class="piede"><span class="vai">Leggi</span></span>
+    </a>
+    <a class="hud-card oro glass hud-entra" href="preventivo-b.html" data-mirino="04 · PREVENTIVO B" data-mirino-oro>
+      <span class="testa"><span class="ico"><svg viewBox="0 0 24 24"><path d="M6 2.5h9l4 4v15H6z"/><path d="M15 2.5v4h4M12.5 10v6.5M10 14l2.5 2.5L15 14"/></svg></span><span class="nn">04</span></span>
+      <span class="tag-sopra">Essenziale · spende meno</span>
+      <h3>Preventivo Piano B</h3>
+      <p>Poca spesa, niente complicazioni: si comincia subito e si cresce quando vuole.</p>
+      <span class="piede"><span class="vai">Leggi</span></span>
+    </a>
+    <a class="hud-card glass hud-entra" href="media/logo/index.html" data-mirino="05 · IL MARCHIO">
+      <span class="testa"><span class="ico"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="9.5" ry="7"/><circle cx="9" cy="12" r="2.2"/><circle cx="15" cy="12" r="2.2"/><path d="M11.2 11.6h1.6"/></svg></span><span class="nn">05</span></span>
+      <span class="card-mini" aria-hidden="true"><img src="media/logo/marchi6/06-ovale/06-ovale-colori.svg" alt=""></span>
+      <span class="tag-sopra">Il marchio definitivo</span>
+      <h3>Il marchio Ottica Macrì</h3>
+      <p>L'ovale da bottega con il draghetto di sempre e l'icona OM: su insegna, biglietto, cartelli e app.</p>
+      <span class="piede"><span class="vai">Guarda</span></span>
+    </a>
+    <div class="hud-card glass hud-entra" data-mirino="06 · VETRINE BLACK FRIDAY">
+      <span class="testa"><span class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="11"/><rect x="13" y="3" width="8" height="7"/><rect x="13" y="12" width="8" height="9"/><path d="M3 17h8M3 21h8"/></svg></span><span class="nn">06</span></span>
+      <span class="tag-sopra">Black Friday · da stampare e a schermo</span>
+      <h3>Le vetrine Black Friday</h3>
+      <p>I cartelli alle misure vere dei porta-prezzi (offerte, brand, poster grande, totem d'ingresso) e il loop del tablet in vetrina, come lo vedranno i passanti.</p>
+      <span class="piede card-pdf">
+        <a class="hbtn" href="media/blackfriday/vetrine/anteprima.html">I cartelli delle vetrine</a>
+        <a class="hbtn" href="media/blackfriday/loop/anteprima.html">▶ Il loop del tablet</a>
+      </span>
+    </div>
+    <a class="hud-card oro glass hud-entra" href="presentazione/Ottica%20Macri%20-%20Riepilogo.pdf" download data-mirino="07 · RIEPILOGO" data-mirino-oro>
+      <span class="testa"><span class="ico"><svg viewBox="0 0 24 24"><path d="M4 20.5l1.3-3.9A8.3 8.3 0 1 1 8.2 19.3z"/><path d="M12 7.5v6.2M9.4 11.2l2.6 2.6 2.6-2.6"/></svg></span><span class="nn">07</span></span>
+      <span class="tag-sopra">PDF · per il telefono</span>
+      <h3>Scarica il riepilogo</h3>
+      <p>Un PDF leggero con tutto in breve e i due preventivi, da tenere sul telefono o mandare su WhatsApp.</p>
+      <span class="piede"><span class="vai">Scarica</span></span>
+    </a>
+    <a class="hud-card largo2 glass hud-entra" href="finale/stretta-di-mano.html" data-mirino="08 · LA STRETTA DI MANO">
+      <span class="testa"><span class="ico"><svg viewBox="0 0 24 24"><path d="M2.5 11.5 6 8l4 1.5 2.5-1.5 4 1 5 2.5M2.5 11.5l5 5.5c.8.8 2 .8 2.8 0l5.7-5.7M8.5 13.5l2 2M11 11.5l2.5 2.5"/></svg></span><span class="nn">08</span></span>
+      <span class="tag-sopra">Il finale</span>
+      <h3>La stretta di mano</h3>
+      <p>Tu e Fabrice dietro al bancone, come su uno schermo dell'app: inclina il telefono e l'immagine prende profondità.</p>
+      <span class="piede"><span class="vai">Guarda</span></span>
+    </a>
+  </div>
+  </div></div>
+  </section>
+
+  <div class="piede-firma">
+    <span class="chi">Progetto di <b>Fabrice · STORE // CRAFT</b></span>
+    <span class="piede-dx">
+      <!-- 6/11: «Tutto il materiale» = tasto rosso che apre la galleria a tutto schermo (✕ / Esc per chiudere) -->
+      <button type="button" class="tasto-mat" id="tastoMat" aria-haspopup="dialog" aria-controls="matOver" aria-expanded="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Tutto il materiale
+      </button>
+      <span class="chip oro">Cool · Easy · Smart</span>
+    </span>
+  </div>
+
+  <!-- ===================== TUTTO IL MATERIALE (da materiali.js) · pannello a tutto schermo ===================== -->
+  <div class="mat-over" id="matOver" role="dialog" aria-modal="true" aria-label="Tutto il materiale" hidden>
+    <div class="mat-over-in">
+      <button type="button" class="mat-chiudi" id="matChiudi" aria-label="Chiudi (Esc)">✕</button>
+      <section class="mat glass" id="materiali" aria-label="Tutto il materiale"></section>
+    </div>
+  </div>
+
+  <!-- ===================== AREA SVILUPPO ===================== -->
+  <button class="dev-tasto" type="button" id="devTasto" aria-expanded="false" aria-controls="dev">
+    <svg class="lucch" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg>
+    Area sviluppo · riservata
+  </button>
+  <section class="dev glass" id="dev" hidden aria-label="Area sviluppo, riservata">
+    <h2 class="hud-sect oro">Area sviluppo · solo Fabrice <span class="cod">· uso interno</span></h2>
+    <div class="dev-lista">
+      <a href="info-azienda.html"><span class="k">D1</span><span class="t">Info azienda</span><span class="d">Dati di Aldo trovati online, presenza sul web, concorrenti in zona, domande da fare</span></a>
+      <a href="previsione-progetto.html"><span class="k">D2</span><span class="t">Previsione Piano A</span><span class="d">Le 5 aree: ore, difficoltà, tempi, costi, confronto con il mercato</span></a>
+      <a href="previsione-progetto.html?piano=b"><span class="k">D2B</span><span class="t">Previsione Piano B</span><span class="d">Solo STORE // CRAFT + video vetrina economica + archivio clienti con note</span></a>
+      <a href="preventivo.html"><span class="k">D3</span><span class="t">Preventivo · bozza di lavoro</span><span class="d">Preventivo scalare da compilare (tariffa, difficoltà, IVA) e stampare</span></a>
+      <a href="ricerca/vetrina-hardware.md"><span class="k">R1</span><span class="t">Ricerca · schermi vetrina</span><span class="d">Cornice, tablet o monitor: prezzi rilevati online</span></a>
+      <a href="ricerca/streetview.md"><span class="k">R2</span><span class="t">Ricerca · Street View</span><span class="d">Note sulla vetrina aumentata con Google Street View</span></a>
+      <a href="presentazione/presentazione-aldo.html"><span class="k">S1</span><span class="t">Sorgente presentazione A · archivio</span><span class="d">Pagina HTML da cui nasce il PDF del Piano A (superato)</span></a>
+      <a href="presentazione/presentazione-piano-b.html"><span class="k">S2</span><span class="t">Sorgente presentazione B · archivio</span><span class="d">Pagina HTML da cui nasce il PDF del Piano B (superato)</span></a>
+      <a href="ricerca/display-vetrina.md"><span class="k">R3</span><span class="t">Ricerca · display e cornici</span><span class="d">Plexiglass 10×15, 13×18, A5, A4 e cornici in legno: prezzi rilevati online</span></a>
+      <a href="presentazione/riepilogo.html"><span class="k">S3</span><span class="t">Sorgente riepilogo WhatsApp</span><span class="d">Pagina HTML da cui nasce il PDF riepilogo con i due preventivi</span></a>
+      <a href="media/blackfriday/"><span class="k">G1</span><span class="t">Grafiche Black Friday</span><span class="d">Cartelli, cartellini e slide per il tablet in vetrina (cartella)</span></a>
+      <a href="media/storecraft/"><span class="k">G2</span><span class="t">Immagini STORE // CRAFT</span><span class="d">Cartelli, cartellino ed etichetta DYMO fatti con StoreCraft (cartella)</span></a>
+      <a href="demo/screenshot/"><span class="k">G3</span><span class="t">Foto della demo</span><span class="d">Schermate dell'app su desktop, tablet e telefono (cartella)</span></a>
+      <a href="demo/demo-app.html"><span class="k">X1</span><span class="t">Vecchia demo · v1 · archivio</span><span class="d">La prima demo scura (Piano A); la definitiva è la v2</span></a>
+      <a href="demo/demo-app.html?piano=b"><span class="k">X1B</span><span class="t">Vecchia demo v1 · Piano B · archivio</span><span class="d">La prima demo del Piano B</span></a>
+      <a href="presentazione/Ottica%20Macri%20-%20Presentazione%20STORE%20CRAFT.pdf"><span class="k">X2</span><span class="t">PDF presentazione Piano A · archivio</span><span class="d">Demo vecchia e prezzi vecchi: non darlo ad Aldo</span></a>
+      <a href="presentazione/Ottica%20Macri%20-%20Piano%20B.pdf"><span class="k">X3</span><span class="t">PDF presentazione Piano B · archivio</span><span class="d">Demo vecchia e prezzi vecchi: non darlo ad Aldo</span></a>
+      <a href="video.html"><span class="k">X4</span><span class="t">Pagina video · archivio</span><span class="d">I due video della demo vecchia (Piano A e B)</span></a>
+      <a href="video/Ottica%20Macri%20-%20Demo%20video.mp4"><span class="k">V1</span><span class="t">File video Piano A · archivio</span><span class="d">Il file .mp4 originale (demo vecchia)</span></a>
+      <a href="video/Ottica%20Macri%20-%20Piano%20B%20video.mp4"><span class="k">V2</span><span class="t">File video Piano B · archivio</span><span class="d">Il file .mp4 originale (demo vecchia)</span></a>
+      <a href="media/logo/scelta.html"><span class="k">L1</span><span class="t">Scelta del logo · tutte le opzioni</span><span class="d">Restauri, 6 marchi, 10 stili: il lavoro fatto per arrivare al marchio</span></a>
+      <a href="#materiali"><span class="k">M</span><span class="t">Tutto il materiale</span><span class="d">Con l'area sviluppo attiva l'elenco mostra anche le schede «solo noi» · si aggiorna in materiali.js</span></a>
+      <a href="index.html?avvio"><span class="k">FX</span><span class="t">Rivedi l'avvio</span><span class="d">Riapre il portale con l'animazione iniziale</span></a>
+    </div>
+    <p class="avv">I prezzi per il cliente si cambiano solo in prezzi.js · tutto resta su questo computer, niente invio online.</p>
+  </section>
+
+  <div class="hud-nastro" aria-hidden="true"><span>OM-01 · ROMA · VIA POGGI D'ORO 23</span><span>STORE // CRAFT · COOL · EASY · SMART</span><span data-data></span></div>
+</div>
+
+<script>
+(function(){
+  var t=document.getElementById('devTasto'),d=document.getElementById('dev'),K='ottica-macri-area-sviluppo';
+  function metti(on,scorri){d.hidden=!on;t.setAttribute('aria-expanded',on?'true':'false');try{localStorage.setItem(K,on?'1':'0');}catch(e){}
+    try{document.dispatchEvent(new CustomEvent('area-sviluppo',{detail:on}));}catch(e){}
+    if(on&&scorri)d.scrollIntoView({behavior:'smooth',block:'nearest'});}
+  var on=false;try{on=localStorage.getItem(K)==='1';}catch(e){}
+  metti(on,false);
+  t.addEventListener('click',function(){metti(d.hidden,true);});
+})();
+</script>
+<script>
+/* 6/11 sezioni apribili (chiuse di default; stato per sessione) */
+(function(){
+  var K='om-portale-sez-';
+  function leggi(id){try{return sessionStorage.getItem(K+id)==='1';}catch(e){return false;}}
+  function salva(id,on){try{sessionStorage.setItem(K+id,on?'1':'0');}catch(e){}}
+  function metti(sez,on,anima){
+    var b=sez.querySelector('.sez-testa'),c=sez.querySelector('.sez-corpo');
+    b.setAttribute('aria-expanded',on?'true':'false');
+    b.querySelector('.sez-sotto').textContent=on?'Tocca per chiudere':'Tocca per aprire';
+    if(!anima){sez.classList.toggle('aperta',on);c.style.maxHeight=on?'none':'0px';return;}
+    if(on){sez.classList.add('aperta');c.style.maxHeight=c.scrollHeight+'px';
+      var fine=function(e){if(e.target!==c||e.propertyName!=='max-height')return;c.removeEventListener('transitionend',fine);if(sez.classList.contains('aperta'))c.style.maxHeight='none';};
+      c.addEventListener('transitionend',fine);
+    }else{c.style.maxHeight=c.scrollHeight+'px';void c.offsetHeight;sez.classList.remove('aperta');
+      requestAnimationFrame(function(){c.style.maxHeight='0px';});}
+  }
+  var tutte=[].slice.call(document.querySelectorAll('.sez[data-sez]'));
+  tutte.forEach(function(sez){
+    var id=sez.getAttribute('data-sez');
+    metti(sez,leggi(id),false);
+    sez.querySelector('.sez-testa').addEventListener('click',function(){
+      var on=!sez.classList.contains('aperta');metti(sez,on,true);salva(id,on);});
+  });
+  /* un link a #materiali (o a qualcosa dentro una sezione chiusa) la apre */
+  window.apriSezioneDi=function(el){
+    var sez=el&&el.closest&&el.closest('.sez[data-sez]');
+    if(sez&&!sez.classList.contains('aperta')){metti(sez,true,false);salva(sez.getAttribute('data-sez'),true);}
+  };
+  document.addEventListener('click',function(e){
+    var a=e.target.closest&&e.target.closest('a[href^="#"]');if(!a)return;
+    var t=document.getElementById(a.getAttribute('href').slice(1));if(t)window.apriSezioneDi(t);
+  });
+  if(location.hash){var t0=document.getElementById(location.hash.slice(1));if(t0)window.apriSezioneDi(t0);}
+  window.addEventListener('beforeprint',function(){tutte.forEach(function(s){s.querySelector('.sez-corpo').style.maxHeight='none';});});
+  window.addEventListener('afterprint',function(){tutte.forEach(function(s){if(!s.classList.contains('aperta'))s.querySelector('.sez-corpo').style.maxHeight='0px';});});
+})();
+</script>
+<script>
+/* 6/11 pannello «Tutto il materiale»: apre col tasto rosso o con un link #materiali; ✕ / Esc / clic fuori chiudono */
+(function(){
+  var o=document.getElementById('matOver'),t=document.getElementById('tastoMat'),x=document.getElementById('matChiudi'),prima=null;
+  function apri(){if(!o.hidden)return;prima=document.activeElement;o.hidden=false;document.body.classList.add('mat-aperto');t.setAttribute('aria-expanded','true');
+    requestAnimationFrame(function(){o.classList.add('su');});o.scrollTop=0;x.focus({preventScroll:true});}
+  function chiudi(){if(o.hidden)return;o.classList.remove('su');document.body.classList.remove('mat-aperto');t.setAttribute('aria-expanded','false');
+    setTimeout(function(){o.hidden=true;},250);if(history.replaceState&&location.hash==='#materiali')history.replaceState(null,'',location.pathname+location.search);
+    if(prima&&prima.focus)prima.focus({preventScroll:true});}
+  window.apriMateriale=apri;window.chiudiMateriale=chiudi;
+  t.addEventListener('click',apri);x.addEventListener('click',chiudi);
+  o.addEventListener('click',function(e){if(e.target===o)chiudi();});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!o.hidden)chiudi();});
+  document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('a[href="#materiali"]');if(a){e.preventDefault();apri();}});
+  if(location.hash==='#materiali')apri();
+})();
+</script>
+<script src="materiali.js"></script>
+<script src="materiali-vista.js"></script>
+<script>
+/* sezione «TUTTO IL MATERIALE»: le schede «solo noi» (perAldo:false) compaiono solo con l'AREA SVILUPPO aperta */
+if(window.MaterialiVista)MaterialiVista.sezione(document.getElementById('materiali'),{sviluppo:function(){var d=document.getElementById('dev');return !!d&&!d.hidden;}});
+</script>
+<script src="media/logo/storico/animazione/draghetto-avvio.js" data-avvio="auto" data-tema="chiaro"></script>
+<script src="vendor/three/three-bundle.js"></script>
+<script src="media/modelli3d/wayfarer.js"></script>
+<script src="media/wayfarer3d.js"></script>
+<script>(function(){var W=window.WAYFARER3D&&WAYFARER3D(document.getElementById('wayfarer3d')),b=document.getElementById('bLievita');if(!W||!b)return;
+b.onclick=function(){var on=W.lievita();b.setAttribute('aria-pressed',on);b.textContent=on?'❚❚':'▶';b.setAttribute('aria-label',on?'Pausa':'Riprendi')};
+var L=[{f:'wayfarer',n:'Wayfarer',c:'«Wayfarer sunglasses» di SusanKing'},{f:'vogue',n:'Rotondo in metallo',c:'«Free Sunglasses Set» di Berk Gedik'},{f:'tommy',n:'Rotondo sottile',c:'«Free Sunglasses Set» di Berk Gedik'},
+ {f:'classico',n:'Esagonale in metallo',c:'«Free Sunglasses Set» di Berk Gedik'},{f:'inesta3',n:'Squadrato',c:'«Free Sunglasses Set» di Berk Gedik'},{f:'inesta2',n:'Farfalla',c:'«Free Sunglasses Set» di Berk Gedik'},
+ {f:'inesta1',n:'Panto',c:'«Free Sunglasses Set» di Berk Gedik'},{f:'mustang',n:'Squadrato grande',c:'«Free Sunglasses Set» di Berk Gedik'}],i=0;
+function mostra(){var m=L[i];function vai(){W.cambia(m.f);document.getElementById('wNome').textContent=(m.n+' · '+(i+1)+'/'+L.length).toUpperCase();document.getElementById('wCred').textContent='CREDITS · '+m.c+' · CC BY 4.0'}
+ if(window.MODELLI3D&&window.MODELLI3D[m.f])return vai();var sc=document.createElement('script');sc.src='media/modelli3d/'+m.f+'.js';sc.onload=vai;document.head.appendChild(sc)}
+document.getElementById('wPrev').onclick=function(){i=(i+L.length-1)%L.length;mostra()};document.getElementById('wNext').onclick=function(){i=(i+1)%L.length;mostra()};})();</script>
+<script>(function(){ /* striscia notizie: messaggi per Aldo, curiosità dal mondo dell'ottica, notifiche di sistema (pallino rosso) */
+var tit=document.getElementById('tkTit'),txt=document.getElementById('tkTxt'),vp=txt&&txt.parentNode;if(!tit||!txt)return;
+var MSG=[
+ {t:'PER TE',x:'Buon lavoro, Aldo: oggi la vetrina è il tuo biglietto da visita.'},
+ {t:'STAMPE',x:'Un cartello nuovo in vetrina? Scegli il modello, scrivi il prezzo e stampi: è pronto in un minuto.'},
+ {t:'OTTICA',x:'Il Wayfarer nasce nel 1952 dalla matita di Raymond Stegeman: più di settant’anni e non sente l’età.'},
+ {t:'VETRINA',x:'Il tablet in vetrina lavora anche a negozio chiuso: le tue offerte girano giorno e notte.'},
+ {t:'OTTICA',x:'Le prime lenti progressive Varilux sono del 1959, ideate in Francia da Bernard Maitenaz.'},
+ {t:'CLIENTI',x:'Ogni cliente ha la sua scheda con gli acquisti e le note: lo riconosci al primo sguardo.'},
+ {t:'OTTICA',x:'Persol nasce a Torino nel 1917: il nome viene da «per il sole».'},
+ {t:'STAMPE',x:'Cartellini e prezzi da stanghetta tutti uguali e ordinati: la vetrina sembra subito più curata.'},
+ {t:'OTTICA',x:'Gli occhiali da sole con filtro UV proteggono anche d’inverno: la neve riflette fino all’80% dei raggi.'},
+ {t:'VETRINA',x:'Cambia il messaggio del tablet dal PC del negozio: nessuna chiavetta, nessuna fatica.'}
+],coda=[],i=0;
+window.STRISCIA={notifica:function(testo,titolo){coda.push({t:titolo||'AVVISO',x:testo,n:true})}};
+function prossimo(){var m=coda.length?coda.shift():MSG[i++%MSG.length];tit.textContent=m.t;tit.classList.toggle('notifica',!!m.n);txt.textContent=m.x;
+ var W=vp.clientWidth,L=txt.scrollWidth,v=45,d=(W+L)/v*1000;
+ txt.animate([{transform:'translateX('+W+'px)'},{transform:'translateX('+(-L)+'px)'}],{duration:d,easing:'linear'}).onfinish=function(){setTimeout(prossimo,350)}}
+if(matchMedia('(prefers-reduced-motion: reduce)').matches){tit.textContent=MSG[0].t;txt.textContent=MSG[0].x;return}
+setTimeout(prossimo,800);})();</script>
+</body>
+</html>

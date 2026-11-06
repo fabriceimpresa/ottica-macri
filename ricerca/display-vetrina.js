@@ -1,0 +1,1 @@
+window.DISPLAY_PREZZI = {"10x15":"da ~2 € a pezzo (conf. 10, base a L) · singolo 4-5 €","13x18":"da 5,50 € a pezzo (conf. 2) · singolo 10-12 €","A5":"da 3,70 € a pezzo · conf. 4-6: 4,70-6 €/pz","A4":"da 4,88 € a pezzo (a L) · conf. 5-8: 5,80-8 €/pz","cornice-legno-10x15":"da 3,70 € · tipico 5,50-10 €","cornice-legno-13x18":"da 4,50 €/pz (conf. 2) · singola 6,70-25 €"};

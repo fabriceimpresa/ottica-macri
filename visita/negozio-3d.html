@@ -1,0 +1,999 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Ottica Macrì in 3D</title>
+<meta name="color-scheme" content="light">
+<meta name="description" content="Il negozio vero di Aldo (Ottica Macrì, Via Poggi D'Oro 23, Roma) ricostruito in 3D dalle foto, con e senza STORE // CRAFT.">
+<!--
+  Negozio 3D, versione 2 (5/11/2026): rifatto da zero sulle FOTO VERE (foto-negozio/). La v1 inventata è negozio-3d.v1-inventato.html.
+  Si apre col doppio clic (file://): solo script classici, niente moduli né fetch.
+  Dati che arrivano da file separati (se mancano la pagina usa la riserva qui sotto):
+    negozio3d/rilievo.js  -> window.RILIEVO  (stanza, aperture, elementi, camere = punti delle foto)
+    negozio3d/tex.js      -> window.TEX      (materiali: radica, ocra, parquet, ...)
+    negozio3d/arredi.js   -> window.ARREDI   (mobili: origine centro base sul retro, fronte verso -z)
+  Sistema: metri; origine angolo interno sinistro dell'ingresso guardando da fuori; x a destra, z verso l'interno, y su.
+-->
+<script>
+/* VERSIONI 5/11: la stessa pagina in DUE versioni (vedi negozio3d/STATO_VERSIONI.md).
+   ALTA (predefinita)      = PC potente / Mac M1: qualità Foto/Alta/Media/Leggera, MIX REALTÀ completo, Scatta foto.
+   UNIVERSALE              = qualsiasi PC e telefono: ?versione=universale (o window.N3D_PROFILO='universale' impostato prima,
+                             es. negozio-3d-universale.html). Qualità Media/Leggera, frecce grandi a schermo, MIX leggero. */
+(function(){var q=(location.search.match(/[?&]versione=([a-z]+)/)||[])[1],p=window.N3D_PROFILO||q||'alta';if(p!=='universale')p='alta';
+  var ua=navigator.userAgent,mt=navigator.maxTouchPoints||0,lato=Math.min(screen.width||9999,screen.height||9999);
+  var tel=/android.*mobile|iphone|ipod|windows phone/i.test(ua)||(mt>0&&lato<600);
+  var tab=!tel&&(/ipad|tablet|android/i.test(ua)||(mt>1&&/macintosh/i.test(ua)));
+  window.N3D_PROFILO=p;window.N3D_P={uni:p==='universale',telefono:tel,tablet:tab,tocco:mt>0||('ontouchstart' in window)};
+  var c=document.documentElement.classList;c.add('n3-'+p);if(tel)c.add('n3-tel');if(window.N3D_P.tocco)c.add('n3-tocco');})();
+</script>
+<link rel="stylesheet" href="../tema-hud.css">
+<script src="../tema-hud.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" media="print" onload="this.media='all'"><!-- VERSIONI 5/11: font senza bloccare l'avvio (con rete lenta o assente) -->
+<style>
+:root{
+  --bg:#efe6d8;--line:rgba(110,92,72,.24);--line2:rgba(110,92,72,.45);
+  --text:#2b2118;--mut:#5e4f41;--dim:#6b5c4c;--ice:#2a1d12;
+  --cyan:#1f4e79;--amber:#9e3b25;--sc:#c39a4e;--sc2:#7d5a1c;--mat:#b5462c;--glow:rgba(44,106,160,.55);--cut:14px;
+  --font:"Chakra Petch","Rajdhani","Segoe UI",system-ui,sans-serif;--title:"Rajdhani","Chakra Petch","Segoe UI",sans-serif;--mono:"JetBrains Mono",Consolas,"SF Mono",Menlo,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font:400 14px/1.45 var(--font);-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid #2c6aa0;outline-offset:3px}
+#stage{position:fixed;inset:0;background:#2a2118}
+#stage canvas{position:absolute;display:block;touch-action:none;outline:none;cursor:grab}
+#stage canvas.trascino{cursor:grabbing}
+#stage canvas.alto{cursor:move}
+.n3-frame{position:fixed;inset:0;pointer-events:none;z-index:5}
+.n3-frame i{position:absolute;width:30px;height:30px;border-color:rgba(31,78,121,.7);border-style:solid;border-width:0}
+.n3-frame .a{left:10px;top:10px;border-left-width:2px;border-top-width:2px}.n3-frame .b{right:10px;top:10px;border-right-width:2px;border-top-width:2px}
+.n3-frame .c{left:10px;bottom:10px;border-left-width:2px;border-bottom-width:2px}.n3-frame .d{right:10px;bottom:10px;border-right-width:2px;border-bottom-width:2px;border-color:rgba(181,70,44,.8)}
+.n3-glass{position:relative;background:linear-gradient(160deg,rgba(255,253,249,.93),rgba(246,239,228,.9));border:1px solid var(--line);
+  clip-path:polygon(0 0,calc(100% - var(--cut)) 0,100% var(--cut),100% 100%,var(--cut) 100%,0 calc(100% - var(--cut)));
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:inset 0 1px 0 #fff}
+.n3-glass::before{content:"";position:absolute;inset:0;pointer-events:none;background:
+  linear-gradient(var(--cyan),var(--cyan)) left top/22px 2px no-repeat,linear-gradient(var(--cyan),var(--cyan)) left top/2px 22px no-repeat,
+  linear-gradient(var(--mat),var(--mat)) right bottom/22px 2px no-repeat,linear-gradient(var(--mat),var(--mat)) right bottom/2px 22px no-repeat}
+.n3-top{position:fixed;left:14px;right:14px;top:12px;z-index:10;display:flex;align-items:center;gap:12px;padding:8px 14px;--cut:16px}
+.n3-brand h1{margin:0;font:700 20px/1.05 var(--title);letter-spacing:3px;text-transform:uppercase;color:var(--ice)}
+.n3-brand h1 span{color:var(--amber)}
+.n3-brand small{display:block;margin-top:2px;font:500 12px var(--font);color:var(--mut)}
+.n3-sp{flex:1}
+.n3-link{display:inline-flex;align-items:center;gap:7px;padding:9px 14px;font:600 14px var(--title);letter-spacing:1.2px;text-transform:uppercase;color:var(--cyan);text-decoration:none;white-space:nowrap;
+  background:#fffdf9;border:1px solid rgba(31,78,121,.45);clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px))}
+.n3-link:hover{background:#eef2f6;border-color:var(--cyan)}
+.n3-link.demo{color:var(--amber);border-color:rgba(181,70,44,.5)}
+/* 6/11 (Fabrice): header TRASPARENTE, solo bordato, testi bianchi, tasti bordati (come l'header di The Arcaders) */
+.n3-top.n3-glass{background:linear-gradient(160deg,rgba(255,253,249,.6),rgba(246,239,228,.52));backdrop-filter:blur(6px) saturate(1.1);-webkit-backdrop-filter:blur(6px) saturate(1.1)}   /* 6/11 Fabrice: come prima ma traslucida */
+/* 6/11 Fabrice: header più bello, qualche dettaglio HUD */
+.n3-top.n3-glass{box-shadow:0 10px 28px rgba(20,12,6,.28),inset 0 1px 0 rgba(255,255,255,.85),inset 0 -1px 0 rgba(31,78,121,.18)}
+.n3-top .hdr-riga{position:absolute;left:18px;right:18px;bottom:-1px;height:2px;pointer-events:none;
+  background:linear-gradient(90deg,#b5462c 0 18%,transparent 18% 19%,#1f4e79 19% 21%,transparent 21% 79%,#1f4e79 79% 81%,transparent 81% 82%,#b5462c 82%)}
+.n3-top .hdr-tacche{position:absolute;left:34%;right:34%;bottom:4px;height:5px;pointer-events:none;opacity:.55;
+  background:repeating-linear-gradient(90deg,#1f4e79 0 1px,transparent 1px 9px)}
+.n3-top .hdr-luce{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.n3-top .hdr-luce::after{content:"";position:absolute;top:0;bottom:0;width:22%;left:-30%;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.38),transparent);animation:hdrLuce 9s ease-in-out infinite}
+@keyframes hdrLuce{0%,70%{left:-30%}100%{left:110%}}
+.n3-top .hdr-sep{width:1px;align-self:stretch;margin:2px 4px;background:linear-gradient(180deg,transparent,rgba(31,78,121,.45),transparent)}
+.n3-top .hdr-chip{display:inline-flex;align-items:center;gap:7px;padding:5px 9px;font:600 11px var(--mono);letter-spacing:1.4px;text-transform:uppercase;
+  color:#1f4e79;background:rgba(255,255,255,.45);border:1px solid rgba(31,78,121,.3);white-space:nowrap;
+  clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px))}
+.n3-top .hdr-chip b{color:#b5462c;font-weight:700}
+.n3-top .hdr-led{width:7px;height:7px;border-radius:50%;background:#d23a1c;box-shadow:0 0 6px #ff5a36;animation:hdrLed 1.6s ease-in-out infinite}
+@keyframes hdrLed{50%{opacity:.25;box-shadow:none}}
+@media (max-width:900px){.n3-top .hdr-chip,.n3-top .hdr-sep,.n3-top .hdr-tacche{display:none}}
+@media (prefers-reduced-motion:reduce){.n3-top .hdr-luce::after,.n3-top .hdr-led{animation:none}}
+.n3-hint{position:fixed;left:24px;top:76px;z-index:9;font:500 13px var(--font);color:var(--mut);max-width:520px;pointer-events:none;padding:7px 12px;background:rgba(255,253,249,.9);border-left:2px solid var(--mat);transition:opacity .8s}
+.n3-hint.via{opacity:0}
+.n3-hint[hidden]{display:none}
+.n3-comandi{position:fixed;left:24px;top:76px;z-index:9;width:min(330px,calc(100vw - 48px));padding:10px 14px 10px;background:rgba(255,253,249,.94);border:1px solid rgba(110,92,72,.35);border-left:3px solid #b5462c;color:#2a1d12;font:500 13.5px/1.4 var(--font);box-shadow:0 10px 26px -18px rgba(40,25,10,.6)}
+.n3-comandi h4{margin:0 0 6px;font:700 12px/1 var(--font);letter-spacing:2px;color:#1f4e79}
+.n3-comandi ul{margin:0;padding:0;list-style:none}.n3-comandi li{padding:3px 0;border-top:1px dashed rgba(110,92,72,.25)}.n3-comandi li:first-child{border-top:0}
+.n3-comandi b{color:#b5462c}
+.n3-comandi[hidden]{display:none}
+.n3-cx{position:absolute;right:6px;top:6px;width:30px;height:30px;border:1px solid rgba(110,92,72,.4);background:#fffaf2;cursor:pointer;font-size:14px}
+.n3-cq{position:fixed;left:24px;top:76px;z-index:9;padding:7px 12px;border:1px solid #b5462c;background:#fffaf2;color:#b5462c;font:700 12px var(--font);letter-spacing:1.5px;cursor:pointer}
+.n3-cq[hidden]{display:none}
+@media (max-width:700px){.n3-comandi{left:10px;top:64px;font-size:12.5px;width:calc(100vw - 20px)}.n3-cq{left:10px;top:64px}}
+.n3-hint b{color:var(--ice)}
+/* barra comandi */
+.n3-dock{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);z-index:10;display:flex;flex-wrap:wrap;justify-content:center;gap:10px;align-items:center;padding:10px 12px;width:max-content;max-width:calc(100vw - 20px)}
+.n3-grp{display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:center}
+.n3-grp+.n3-grp{padding-left:0}
+.n3-btn{display:inline-flex;align-items:center;gap:7px;min-height:44px;padding:8px 14px;font:600 15px var(--title);letter-spacing:.9px;text-transform:uppercase;color:var(--ice);white-space:nowrap;
+  background:#fffdf9;border:1px solid var(--line2);transition:.15s;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px))}
+.n3-btn:hover{background:#eef2f6;border-color:var(--cyan);color:var(--cyan)}
+.n3-btn.on{background:#1f4e79;border-color:#1f4e79;color:#fffdf9}
+#bAlto{background:#1f4e79;border-color:#1f4e79;color:#fffdf9}#bAlto:hover{background:#2a6299;border-color:#2a6299}#bAlto.on{background:#123352;border-color:#123352}   /* 6/11 Fabrice: tasto Dall'alto blu */
+.n3-btn.foto{border-color:rgba(181,70,44,.6);color:var(--amber)}
+.n3-btn.foto.on{background:var(--mat);border-color:var(--mat);color:#fffdf9}
+.n3-btn.sc{border-color:rgba(195,154,78,.9);color:var(--sc2)}
+.n3-btn.sc.on{background:linear-gradient(180deg,#c39a4e,#9f7a33);border-color:#8a6a2a;color:#fffdf9}
+.n3-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.n3-btn.pri{background:linear-gradient(180deg,#b5462c,#9e3b25);border-color:#8a321f;color:#fffdf9}
+.n3-btn.pri.on{filter:brightness(1.1)}
+.n3-btn.piccolo{min-height:36px;padding:5px 9px;font-size:12.5px;letter-spacing:.4px;text-transform:none}
+.n3-em{font:600 11px var(--title);font-style:normal;letter-spacing:1.6px;text-transform:uppercase;color:var(--dim);width:100%;text-align:center}
+.n3-dock{flex-direction:column;gap:6px}
+.n3-sel{min-height:44px;max-width:300px;padding:6px 10px;font:600 14px var(--title);color:var(--ice);background:#fffdf9;border:1px solid var(--line2)}
+.n3-btn .st{font:500 11px var(--mono);text-transform:none;opacity:.9}
+/* confronto con la foto */
+#foto{position:fixed;z-index:3;object-fit:fill;pointer-events:none;display:none;background:#000}
+#fotoBar{position:fixed;right:14px;top:78px;z-index:11;display:none;gap:8px;align-items:center;padding:8px 12px;flex-wrap:wrap;max-width:calc(100vw - 28px)}
+#fotoBar label{font:600 13px var(--title);letter-spacing:1px;text-transform:uppercase;color:var(--ice);display:flex;gap:8px;align-items:center}
+#fotoBar input[type=range]{width:160px;accent-color:#b5462c}
+#fotoBar .n3-btn{min-height:36px;padding:5px 10px;font-size:13px}
+#fotoNome{font:500 11px var(--mono);color:var(--mut)}
+/* etichette */
+#labs{position:fixed;inset:0;z-index:6;pointer-events:none;overflow:hidden}
+.n3-lab{position:absolute;left:0;top:0;transform:translate(-50%,-100%);padding:3px 8px;font:600 12px var(--title);letter-spacing:.8px;text-transform:uppercase;white-space:nowrap;
+  color:var(--ice);background:rgba(255,253,249,.9);border:1px solid rgba(31,78,121,.5)}
+.n3-lab.sc{border-color:#c39a4e;color:var(--sc2)}
+.n3-lab.riserva{border-color:#b5462c;color:#9e3b25}
+.labs-off .n3-lab{display:none}
+/* AVVIO 5/11: schermata d'avvio col draghetto e barra di avanzamento vera (la guida negozio3d/avvio.js) */
+.n3-load{position:fixed;inset:0;z-index:20;display:grid;place-items:center;padding:16px;background:radial-gradient(ellipse at 50% 38%,#f8f2e8 0%,var(--bg) 62%,#e4d8c6 100%);transition:opacity .8s}
+.n3-load.via{opacity:0;pointer-events:none}
+.av-box{width:min(440px,100%);padding:22px 26px 18px;text-align:center;--cut:18px}
+.av-logo{display:block;width:118px;height:auto;margin:0 auto 6px;filter:drop-shadow(0 6px 10px rgba(80,40,20,.18));animation:avRespiro 2.6s ease-in-out infinite;will-change:transform}
+@keyframes avRespiro{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-4px) scale(1.025)}}
+.av-tit{margin:0;font:700 22px/1.1 var(--title);letter-spacing:3px;text-transform:uppercase;color:var(--ice)}
+.av-tit span{color:var(--amber)}
+.av-sub{margin:3px 0 14px;font:500 12.5px var(--font);color:var(--mut)}
+.av-fase{margin:0 0 8px;min-height:20px;font:600 15px var(--title);letter-spacing:1.2px;text-transform:uppercase;color:var(--cyan)}
+.n3-load b{position:relative;display:block;height:10px;background:#fffdf9;border:1px solid var(--line2);overflow:hidden;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px))}
+.n3-load b i{position:absolute;left:0;top:0;bottom:0;width:100%;transform-origin:0 50%;transform:scaleX(.02);background:linear-gradient(90deg,#1f4e79,#2c6aa0 60%,#b5462c);transition:transform .35s ease-out}
+.n3-load b::after{content:"";position:absolute;top:0;bottom:0;left:0;width:30%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);animation:avLuce 1.3s linear infinite;will-change:transform}
+@keyframes avLuce{from{transform:translateX(-110%)}to{transform:translateX(360%)}}
+.av-riga{display:flex;justify-content:space-between;margin-top:6px;font:500 12px var(--mono);color:var(--mut)}
+.av-elenco{list-style:none;margin:12px 0 0;padding:0;text-align:left;font:500 13px/1.25 var(--font);color:var(--dim)}
+.av-elenco li{padding:4px 0 4px 24px;position:relative;border-top:1px dashed rgba(110,92,72,.22)}
+.av-elenco li:first-child{border-top:0}
+.av-elenco li::before{content:"";position:absolute;left:4px;top:8px;width:9px;height:9px;border:1.5px solid rgba(110,92,72,.5);transform:rotate(45deg)}
+.av-elenco li.ora{color:var(--ice);font-weight:600}
+.av-elenco li.ora::before{border-color:#b5462c;background:#b5462c;animation:avPunto 1s ease-in-out infinite}
+@keyframes avPunto{50%{opacity:.35}}
+.av-elenco li.fatto{color:var(--mut)}
+.av-elenco li.fatto::before{border-color:#1f4e79;background:#1f4e79}
+.n3-load .err{max-width:460px;margin:12px auto 0;font:400 14px var(--font);letter-spacing:0;text-transform:none;color:#9e3b25}
+@media (max-width:520px){.av-box{padding:16px 16px 14px}.av-logo{width:92px}.av-tit{font-size:18px;letter-spacing:2px}.av-elenco{font-size:12.5px}}
+@media (prefers-reduced-motion:reduce){.av-logo,.n3-load b::after,.av-elenco li.ora::before{animation:none}}
+.n3-ticker{position:fixed;right:24px;bottom:4px;z-index:6;font:400 10px var(--mono);letter-spacing:1.2px;color:var(--mut);background:rgba(255,253,249,.8);padding:1px 6px;pointer-events:none;white-space:nowrap}
+.n3-mini{position:fixed;left:14px;top:76px;z-index:9;display:none;padding:6px}
+.n3-avviso{position:fixed;left:50%;top:76px;transform:translateX(-50%);z-index:12;padding:8px 14px;font:500 13px var(--font);color:#9e3b25;background:#fff6f0;border:1px solid rgba(181,70,44,.5);display:none}
+@media (max-width:860px){
+  .n3-top{left:6px;right:6px;top:6px;padding:6px 10px;gap:8px}
+  .n3-brand h1{font-size:15px;letter-spacing:1.5px;white-space:nowrap}.n3-brand small,.n3-brand h1 span{display:none}
+  .n3-link{padding:7px 9px;font-size:12.5px}
+  .n3-hint{display:none}
+  .n3-dock{left:6px;right:6px;bottom:6px;transform:none;width:auto;max-width:none;max-height:42vh;overflow-y:auto;gap:6px;padding:6px}
+  .n3-grp+.n3-grp{padding-left:0;border-left:0}
+  .n3-btn{min-height:40px;padding:6px 9px;font-size:13px}
+  .n3-ticker,.n3-frame{display:none}
+  #fotoBar{top:58px;right:6px;left:6px}
+}
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<img id="foto" alt="Foto vera del negozio">
+<div class="n3-frame"><i class="a"></i><i class="b"></i><i class="c"></i><i class="d"></i></div>
+<div id="labs" class="labs-off"></div>
+
+<header class="n3-top n3-glass">
+  <div class="n3-brand"><h1>Ottica Macrì <span>· il negozio in 3D</span></h1><small>Via Poggi D’Oro 23, Roma · ricostruito dalle foto vere</small></div>
+  <span class="hdr-sep"></span><span class="hdr-chip"><i class="hdr-led"></i>3D <b>LIVE</b></span><span class="hdr-chip" id="hdrOra">ROMA --:--</span>
+  <span class="n3-sp"></span><span class="hdr-luce"></span><span class="hdr-riga"></span><span class="hdr-tacche"></span>
+  <a class="n3-link demo" href="../demo/demo-app-v2.html">Demo app</a>
+  <a class="n3-link" href="../index.html">☰ Menu</a>
+</header>
+
+<aside class="n3-comandi" id="comandi" aria-label="Comandi">
+ <button type="button" class="n3-cx" id="comandiX" title="Nascondi i comandi">✕</button>
+ <h4>COMANDI</h4>
+ <ul>
+  <li><b>Gira lo sguardo</b> · tieni premuto il tasto sinistro e trascina</li>
+  <li><b>Zoom</b> · rotella del mouse</li>
+  <li><b>Cammina fin lì</b> · clic sul pavimento</li>
+  <li><b>Cammina</b> · frecce o W A S D</li>
+  <li><b>Vai a un punto</b> · pulsanti in basso («Entra nel negozio» fa il giro da solo)</li>
+  <li><b>Telefono/tablet</b> · un dito gira, due dita zoom, tocco sul pavimento cammina</li>
+ </ul>
+</aside>
+<button type="button" class="n3-cq" id="comandiQ" title="Mostra i comandi" hidden>? COMANDI</button>
+<div class="n3-hint" id="hint" hidden><b>Tieni premuto e trascina</b> per guardarti intorno · <b>rotella</b> per lo zoom · <b>clic sul pavimento</b>, <b>frecce</b> o <b>W A S D</b> per camminare.</div>
+<div class="n3-avviso" id="avviso"></div>
+
+<div id="fotoBar" class="n3-glass">
+  <span id="fotoNome"></span>
+  <button class="n3-btn" id="fSopra">Sovrapposta</button>
+  <button class="n3-btn" id="fAccanto">Accanto</button>
+  <label>3D <input type="range" id="fAlpha" min="0" max="100" value="50"> Foto</label>
+  <button class="n3-btn" id="fChiudi">✕ Chiudi</button>
+</div>
+
+<nav class="n3-dock n3-glass" aria-label="Comandi">
+  <div class="n3-grp" id="viste"><button class="n3-btn pri" id="bEntra"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m10 8 6 4-6 4z"/></svg>Entra nel negozio</button></div>
+  
+  <div class="n3-grp">
+    <select id="selFoto" class="n3-sel" aria-label="Punti di vista delle foto"><option value="">📷 Punti delle foto vere…</option></select>
+    <button class="n3-btn" id="bAlto"><svg viewBox="0 0 24 24"><path d="M3 8l9-5 9 5-9 5z"/><path d="M3 8v8l9 5 9-5V8"/></svg>Dall’alto</button>
+    <button class="n3-btn foto" id="bFoto" hidden style="display:none"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="14" rx="2"/><circle cx="12" cy="13" r="4"/><path d="M8 6l2-3h4l2 3"/></svg>Confronta con la foto</button>
+    <button class="n3-btn sc" id="bSC"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="1"/><path d="M8 20h8M12 16v4"/></svg>DOPO · con STORE // CRAFT <span class="st" id="tSC">spento</span></button>
+    <button class="n3-btn" id="bEti"><svg viewBox="0 0 24 24"><path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8" r="1.5"/></svg>Nomi</button>
+  </div>
+</nav>
+<div class="n3-ticker" id="ticker"></div>
+<div class="n3-load" id="load" role="status" aria-live="polite"><div class="av-box n3-glass">
+  <img class="av-logo" src="../media/logo/marchi6/06-ovale/06-ovale-colori.svg" alt="Ottica Macrì" width="118" height="94">
+  <h2 class="av-tit">Ottica Macrì <span>· in 3D</span></h2>
+  <p class="av-sub">Preparo il negozio di Aldo, un momento…</p>
+  <p class="av-fase" id="avFase">Costruisco le pareti…</p>
+  <b><i id="avBarra"></i></b>
+  <div class="av-riga"><span id="avPasso">passo 1 di 5</span><span id="avPct">2%</span></div>
+  <ol class="av-elenco" id="avElenco">
+    <li data-f="pareti" class="ora">Costruisco le pareti…</li>
+    <li data-f="mobili">Monto i mobili…</li>
+    <li data-f="occhiali">Metto gli occhiali in vetrina…</li>
+    <li data-f="luci">Accendo le luci…</li>
+    <li data-f="riflessi">Calcolo riflessi e ombre…</li>
+  </ol>
+  <p class="err" id="err" hidden></p>
+</div></div>
+<script>
+/* AVVIO 5/11: avanzamento della schermata d'avvio. Le fasi le segnano i pezzetti di script fra un file e l'altro e negozio3d/avvio.js
+   (che compila gli shader in parallelo e toglie la schermata). Senza avvio.js la pagina funziona come prima (vedi «riserva» sotto). */
+window.__AVVIO=(function(){
+  var FASI=['pareti','mobili','occhiali','luci','riflessi'],pct=0,t0=performance.now(),tempi={};
+  function el(id){return document.getElementById(id)}
+  function fase(f,p){var i=FASI.indexOf(f);if(i<0)return;tempi[f]=Math.round(performance.now()-t0);
+    var li=document.querySelectorAll('#avElenco li');for(var k=0;k<li.length;k++){li[k].className=k<i?'fatto':(k===i?'ora':'')}
+    el('avFase').textContent=li[i]?li[i].textContent:'';el('avPasso').textContent='passo '+(i+1)+' di 5';if(p!=null)avanza(p)}
+  function avanza(p){p=Math.max(pct,Math.min(100,p));pct=p;el('avBarra').style.transform='scaleX('+Math.max(.02,p/100).toFixed(3)+')';el('avPct').textContent=Math.round(p)+'%'}
+  function fine(){var li=document.querySelectorAll('#avElenco li');for(var k=0;k<li.length;k++)li[k].className='fatto';avanza(100);el('avFase').textContent='Pronto!';
+    tempi.pronto=Math.round(performance.now()-t0);A.pronto=true;try{window.__RESA&&window.__RESA.dopoAvvio&&window.__RESA.dopoAvvio()}catch(e){console.warn(e)}setTimeout(function(){var l=el('load');if(l&&el('err').hidden)l.classList.add('via')},250)}
+  var A={attivo:true,pronto:false,fase:fase,avanza:avanza,fine:fine,tempi:tempi};
+  /* riserva: se avvio.js non arriva (file mancante) la pagina si sblocca da sola come prima */
+  addEventListener('load',function(){setTimeout(function(){if(!A.gestito&&!A.pronto)fine()},400)});
+  return A})();
+</script>
+
+<script src="../vendor/three/three-bundle.js"></script>
+<script>__AVVIO.avanza(7)</script>
+<script>/* VERSIONI 5/11: UNIVERSALE = solo le grafiche Black Friday che il 3D usa, ridotte (negozio3d/uni-dati.js, ~1,5 MB invece di ~4 MB;
+  lo crea negozio3d/build_universale.py). ALTA = i file completi come prima. */
+if(window.N3D_P&&N3D_P.uni)document.write('<script src="negozio3d/uni-dati.js"><\/script>');
+else document.write('<script src="../media/blackfriday/bf-data.js"><\/script><script src="../media/blackfriday/bf-loop-data.js"><\/script>');</script>
+<script src="negozio3d/rilievo.js"></script>
+<script src="negozio3d/tex.js"></script>
+<script src="negozio3d/arredi.js"></script>
+<script src="negozio3d/foto-tex.js"></script>
+<script>__AVVIO.avanza(14)</script>
+<script src="../dispositivi.js"></script>
+<script src="../proposta-schermo.js"></script>
+<script src="../ricerca/display-vetrina.js"></script>
+<script src="../media/blackfriday/vetrine/bf-vetrine-data.js"></script>
+<script src="negozio3d/vetrine-tex.js"></script>
+<script src="negozio3d/occhiali.js"></script>
+<script src="negozio3d/facciata.js"></script><!-- GIRO 2: facciata su strada di notte (insegna OTTICA · Aldo Macrì) -->
+<script src="negozio3d/bancone2.js"></script><!-- GIRO 2: dettagli dietro il bancone (IMG_9487), li posa allestimento.js -->
+<script>__AVVIO.fase('mobili',20)</script>
+<script>
+/* Riserva: usata solo se negozio3d/rilievo.js manca. Misure stimate dalle foto (da confermare col metro). */
+window.RILIEVO_RISERVA={
+  stanza:{poligono:[[0,0],[4.6,0],[4.6,6.2],[0,6.2]],h:3.0},
+  aperture:[{tipo:'porta',x0:1.5,z0:0,x1:2.5,z1:0,y0:0,y1:2.4}],
+  elementi:[
+    {id:'bancone',tipo:'bancone',x:1.2,z:3.2,rotY:-90,w:3.2,h:1.0,d:.6,nome:'Bancone'},
+    {id:'totem',tipo:'totemRayBan',x:3.8,z:4.6,rotY:180,w:.6,h:2.0,d:.35,nome:'Totem Ray-Ban'}
+  ],
+  camere:[
+    {id:'ingresso',nome:'Ingresso',pos:[2.0,1.6,.4],guarda:[2.0,1.4,5]}
+  ]
+};
+</script>
+<script>
+(function(){
+'use strict';
+const T=window.THREE;
+const $=s=>document.querySelector(s);
+function errore(m){const e=$('#err');e.hidden=false;e.textContent=m;$('#load b').style.display='none'}
+if(!T){errore('Non riesco a caricare la libreria 3D (vendor/three/three-bundle.js).');return}
+const D2R=Math.PI/180;
+const TEX=window.TEX||null, ARREDI=window.ARREDI||null;
+const RIS=!window.RILIEVO;
+const RIL=window.RILIEVO||window.RILIEVO_RISERVA;
+const mancano=[];if(RIS)mancano.push('rilievo');if(!TEX)mancano.push('materiali');if(!ARREDI)mancano.push('arredi');
+
+/* ================= renderer, scena, camera ================= */
+const stage=$('#stage');
+let renderer;
+try{renderer=new T.WebGLRenderer({antialias:true,powerPreference:'high-performance',preserveDrawingBuffer:false})}
+catch(e){errore('Questo browser non riesce ad aprire la grafica 3D (WebGL). Prova con Chrome o Safari aggiornati.');return}
+const PROF=window.N3D_P||{}; /* VERSIONI 5/11: profilo alta/universale (script in testa alla pagina) */
+let PR=Math.min(window.devicePixelRatio||1,PROF.uni?(PROF.telefono?1.5:1.25):1.5);
+renderer.setPixelRatio(PR);
+renderer.shadowMap.enabled=true;renderer.shadowMap.type=PROF.uni?T.PCFShadowMap:T.PCFSoftShadowMap;
+renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;
+const cv=renderer.domElement;stage.appendChild(cv);cv.tabIndex=0;
+const scene=new T.Scene();scene.background=new T.Color(window.RILIEVO&&window.RILIEVO.stanza&&window.RILIEVO.stanza.facciata?0x0e1118:0x7d8590); /* GIRO 2: fuori è sera/notte come nella foto 9485 */
+const camera=new T.PerspectiveCamera(62,1,.03,120);camera.rotation.order='YXZ';
+const ANISO=Math.min(8,renderer.capabilities.getMaxAnisotropy());
+{const pm=new T.PMREMGenerator(renderer);scene.environment=pm.fromScene(new T.RoomEnvironment(),.04).texture;pm.dispose()}
+scene.environmentIntensity=.35;
+
+/* ================= utilità ================= */
+const num=(v,d)=>(typeof v==='number'&&isFinite(v))?v:d;
+function ang(v){ /* rotY: gradi se |v|>2π, altrimenti radianti (RILIEVO può usare l'uno o l'altro: vedi angUnita) */
+  v=num(v,0);if(ANG_GRADI)return v*D2R;return v}
+let ANG_GRADI=true;
+function rot3(v){return Math.PI-ang(v)}
+function cTex(w,h,draw){const c=document.createElement('canvas');c.width=w;c.height=h;draw(c.getContext('2d'),w,h);const t=new T.CanvasTexture(c);t.colorSpace=T.SRGBColorSpace;t.anisotropy=ANISO;return t}
+const MAT={}; /* materiali di riserva se tex.js manca */
+function mat(nome,opts){
+  opts=opts||{};
+  if(TEX&&typeof TEX[nome]==='function'){try{const m=TEX[nome](opts);if(m&&m.isMaterial)return m;if(m&&m.isTexture)return new T.MeshStandardMaterial({map:m,roughness:.6})}catch(e){console.warn('TEX.'+nome,e)}}
+  const col={radica:0x2a1a10,ocra:0xd7b45c,bancone:0xd9bb5f,parquet:0x8a5a34,intonaco:0xf2efe9,soffitto:0xf3f1ec,ottone:0xc9a24a,vetro:0xffffff,mosaico:0xe4dccb,nero:0x141414,cromo:0xdddddd,metalloTotem:0x9a9ea3,plasticaBlu:0x1f4fa0}[nome];
+  const k=nome+(opts.dim?opts.dim.join('x'):'');
+  if(MAT[k])return MAT[k];
+  let m;
+  if(nome==='vetro')m=new T.MeshPhysicalMaterial({color:0xffffff,roughness:.03,metalness:0,transparent:true,opacity:.12,depthWrite:false,side:T.DoubleSide});
+  else if(nome==='parquet')m=new T.MeshStandardMaterial({map:texParquetRis(opts.dim),roughness:.5});
+  else m=new T.MeshStandardMaterial({color:col!=null?col:0xbbbbbb,roughness:nome==='radica'?.3:.75,metalness:(nome==='ottone'||nome==='cromo')?1:0});
+  return MAT[k]=m;
+}
+function texParquetRis(dim){
+  const t=cTex(512,512,(g,w,h)=>{const n=8;for(let i=0;i<n;i++)for(let j=0;j<4;j++){const off=(i%2)*64;const l=100+((i*37+j*53)%40);g.fillStyle=`rgb(${l+40},${l-10},${l-50})`;g.fillRect(i*w/n,(j*128+off)%h,w/n-2,126);g.fillRect(i*w/n,((j*128+off)%h)-h,w/n-2,126)}});
+  t.wrapS=t.wrapT=T.RepeatWrapping;if(dim)t.repeat.set(dim[0]/1.2,dim[1]/1.2);return t}
+
+/* ================= RILIEVO: normalizzazione ================= */
+/* IL RILIEVO È «GUARDANDO DA FUORI, x a destra, z verso l'interno»: in three.js (destrorso, y su) questo è uno specchio.
+   Quindi tutte le z del rilievo diventano -z qui (l'ingresso guarda verso +z della scena, l'interno è verso -z)
+   e un angolo del rilievo r diventa PI - r (stesso fronte nel mondo vero, oggetti NON specchiati). */
+const Z=v=>-num(v,0);
+function pt(p){if(!p)return null;if(Array.isArray(p))return p.length>=3?{x:p[0],y:p[1],z:Z(p[2])}:{x:p[0],z:Z(p[1])};return{x:num(p.x,0),y:p.y,z:Z(p.z)}}
+const ST=RIL.stanza||{};
+const H=num(ST.h,num(ST.altezza,3.0));
+function poli(a){return (a||[]).map(p=>{const q=pt(p);return[q.x,q.z]})}
+const POLY=poli(ST.poligono||ST.pianta||ST.punti);
+function area(P){let s=0;for(let i=0;i<P.length;i++){const a=P[i],b=P[(i+1)%P.length];s+=a[0]*b[1]-b[0]*a[1]}return s/2}
+function dentro(P,x,z){let c=false;for(let i=0,j=P.length-1;i<P.length;j=i++){const a=P[i],b=P[j];if(((a[1]>z)!==(b[1]>z))&&(x<(b[0]-a[0])*(z-a[1])/(b[1]-a[1])+a[0]))c=!c}return c}
+/* aperture -> segmenti nel mondo */
+function apertureMondo(lista,P){
+  const out=[];(lista||[]).forEach(a=>{
+    let p0,p1;
+    if(a.x0!=null&&a.z0!=null&&a.x1!=null&&a.z1!=null){p0=[a.x0,Z(a.z0)];p1=[a.x1,Z(a.z1)]}
+    else if(a.p0&&a.p1){const A=pt(a.p0),B=pt(a.p1);p0=[A.x,A.z];p1=[B.x,B.z]}
+    else if(a.parete!=null&&P[a.parete]){const i=a.parete,A=P[i],B=P[(i+1)%P.length],L=Math.hypot(B[0]-A[0],B[1]-A[1]),u=[(B[0]-A[0])/L,(B[1]-A[1])/L];
+      const s0=num(a.da,num(a.s0,num(a.inizio,0))),s1=a.a!=null?a.a:(a.s1!=null?a.s1:(a.fine!=null?a.fine:s0+num(a.w,num(a.larghezza,1))));
+      p0=[A[0]+u[0]*s0,A[1]+u[1]*s0];p1=[A[0]+u[0]*s1,A[1]+u[1]*s1]}
+    else if(a.x!=null&&a.z!=null){const w=num(a.w,1),r=rot3(a.rotY);const c=Math.cos(r),s=Math.sin(r);p0=[a.x-c*w/2,Z(a.z)+s*w/2];p1=[a.x+c*w/2,Z(a.z)-s*w/2]}
+    if(!p0)return;
+    const y0=num(a.y0,num(a.davanzale,0)),y1=a.y1!=null?a.y1:(a.h!=null?y0+a.h:2.4);
+    out.push({tipo:a.tipo||'porta',p0,p1,y0,y1,vetro:a.vetro!=null?a.vetro:/vetr/.test(a.tipo||''),src:a});
+  });return out}
+
+/* ================= costruzione della stanza ================= */
+const G={fuori:new T.Group(),stanza:new T.Group(),soff:new T.Group(),arredi:new T.Group(),luci:new T.Group(),sc:new T.Group(),eti:[]};
+Object.values(G).forEach(g=>{if(g.isObject3D)scene.add(g)});
+const PAV=[]; /* mesh calpestabili per il clic */
+const OSTACOLI=[]; /* rettangoli orientati {cx,cz,c,s,hw,hd} */
+const CALP=[]; /* poligoni calpestabili */
+
+function pavimento(P,m,y){
+  const sh=new T.Shape(P.map(p=>new T.Vector2(p[0],-p[1])));
+  const geo=new T.ShapeGeometry(sh);geo.rotateX(-Math.PI/2);
+  const me=new T.Mesh(geo,m);me.position.y=y||0;me.receiveShadow=true;G.stanza.add(me);PAV.push(me);return me}
+function soffittoPoly(P,m,h){
+  const sh=new T.Shape(P.map(p=>new T.Vector2(p[0],-p[1])));
+  const geo=new T.ShapeGeometry(sh);geo.rotateX(-Math.PI/2);
+  const bb=bboxPoly(P);uvMetri(geo,bb.w,bb.d);
+  const mm=m.clone();mm.side=T.BackSide; /* visto da sotto */
+  const me=new T.Mesh(geo,mm);me.position.y=h;G.soff.add(me);return me}
+function bboxPoly(P){let a=1e9,b=1e9,c=-1e9,d=-1e9;P.forEach(p=>{a=Math.min(a,p[0]);b=Math.min(b,p[1]);c=Math.max(c,p[0]);d=Math.max(d,p[1])});return{x0:a,z0:b,x1:c,z1:d,w:c-a,d:d-b}}
+
+let PP=POLY.slice();if(area(PP)<0)PP.reverse(); /* antiorario in (x,z): normale interna = (-uz,ux)... verificata sotto */
+/* in più: il retro della vetrina sinistra è a vetri (si vede da dentro, IMG_9473_021) */
+const RVS=ST.vestibolo&&ST.vestibolo.retroVetrinaSx; /* GIRO 2: retro a vetri della vetrina sx dal rilievo */
+const AP=apertureMondo((RIL.aperture||ST.aperture||[]).concat(RIL.versione&&ST.vestibolo?[RVS?{tipo:'vetrina-retro',x0:RVS.x0,z0:RVS.z,x1:RVS.x1,z1:RVS.z,y0:RVS.y0,y1:RVS.y1}:{tipo:'vetrina-retro',x0:.06,z0:0,x1:1.4,z1:0,y0:.6,y1:2.15}]:[]),POLY);
+const BB=bboxPoly(PP.length?PP:[[0,0],[4,0],[4,6],[0,6]]);
+
+function costruisciStanza(){
+  if(!PP.length)return;
+  CALP.push(PP);
+  const nm=v=>typeof v==='string'?v:null;
+  const pv=pavimento(PP,mat(nm(ST.pavimento)||'parquet',{dim:[BB.w,BB.d]}));uvMetri(pv.geometry,BB.w,BB.d);
+  const ms=mat(nm(ST.soffitto)||'soffitto',{dim:[BB.w,BB.d]});ms.side=T.FrontSide;
+  soffittoPoly(PP,ms,H);
+  /* pareti */
+  const fin=ST.pareti||[];
+  for(let i=0;i<PP.length;i++){
+    const A=PP[i],B=PP[(i+1)%PP.length];const L=Math.hypot(B[0]-A[0],B[1]-A[1]);if(L<.01)continue;
+    const u=[(B[0]-A[0])/L,(B[1]-A[1])/L];
+    let n=[-u[1],u[0]];const mid=[(A[0]+B[0])/2,(A[1]+B[1])/2];
+    let a0=A,uu=u;
+    if(!dentro(PP,mid[0]+n[0]*.02,mid[1]+n[1]*.02)){n=[-n[0],-n[1]]}
+    /* base destrorsa: X=u, Y=su, Z=n  richiede n = (-uz,ux); se no, si percorre al contrario */
+    if(Math.abs(n[0]+u[1])>1e-6||Math.abs(n[1]-u[0])>1e-6){a0=B;uu=[-u[0],-u[1]]}
+    /* fori delle aperture su questa parete (coordinate s lungo il muro, y) */
+    const fori=[];
+    AP.forEach(ap=>{
+      const d0=distSeg(ap.p0,A,B),d1=distSeg(ap.p1,A,B);if(d0>.12||d1>.12)return;
+      let s0=(ap.p0[0]-a0[0])*uu[0]+(ap.p0[1]-a0[1])*uu[1],s1=(ap.p1[0]-a0[0])*uu[0]+(ap.p1[1]-a0[1])*uu[1];if(s0>s1){const t=s0;s0=s1;s1=t}
+      s0=Math.max(.001,s0);s1=Math.min(L-.001,s1);if(s1-s0<.05)return;fori.push([s0,s1,ap.y0,ap.y1]);ap.fatta=true});
+    /* fasce: sotto ocra spugnato fino a "fino_a", sopra bianco (rilievo: stanza.pareti.basso/alto) */
+    const PA=(ST.pareti&&!Array.isArray(ST.pareti))?ST.pareti:null;
+    const hB=PA&&PA.basso?num(PA.basso.fino_a,0):0;
+    const fasce=hB>0?[[0,hB,mat('ocra',{dim:[L,hB]})],[hB,H,mat('intonaco',{dim:[L,H-hB]})]]:[[0,H,materialeParete((Array.isArray(ST.pareti)&&ST.pareti[i])||{},L)]];
+    const M=new T.Matrix4().makeBasis(new T.Vector3(uu[0],0,uu[1]),new T.Vector3(0,1,0),new T.Vector3(n[0],0,n[1]));M.setPosition(a0[0],0,a0[1]);
+    fasce.forEach(f=>{const ya=f[0],yb=f[1];
+      const sh=new T.Shape([new T.Vector2(0,ya),new T.Vector2(L,ya),new T.Vector2(L,yb),new T.Vector2(0,yb)]);
+      /* i fori che tagliano il bordo della fascia: si spezza la fascia in rettangoli */
+      const pezzi=[];let xs=[0,L];fori.forEach(q=>{if(q[3]>ya&&q[2]<yb){xs.push(q[0],q[1])}});xs=[...new Set(xs)].sort((a,b)=>a-b);
+      for(let k=0;k<xs.length-1;k++){const xa=xs[k],xb=xs[k+1],xm=(xa+xb)/2;
+        const q=fori.find(o=>o[0]<=xm&&o[1]>=xm&&o[3]>ya&&o[2]<yb);
+        if(!q)pezzi.push([xa,xb,ya,yb]);else{if(q[2]>ya)pezzi.push([xa,xb,ya,Math.min(q[2],yb)]);if(q[3]<yb)pezzi.push([xa,xb,Math.max(q[3],ya),yb])}}
+      pezzi.forEach(z=>{if(z[1]-z[0]<.002||z[3]-z[2]<.002)return;const geo=new T.PlaneGeometry(z[1]-z[0],z[3]-z[2]);
+        const uv=geo.attributes.uv;for(let k=0;k<uv.count;k++)uv.setXY(k,(z[0]+uv.getX(k)*(z[1]-z[0]))/L,(z[2]-ya+uv.getY(k)*(z[3]-z[2]))/(yb-ya));
+        geo.translate((z[0]+z[1])/2,(z[2]+z[3])/2,0);const me=new T.Mesh(geo,f[2]);me.applyMatrix4(M);me.receiveShadow=true;G.stanza.add(me)});
+      if(hB>0&&ya===0){ /* filo di separazione (CONTROLLO 5/11: interrotto sulle aperture, prima attraversava la porta a mezz'aria) */
+        for(let k=0;k<xs.length-1;k++){const xa=xs[k],xb=xs[k+1],xm=(xa+xb)/2;if(xb-xa<.01||fori.some(o=>o[0]<=xm&&o[1]>=xm&&o[2]<hB&&o[3]>hB))continue;
+          const fl=new T.Mesh(new T.BoxGeometry(xb-xa,.012,.012),mat('ottone'));fl.position.set((xa+xb)/2,hB,.006);fl.applyMatrix4(M);G.stanza.add(fl)}}
+    });
+    /* spessore visto dall'alto: bordo scuro */
+    const top=new T.Mesh(new T.BoxGeometry(L,.02,.12),new T.MeshStandardMaterial({color:0x3a2c20,roughness:.8}));
+    top.position.set(mid[0]-n[0]*.06,H+.01,mid[1]-n[1]*.06);top.rotation.y=Math.atan2(-u[1],u[0]);G.soff.add(top);
+    /* battiscopa ottone */
+    const bs=new T.Mesh(new T.BoxGeometry(L,.06,.01),mat('ottone'));bs.position.set(mid[0]+n[0]*.005,.03,mid[1]+n[1]*.005);bs.rotation.y=Math.atan2(-u[1],u[0]);G.stanza.add(bs);
+  }
+  /* vetri e telai delle aperture */
+  AP.forEach(ap=>{
+    const L=Math.hypot(ap.p1[0]-ap.p0[0],ap.p1[1]-ap.p0[1]);if(L<.05)return;
+    const cx=(ap.p0[0]+ap.p1[0])/2,cz=(ap.p0[1]+ap.p1[1])/2,ry=Math.atan2(-(ap.p1[1]-ap.p0[1]),ap.p1[0]-ap.p0[0]);
+    const h=ap.y1-ap.y0;
+    if(ap.vetro){const v=new T.Mesh(new T.PlaneGeometry(L,h),mat('vetro'));v.position.set(cx,ap.y0+h/2,cz);v.rotation.y=ry;v.renderOrder=2;G.stanza.add(v);ap.vetroMesh=v}
+    const tm=/vetrina-retro|vetrata/.test(ap.tipo)?matCol('#3e3320',.4,.7):mat('ottone');[[L,.035,ap.y1],[L,.035,ap.y0+.017]].forEach(q=>{if(q[2]<.03&&!ap.vetro)return;const b=new T.Mesh(new T.BoxGeometry(q[0],q[1],.05),tm);b.position.set(cx,q[2],cz);b.rotation.y=ry;G.stanza.add(b)});
+    [-1,1].forEach(s=>{const b=new T.Mesh(new T.BoxGeometry(.035,h,.05),tm);b.position.set(cx+Math.cos(ry)*s*L/2,ap.y0+h/2,cz-Math.sin(ry)*s*L/2);b.rotation.y=ry;G.stanza.add(b)});
+  });
+}
+function distSeg(p,A,B){const vx=B[0]-A[0],vz=B[1]-A[1],L2=vx*vx+vz*vz;let t=((p[0]-A[0])*vx+(p[1]-A[1])*vz)/L2;t=Math.max(-.02,Math.min(1.02,t));return Math.hypot(A[0]+vx*t-p[0],A[1]+vz*t-p[1])}
+function materialeParete(f,L){
+  /* f: {finitura:'ocra'|'intonaco'|'radica', zoccolo:{h,mat}} o stringa */
+  if(typeof f==='string')f={finitura:f};
+  const nome=f.finitura||f.mat||ST.finituraPareti||'intonaco';
+  const m=mat(nome,{dim:[L,H]});
+  /* le uv della ShapeGeometry sono in metri: le mappe del TEX sono già ripetute per "dim", quindi riporta a 0..1 */
+  return m}
+function uvMetri(geo,L,h){ /* converte uv (metri) in 0..1 sull'intera superficie */
+  const uv=geo.attributes.uv;for(let i=0;i<uv.count;i++)uv.setXY(i,uv.getX(i)/L,uv.getY(i)/h);uv.needsUpdate=true}
+
+/* zone in più (es. ingresso con mosaico, vano vetrine) */
+function costruisciZone(){
+  const zone=(RIL.zone||[]).slice();
+  if(ST.vestibolo&&ST.vestibolo.poligono)zone.push({nome:'vestibolo',poligono:ST.vestibolo.poligono,pavimento:(TEX&&TEX.pavimentoIngresso)?'pavimentoIngresso':'mosaico',soffitto:(TEX&&TEX.soffittoIngresso)?'soffittoIngresso':'oro',h:num(ST.vestibolo.altezzaSoffitto,2.75)});
+  zone.forEach(z=>{
+    const P=poli(z.poligono||z.punti);if(P.length<3)return;if(area(P)<0)P.reverse();
+    const b=bboxPoly(P);
+    const pm=mat(z.pavimento||'mosaico',{dim:[b.w,b.d]});const fm=pavimento(P,pm,num(z.y,0)+.002);uvMetri(fm.geometry,b.w,b.d);
+    if(z.calpestabile!==false)CALP.push(P);
+    if(z.soffitto!==false){const sm=z.soffitto==='oro'?new T.MeshStandardMaterial({color:0xc4a466,metalness:.45,roughness:.28,envMapIntensity:1.1}) /* GIRO 2: ottone brunito, non oro acceso */:mat(z.soffitto||'ocra',{dim:[b.w,b.d]});
+      soffittoPoly(P,sm,num(z.h,H));
+      /* gradoni del soffitto: una fascia più bassa lungo il bordo */
+      if(/oro|Ingresso/.test(z.soffitto)){const f=prisma(P,num(z.h,H)-.18,num(z.h,H)-.16,sm);f.castShadow=false;G.soff.add(f)}}
+  });
+  /* fuori: marciapiede, strada e facciata con il vano dell'ingresso */
+  const f0=ST.vestibolo?num(ST.vestibolo.filoFacciata,-1.3):0;
+  if(ST.facciata&&window.FACCIATA3D){try{window.FACCIATA3D({T,G,ST,Z,CALP,pavimento,uvMetri,matCol,mat,cTex,scene,f0})}catch(e){console.warn('facciata',e)}}else{ /* GIRO 2: facciata vera in negozio3d/facciata.js */
+  const marc=[[-4,Z(f0)],[9,Z(f0)],[9,Z(f0-3.2)],[-4,Z(f0-3.2)]];
+  const mm=new T.MeshStandardMaterial({map:cTex(256,256,(g,w,h)=>{g.fillStyle='#9d978c';g.fillRect(0,0,w,h);for(let i=0;i<4;i++)for(let j=0;j<4;j++){const l=140+((i*7+j*13)%5)*6;g.fillStyle=`rgb(${l},${l-4},${l-12})`;g.fillRect(i*64+2,j*64+2,60,60)}}),roughness:.9});
+  mm.map.wrapS=mm.map.wrapT=T.RepeatWrapping;mm.map.repeat.set(13/1.2,3.2/1.2);
+  const mp=pavimento(marc,mm,0);uvMetri(mp.geometry,13,3.2);CALP.push(marc);
+  const strada=new T.Mesh(new T.PlaneGeometry(40,14),matCol('#3b3c40',.85));strada.rotation.x=-Math.PI/2;strada.position.set(2,-.12,Z(f0-3.2)+7);G.stanza.add(strada);
+  const xv1=ST.larghezza||4.5;
+  const sh=new T.Shape([new T.Vector2(-4,0),new T.Vector2(9,0),new T.Vector2(9,6.5),new T.Vector2(-4,6.5)]);
+  sh.holes.push(new T.Path([new T.Vector2(-.12,.001),new T.Vector2(-.12,2.75),new T.Vector2(xv1-.05,2.75),new T.Vector2(xv1-.05,.001)]));
+  const fac=new T.Mesh(new T.ShapeGeometry(sh),new T.MeshStandardMaterial({color:0xd9a95e,roughness:.92}));fac.position.z=Z(f0)+.001;fac.receiveShadow=true;G.fuori.add(fac);
+  /* insegna scura sopra l'ingresso + piccola tettoia */
+  const ins=new T.Mesh(new T.BoxGeometry(xv1+.3,.55,.08),matCol('#2a1c14',.35));ins.position.set(xv1/2-.08,3.1,Z(f0)+.04);G.fuori.add(ins);
+  const tx=cTex(1024,128,(g,w,h)=>{g.fillStyle='#2a1c14';g.fillRect(0,0,w,h);g.fillStyle='#e8c88a';g.font='700 78px Georgia,serif';g.textAlign='center';g.textBaseline='middle';g.fillText('OTTICA MACRÌ',w/2,h/2+4)});
+  const it=new T.Mesh(new T.PlaneGeometry(xv1*.8,.4),new T.MeshBasicMaterial({map:tx,toneMapped:false,color:0xbbbbbb}));it.position.set(xv1/2-.08,3.1,Z(f0)+.082);G.fuori.add(it);}
+  /* porta interna a vetro SEMPRE APERTA (dato di Fabrice): anta incernierata a destra, girata verso l'interno */
+  const ap=(RIL.aperture||[]).find(a=>/porta/.test(a.tipo||'')&&num(a.z,0)>=-.05);
+  if(ap&&ARREDI&&ARREDI.porta&&!(RIL.elementi||[]).some(e=>e.tipo==='porta')){const w=num(ap.w,.9),h=num(ap.h,2.2);let anta;try{anta=ARREDI.porta({w,h})}catch(e){anta=null}
+    if(anta){const piv=new T.Group();piv.position.set(num(ap.x,0)+w/2-.02,0,Z(ap.z));anta.position.x=-w/2;anta.rotation.y=Math.PI;piv.add(anta);piv.rotation.y=-80*D2R;G.arredi.add(piv);
+      anta.traverse(o=>{if(o.isMesh)o.castShadow=!(o.material&&o.material.transparent)})}}
+}
+/* ================= arredi ================= */
+const ELEM=[];
+function etichetta(testo,col){
+  const c=document.createElement('canvas'),g=c.getContext('2d');g.font='600 34px Rajdhani,Segoe UI,sans-serif';const w=Math.ceil(g.measureText(testo).width)+24;c.width=w;c.height=48;
+  g.fillStyle=col||'#b5462c';g.fillRect(0,0,w,48);g.fillStyle='#fff';g.font='600 34px Rajdhani,Segoe UI,sans-serif';g.textBaseline='middle';g.fillText(testo,12,26);
+  const t=new T.CanvasTexture(c);t.colorSpace=T.SRGBColorSpace;const s=new T.Sprite(new T.SpriteMaterial({map:t,depthTest:true}));s.scale.set(w/48*.12,.12,1);return s}
+function scatola(el,col){ /* riserva: box colorato con etichetta (origine centro base sul retro, fronte -z) */
+  const w=num(el.w,.6),h=num(el.h,1),d=num(el.d,.4);const g=new T.Group();
+  const geo=new T.BoxGeometry(w,h,d);geo.translate(0,h/2,-d/2);
+  const m=new T.Mesh(geo,new T.MeshStandardMaterial({color:col||0xb5462c,roughness:.7,transparent:true,opacity:.75}));m.castShadow=m.receiveShadow=true;g.add(m);
+  const s=etichetta(el.tipo||el.id||'?');s.position.set(0,h+.12,-d/2);g.add(s);g.userData.riserva=true;return g}
+/* ---- costruttori locali per i tipi che arredi.js non ha (o nomi diversi) ---- */
+const ALIAS={'tubo LED':'tuboLed','tubo led':'tuboLed',tuboLED:'tuboLed',plafoniera:'faretto',binario:'faretto'};
+function matCol(c,r,me){return new T.MeshStandardMaterial({color:new T.Color(c||'#888888'),roughness:r==null?.6:r,metalness:me||0})}
+function prisma(P3,y0,y1,m){ /* poligono (coordinate scena) estruso in verticale */
+  const sh=new T.Shape(P3.map(p=>new T.Vector2(p[0],-p[1])));const geo=new T.ExtrudeGeometry(sh,{depth:y1-y0,bevelEnabled:false});
+  geo.rotateX(-Math.PI/2);geo.translate(0,y0,0);const me=new T.Mesh(geo,m);me.castShadow=me.receiveShadow=true;return me}
+function lastra(a,b,y0,y1,m){const L=Math.hypot(b[0]-a[0],b[1]-a[1]);const me=new T.Mesh(new T.PlaneGeometry(L,y1-y0),m);
+  me.position.set((a[0]+b[0])/2,(y0+y1)/2,(a[1]+b[1])/2);me.rotation.y=Math.atan2(-(b[1]-a[1]),b[0]-a[0]);return me}
+function inset(P,k){const c=P.reduce((s,p)=>[s[0]+p[0]/P.length,s[1]+p[1]/P.length],[0,0]);return P.map(p=>[c[0]+(p[0]-c[0])*k,c[1]+(p[1]-c[1])*k])}
+function vetrinaEsterna(el){ /* vetrina su strada: zoccolo bronzo a doghe, vetri con profili, fondo ocra, 2 ripiani, faretti. Coordinate già nel mondo. */
+  const g=new T.Group();let P;
+  if(el.poligono)P=el.poligono.map(q=>[q[0],Z(q[1])]);
+  else{const w=num(el.w,1),d=num(el.d,1),x0=el.x-w/2,x1=el.x+w/2,z0=el.z-d/2,z1=el.z+d/2;P=[[x0,Z(z0)],[x1,Z(z0)],[x1,Z(z1)],[x0,Z(z1)]]}
+  if(area(P)<0)P.reverse();
+  const mt=el.materiale||'';const mz=mt.match(/zoccolo[^,;]*?h\s*([\d.]+)/);const mr=mt.match(/ripian[^(]*\(([^)]*)\)/);
+  const RIP=mr?(mr[1].match(/\d+\.\d+/g)||[]).map(Number):[.95,1.45];const ripNero=/ripiano nero/.test(mt);
+  const h=num(el.h,2.2),hz=num(el.zoccolo,mz?+mz[1]:.55),bronzo=(TEX&&TEX.bronzo)?TEX.bronzo({doghe:true,dim:[1.5,hz]}):matCol('#6b6136',.45,.55),vet=mat('vetro'),ocra=mat('ocra',{dim:[1.5,1.5]}),rad=mat('radica',{dim:[1,1]});
+  g.add(prisma(P,0,hz,bronzo));
+  /* doghe orizzontali dello zoccolo */
+  for(let i=1;i<4;i++){const r=prisma(inset(P,1.004),hz*i/4-.004,hz*i/4+.004,matCol('#3f3a20',.6,.3));r.castShadow=false;g.add(r)}
+  g.add(prisma(P,hz,hz+.03,rad)); /* piano */
+  const lato=ST.larghezza||4.5;
+  /* GIRO 2: el.lati = tipo di ogni lato del poligono del rilievo ('vetro'|'muro'|'radica'|'aperto'); profili in bronzo scuro */
+  const LATI=Array.isArray(el.lati)&&el.poligono?el.poligono.map((q,i)=>{const r=el.poligono[(i+1)%el.poligono.length];return{m:[(q[0]+r[0])/2,Z((q[1]+r[1])/2)],t:el.lati[i]}}):null;
+  const tipoLato=(a,b)=>{if(!LATI)return null;const m=[(a[0]+b[0])/2,(a[1]+b[1])/2];let best=null,bd=1e9;LATI.forEach(l=>{const d=Math.hypot(l.m[0]-m[0],l.m[1]-m[1]);if(d<bd){bd=d;best=l.t}});return best};
+  if(LATI){const bz=matCol('#3e3320',.4,.7);
+    for(let i=0;i<P.length;i++){const a=P[i],b=P[(i+1)%P.length],t=tipoLato(a,b);
+      if(t==='muro'){const m=lastra(a,b,hz,h,ocra);m.material.side=T.DoubleSide;g.add(m)}
+      else if(t==='radica'){g.add(lastra(a,b,0,h,rad))}
+      else if(t==='vetro'){const v=lastra(a,b,hz+.03,h-.04,vet);v.renderOrder=2;g.add(v);
+        [a,b].forEach(q=>{const c=new T.Mesh(new T.BoxGeometry(.028,h-hz,.028),bz);c.position.set(q[0],(h+hz)/2,q[1]);g.add(c)});
+        const L=Math.hypot(b[0]-a[0],b[1]-a[1]),ry=Math.atan2(-(b[1]-a[1]),b[0]-a[0]);[hz+.03,h-.02].forEach(y=>{const tr=new T.Mesh(new T.BoxGeometry(L,.03,.03),bz);tr.position.set((a[0]+b[0])/2,y,(a[1]+b[1])/2);tr.rotation.y=ry;g.add(tr)})}}}
+  for(let i=0;i<P.length;i++){if(LATI)break;const a=P[i],b=P[(i+1)%P.length];
+    const muro=(Math.abs(a[0])<.02&&Math.abs(b[0])<.02)||(Math.abs(a[0]-lato)<.08&&Math.abs(b[0]-lato)<.08&&!el.poligono)||(el.id==='vetrina-dx'&&a[0]>4.3&&b[0]>4.3);
+    if(muro){const m=lastra(a,b,hz,h,ocra);m.material=ocra;m.material.side=T.DoubleSide;g.add(m)}
+    else{const v=lastra(a,b,hz+.03,h-.04,vet);v.renderOrder=2;g.add(v);
+      const pr=/cornice nera/.test(mt)?matCol('#151515',.3,.2):matCol('#8a7440',.35,.8);[[a],[b]].forEach(q=>{const c=new T.Mesh(new T.BoxGeometry(.03,h-hz,.03),pr);c.position.set(q[0][0],(h+hz)/2,q[0][1]);g.add(c)})}}
+  /* cielo della vetrina in ocra dorato con faretti */
+  const cielo=prisma(P,h-.04,h,LATI?matCol('#c7a35e',.32,.4):matCol('#c9a24a',.35,.6));g.add(cielo);
+  if(el.ripianoPieno){ /* GIRO 2: ripiano su tutta la pianta (anche ad angolo), piano ocra chiaro + fascia nera spessa sui lati a vetro */
+    const Pi=inset(P,.985);RIP.forEach(y=>{if(y>h-.2)return;g.add(prisma(Pi,y-.03,y,mat('ocra',{dim:[1,1]})));
+      for(let i=0;i<P.length;i++){const a=P[i],b=P[(i+1)%P.length];if(tipoLato(a,b)!=='vetro')continue;const L=Math.hypot(b[0]-a[0],b[1]-a[1]),ry=Math.atan2(-(b[1]-a[1]),b[0]-a[0]);
+        const c=P.reduce((s,p)=>[s[0]+p[0]/P.length,s[1]+p[1]/P.length],[0,0]);const mx=(a[0]+b[0])/2,mz=(a[1]+b[1])/2,ln=Math.hypot(c[0]-mx,c[1]-mz);
+        const f=new T.Mesh(new T.BoxGeometry(L-.03,.08,.018),matCol('#0d0d0e',.22,.1));f.position.set(mx+(c[0]-mx)/ln*.035,y-.04,mz+(c[1]-mz)/ln*.035);f.rotation.y=ry;g.add(f)}})}
+  RIP.forEach(y=>{if(el.ripianoPieno||y>h-.2)return;const Pi=inset(P,.9);g.add(prisma(Pi,y-.025,y,ripNero?matCol('#111111',.25):mat('ocra',{dim:[1,1]})));const bordo=prisma(inset(P,.905),y-.03,y-.022,matCol('#111111',.3));g.add(bordo)});
+  const c=P.reduce((s,p)=>[s[0]+p[0]/P.length,s[1]+p[1]/P.length],[0,0]);
+  /* dischi luminosi e una luce calda dentro */
+  (el.luci?el.luci.map(q=>[q[0],Z(q[1])]):inset(P,.55)).forEach(q=>{const d=new T.Mesh(new T.CircleGeometry(.045,20),new T.MeshBasicMaterial({color:0xfff3dc}));d.rotation.x=Math.PI/2;d.position.set(q[0],h-.045,q[1]);g.add(d)});
+  const L=new T.PointLight(0xffe6c2,LATI?1.3:4.5,2.6,1.5);L.position.set(c[0],h-.25,c[1]);g.add(L); /* GIRO 2: meno luce, le vetrine erano bruciate */
+  /* merce: occhiali sui ripiani e due pannelli pubblicitari (senza volti: solo colore e marchio generico) */
+  const occ=ARREDI&&ARREDI.occhiale;
+  if(!(el.fotoPiani&&window.FOTO_TEX)&&!el.allestimento)RIP.concat([hz+.03]).forEach((y,k)=>{const Pi=inset(P,.7);for(let i=0;i<Pi.length;i++){const a=Pi[i],b=Pi[(i+1)%Pi.length];for(let t=.25;t<.8;t+=.25){
+    const x=a[0]+(b[0]-a[0])*t,z=a[1]+(b[1]-a[1])*t;let o;
+    if(occ){try{o=occ({sole:(i+k)%2===0,seme:i*7+k*3+t*10})}catch(e){o=null}}
+    if(!o){o=new T.Mesh(new T.BoxGeometry(.14,.045,.01),matCol((i+k)%2?'#1a1a1a':'#5a3a22',.4))}
+    o.position.set(x,y+.07,z);o.rotation.y=Math.atan2(c[0]-x,c[1]-z)+Math.PI;o.rotation.x=-.25;g.add(o)}}});
+  /* CONTROLLO 5/11: contenuto VERO della vetrina (ritagli delle foto) su piani interni: el.fotoPiani=[{k,a:[x,z],b:[x,z],y0,y1}] in coordinate del rilievo */
+  const FTv=window.FOTO_TEX||{};(el.fotoPiani||[]).forEach(fp=>{const uri=FTv[fp.k];if(!uri)return;const A=[fp.a[0],Z(fp.a[1])],B=[fp.b[0],Z(fp.b[1])];
+    const m=lastra(A,B,fp.y0,fp.y1,fotoMat(uri));m.material.side=T.DoubleSide;m.castShadow=false;g.add(m)});
+  g.userData.mondo=true;return g}
+function specchioParete(el){const g=new T.Group(),w=num(el.w,1),h=num(el.h,1);
+  const m=new T.Mesh(new T.PlaneGeometry(w,h),new T.MeshStandardMaterial({color:0xb9c3c9,metalness:.55,roughness:.1,envMapIntensity:1.4}));m.position.set(0,h/2,-.012);m.rotation.y=Math.PI;g.add(m);
+  const c=new T.Mesh(new T.BoxGeometry(w+.02,h+.02,.01),mat('ottone'));c.position.set(0,h/2,-.004);g.add(c);return g}
+function altro(el){ /* oggetto generico: volume col colore del rilievo (niente etichette rosse) */
+  const w=num(el.w,.4),h=Math.max(.004,num(el.h,.4)),d=Math.max(.004,num(el.d,.2));const g=new T.Group();
+  let m;const mt=(el.materiale||'')+' '+(el.descrizione||'');
+  if(/radica/i.test(mt))m=mat('radica',{dim:[w,h]});else if(/ocra|stucco/i.test(mt))m=mat('ocra',{dim:[w,h]});else m=matCol(el.colore||'#9a8a70',.55);
+  let geo;
+  if(/orologio/i.test(mt)){geo=new T.CylinderGeometry(w/2,w/2,d,28);geo.rotateX(Math.PI/2);geo.translate(0,h/2,-d/2);
+    const fa=new T.Mesh(new T.CircleGeometry(w/2*.86,28),matCol('#f4f2ee',.4));fa.position.set(0,h/2,-d-.001);fa.rotation.y=Math.PI;g.add(fa)}
+  else if(/mosaico|rosone/i.test(mt)||/rosone/.test(el.id||'')){geo=new T.CircleGeometry(w/2,40);geo.rotateX(-Math.PI/2);geo.translate(0,.006,-d/2);
+    if(TEX&&TEX.mosaico){geo=new T.PlaneGeometry(w,w);geo.rotateX(-Math.PI/2);geo.translate(0,.006,-d/2);m=TEX.mosaico()}else m=new T.MeshStandardMaterial({map:cTex(256,256,(q,W,Hh)=>{q.fillStyle='#e8dfcf';q.fillRect(0,0,W,Hh);for(let r=6;r>0;r--){q.fillStyle=['#7a2c1c','#c9b48a','#3b4a5a','#b5462c','#e8dfcf','#5a3a22'][r%6];q.beginPath();q.arc(W/2,Hh/2,W/2*r/6,0,7);q.fill()}
+      q.strokeStyle='rgba(60,40,20,.35)';for(let i=0;i<40;i++){q.beginPath();q.moveTo(W/2,Hh/2);q.lineTo(W/2+Math.cos(i/40*6.283)*W/2,Hh/2+Math.sin(i/40*6.283)*Hh/2);q.stroke()}}),roughness:.8})}
+  else{geo=new T.BoxGeometry(w,h,d);geo.translate(0,h/2,-d/2)}
+  const me=new T.Mesh(geo,m);me.castShadow=h>.05;me.receiveShadow=true;g.add(me);return g}
+const LOCALI={vetrinaEsterna,specchioParete,altro};
+function posaElemento(el){
+  const tipo=ALIAS[el.tipo]||el.tipo||'';let g=null,ris=false;
+  const f=(ARREDI&&ARREDI[tipo])||LOCALI[tipo];
+  if(/vetrinaEsterna/.test(tipo)&&!(ARREDI&&ARREDI.vetrinaEsterna)){g=vetrinaEsterna(el);g.userData.el=el;el._g=g;G.arredi.add(g);ELEM.push(g);
+    if(!el.lati)OSTACOLI.push({cx:el.x,cz:Z(el.z),c:1,s:0,hw:num(el.w,1)/2,hd:num(el.d,1)/2,id:el.id});return g} /* GIRO 2: con el.lati la pianta della vetrina è fuori dai pavimenti calpestabili */let posY=num(el.y,0);const op=Object.assign({},el);
+  if(/vetrinaParete/.test(tipo)&&el.quota==null&&el.y){op.quota=el.y;posY=0}
+  /* CONTROLLO 5/11: ritagli VERI dalle foto (foto-tex.js) al posto dei poster generici; vetrine/libreria con il contenuto vero dietro il vetro */
+  const FT=window.FOTO_TEX||{};
+  if(FT[el.id]&&/poster|quadro|schermoVerticale/.test(tipo))op.dataUri=FT[el.id];
+  if(tipo==='mensoleOcchialiParete')op.senzaPoster=true;
+  if(FT['fronte:'+el.id])op.occhiali=false;
+  if(typeof f==='function'){try{g=f(op,{THREE:T,TEX:TEX,H:H})}catch(e){console.warn('ARREDI.'+tipo,e);g=null}}
+  if(!g||!g.isObject3D){g=tipo==='altro'?altro(el):scatola(el);ris=tipo!=='altro'}
+  let ex=num(el.x,0),ez=num(el.z,0),er=el.rotY!=null?el.rotY:el.rot;
+  if(tipo==='porta'&&el.posizioneAperta){const q=el.posizioneAperta;ex=num(q.x,ex);ez=num(q.z,ez);er=num(q.rotY,er)}
+  const r3=rot3(er),dd=num(el.d,0);
+  /* il rilievo dà il CENTRO dell'ingombro; arredi.js ha l'origine sul RETRO: si arretra di d/2 */
+  g.position.set(ex+Math.sin(r3)*dd/2,posY,Z(ez)+Math.cos(r3)*dd/2);g.rotation.y=r3;el._g=g;
+  if(/faretto|tuboLed/.test(tipo))g.position.y=num(el.y,H)+num(el.h,0); /* attacco al soffitto */
+  if(tipo==='porta'&&TEX&&TEX.vetrofania){try{const vm=TEX.vetrofania();const v=new T.Mesh(new T.PlaneGeometry(.62,.83),vm);v.position.set(0,1.45,-num(el.d,.04)/2-.012);v.rotation.y=Math.PI;if(v.material){v.material.side=T.DoubleSide;v.material.depthWrite=false}v.renderOrder=3;g.add(v)}catch(e){}}
+  fotoVera(g,el,tipo,FT);
+  g.userData.el=el;
+  g.traverse(o=>{if(o.isMesh){if(o.castShadow===undefined||o.castShadow===false){o.castShadow=!(o.material&&o.material.transparent)}o.receiveShadow=true}});
+  G.arredi.add(g);ELEM.push(g);
+  /* collisione: ingombro a terra degli elementi che stanno sul pavimento */
+  const y=num(el.y,0),h=num(el.h,1);
+  if(y<.4&&h>.5&&el.solido!==false&&!/faretto|tubo|clima|telecamera|quadro|poster|tappeto|occhiale|specchio|mensole|registratore|schermo/i.test(tipo)){
+    const r=g.rotation.y,w=num(el.w,.5),d=num(el.d,.5);
+    /* centro: dal retro (origine) verso il fronte (-z locale) di d/2 */
+    const cx=ex,cz=Z(ez); /* centro dell'ingombro */
+    OSTACOLI.push({cx,cz,c:Math.cos(r),s:Math.sin(r),hw:w/2,hd:d/2,id:el.id});
+  }
+  if((el.nome||el.id)&&!/faretto|tubo|plafon|altro|poster|quadro|telecamera|tappeto|climatizz|specchio|registratore/i.test(tipo)){G.eti.push({o:g,testo:el.nome||(el.id.charAt(0).toUpperCase()+el.id.slice(1)).replace(/-/g,' ').replace(/ sx/,' sinistra').replace(/ dx/,' destra'),ris,v:new T.Vector3(g.position.x,num(el.y,0)+num(el.h,1)+.15,g.position.z)})}
+  return g}
+function fotoMat(uri){const m=new T.MeshBasicMaterial({map:texDa(uri),color:new T.Color(.93,.93,.93),toneMapped:false});return m}
+function fotoVera(g,el,tipo,FT){ /* piano con il ritaglio vero: davanti (vetrine, libreria, oggetti) o sopra (tappetino) */
+  const fr=FT['fronte:'+el.id],ft=tipo==='altro'?FT[el.id]:null;if(!fr&&!ft)return;
+  const w=num(el.w,1),h=num(el.h,1),d=num(el.d,.3);let p;
+  if(fr&&/vetrinaParete/.test(tipo)){const q=num(el.y,0),hi=h-.105;p=new T.Mesh(new T.PlaneGeometry(w-.09,hi),fotoMat(fr));p.position.set(0,q+.06+hi/2,-d+.035)}
+  else if(fr){p=new T.Mesh(new T.PlaneGeometry(w,h),fotoMat(fr));p.position.set(0,h/2,-d-.006)}
+  else if(h<.03){p=new T.Mesh(new T.PlaneGeometry(w,d),fotoMat(ft));p.rotation.x=-Math.PI/2;p.position.set(0,h+.003,-d/2);p.rotation.z=Math.PI}
+  else{p=new T.Mesh(new T.PlaneGeometry(w,h),fotoMat(ft));p.position.set(0,h/2,-d-.003);g.children.forEach(c=>{if(c.isMesh)c.visible=false})}
+  p.rotation.y+=Math.PI;if(h<.03&&!fr){p.rotation.set(-Math.PI/2,0,Math.PI)}p.castShadow=false;p.receiveShadow=false;p.userData.fotoVera=true;g.add(p)}
+function costruisciArredi(){(RIL.elementi||[]).forEach(el=>{if(/graffito/i.test(el.id||''))return; /* è su un muro esterno: escluso (nota del rilievo) */try{posaElemento(el)}catch(e){console.warn('elemento',el,e)}})}
+
+/* ================= luci ================= */
+const LUCI={punti:[],vetrine:[]};
+function costruisciLuci(){
+  const hemi=new T.HemisphereLight(0xfff1dc,0x5a4128,.55);scene.add(hemi);
+  scene.add(new T.AmbientLight(0xffe9cc,.18));
+  /* faretti dal rilievo (o ricavati dagli elementi tipo faretto/tuboLed) */
+  const fonti=[];
+  (RIL.luci||[]).forEach(l=>{const p=pt(l.pos||l);fonti.push({x:p.x,y:num(p.y,H-.05),z:p.z,tipo:l.tipo||'faretto',int:l.intensita||l.int})});
+  if(!fonti.length)(RIL.elementi||[]).forEach(el=>{if(/faretto|tubo|plafon/i.test(el.tipo||''))fonti.push({x:el.x,y:num(el.y,H)-.05,z:Z(el.z),tipo:el.tipo})});
+  /* luci vere: al massimo 10 punti (raggruppati), solo una con ombre */
+  const scelti=raggruppa(fonti,10);
+  scelti.forEach((f,i)=>{
+    const tubo=/tubo/i.test(f.tipo);
+    const L=new T.PointLight(tubo?0xf4f6ff:0xffe2b8,(f.int||(tubo?6:5))*Math.sqrt(f.n||1),6.5,1.6);L.position.set(f.x,f.y-.08,f.z);G.luci.add(L);LUCI.punti.push(L)});
+  /* una luce dall'alto con ombre morbide al centro della stanza */
+  const sp=new T.SpotLight(0xffe4c0,22,9,Math.PI*.38,.6,1.4);sp.position.set((BB.x0+BB.x1)/2,H-.05,(BB.z0+BB.z1)/2);sp.target.position.set((BB.x0+BB.x1)/2,0,(BB.z0+BB.z1)/2+.2);
+  sp.castShadow=true;sp.shadow.mapSize.set(1024,1024);sp.shadow.bias=-.0004;sp.shadow.normalBias=.02;sp.shadow.radius=4;sp.shadow.camera.near=.2;sp.shadow.camera.far=6;
+  G.luci.add(sp);G.luci.add(sp.target);
+  /* senza fonti: tre luci di base */
+  if(!scelti.length){[[.3,.3],[.7,.5],[.5,.8]].forEach(q=>{const L=new T.PointLight(0xffe2b8,8,7,1.6);L.position.set(BB.x0+BB.w*q[0],H-.3,BB.z0+BB.d*q[1]);G.luci.add(L)})}
+}
+function raggruppa(f,max){
+  let g=f.map(p=>({x:p.x,y:p.y,z:p.z,tipo:p.tipo,int:p.int,n:1}));
+  while(g.length>max){let bi=0,bj=1,bd=1e9;for(let i=0;i<g.length;i++)for(let j=i+1;j<g.length;j++){const d=Math.hypot(g[i].x-g[j].x,g[i].z-g[j].z);if(d<bd){bd=d;bi=i;bj=j}}
+    const a=g[bi],b=g[bj],n=a.n+b.n;g[bi]={x:(a.x*a.n+b.x*b.n)/n,y:Math.max(a.y,b.y),z:(a.z*a.n+b.z*b.n)/n,tipo:a.tipo,int:a.int,n};g.splice(bj,1)}
+  return g}
+
+/* ================= DOPO · STORE // CRAFT ================= */
+const BF=window.BF||{},LOOP=window.BF_LOOP||null;
+const M={
+ plexi:new T.MeshPhysicalMaterial({color:0xffffff,roughness:.04,transparent:true,opacity:.1,clearcoat:.6,side:T.DoubleSide,depthWrite:false}),
+ allu:new T.MeshStandardMaterial({color:0xc9ccd0,metalness:1,roughness:.32}),
+ alluScuro:new T.MeshStandardMaterial({color:0x5b5e63,metalness:1,roughness:.38}),
+ vetroNero:new T.MeshPhysicalMaterial({color:0x07080a,roughness:.06,clearcoat:1}),
+ plastica:new T.MeshPhysicalMaterial({color:0x34363a,roughness:.55,clearcoat:.25}),
+ plasticaNera:new T.MeshStandardMaterial({color:0x151618,roughness:.45}),
+ legno:new T.MeshStandardMaterial({color:0x7a4a28,roughness:.5})
+};
+function rbox(w,h,d,r,m){return new T.Mesh(new T.RoundedBoxGeometry(w,h,d,3,r),m)}
+const texCache={};
+function texDa(uri){if(!uri)return null;if(texCache[uri])return texCache[uri];const t=new T.Texture();t.colorSpace=T.SRGBColorSpace;t.anisotropy=ANISO;const im=new Image();im.onload=()=>{t.image=im;t.needsUpdate=true};im.src=uri;return texCache[uri]=t}
+function grafMat(uri){return new T.MeshStandardMaterial({map:texDa(uri),roughness:.6,color:uri?0xffffff:0x222222})}
+function slideList(vert){const L=LOOP&&(vert?(LOOP.scureV||LOOP.chiareV):(LOOP.scure||LOOP.chiare));if(L&&L.length)return L;
+  const out=[];(vert?['bf-slide-v1','bf-slide-v2','bf-slide-v3']:['bf-slide-1','bf-slide-2','bf-slide-3','bf-slide-4']).forEach(k=>{if(BF[k])out.push(BF[k])});return out}
+const schermi=[];
+function schermo(wPx,hPx,vert,disegno){const c=document.createElement('canvas');c.width=wPx;c.height=hPx;const t=new T.CanvasTexture(c);t.colorSpace=T.SRGBColorSpace;t.anisotropy=ANISO;
+  const s={c,g:c.getContext('2d'),t,vert,i:0,t0:performance.now(),imgs:[],disegno};if(!disegno)s.imgs=slideList(vert).map(u=>{const im=new Image();im.src=u;return im});schermi.push(s);return s}
+function copri(g,im,W,Hh,al){const r=Math.max(W/im.naturalWidth,Hh/im.naturalHeight),w=im.naturalWidth*r,h=im.naturalHeight*r;g.globalAlpha=al;g.drawImage(im,(W-w)/2,(Hh-h)/2,w,h);g.globalAlpha=1}
+function aggiornaSchermi(now){schermi.forEach(s=>{const g=s.g,W=s.c.width,Hh=s.c.height;
+  if(s.disegno){if(!s.fatto||now-s.fatto>1000){s.disegno(g,W,Hh,now);s.t.needsUpdate=true;s.fatto=now}return}
+  if(!s.imgs.length)return;const dur=4000,fade=900;let el=now-s.t0;if(el>dur+fade){s.i=(s.i+1)%s.imgs.length;s.t0=now;el=0}
+  const a=s.imgs[s.i],b=s.imgs[(s.i+1)%s.imgs.length];g.fillStyle='#000';g.fillRect(0,0,W,Hh);
+  if(a.complete&&a.naturalWidth)copri(g,a,W,Hh,1);if(el>dur&&b.complete&&b.naturalWidth)copri(g,b,W,Hh,(el-dur)/fade);s.t.needsUpdate=true})}
+function schermoMat(s){return new T.MeshBasicMaterial({map:s.t,toneMapped:false,color:new T.Color(.88,.88,.88)})}
+/* oggetti copiati da vetrina-aumentata.html (fronte verso +z, base al centro) */
+function tablet(){const g=new T.Group(),w=.285,h=.185,d=.0065,tb=new T.Group();tb.position.set(0,.035,.02);tb.rotation.x=-15*D2R;g.add(tb);
+  const corpo=rbox(w,h,d,.0028,M.allu);corpo.position.y=h/2;tb.add(corpo);
+  const vetro=rbox(w-.002,h-.002,.0012,.0025,M.vetroNero);vetro.position.set(0,h/2,d/2);tb.add(vetro);
+  /* tablet 12,4"–13": schermo 16:10 26,7×16,7 cm */const s=schermo(1024,640,false);const sc=new T.Mesh(new T.PlaneGeometry(.267,.167),schermoMat(s));sc.position.set(0,h/2,d/2+.0008);tb.add(sc);
+  const pied=rbox(.13,.008,.11,.003,M.allu);pied.position.set(0,.004,0);g.add(pied);
+  const asta=rbox(.05,.11,.008,.003,M.allu);asta.position.set(0,.06,-.03);asta.rotation.x=-.42;g.add(asta);return g}
+function monitor(){const g=new T.Group(),w=.548,h=.33,s=schermo(1280,770,false,disegnaApp);
+  const sch=new T.Group();sch.position.y=.12;sch.rotation.x=-5*D2R;g.add(sch);
+  const corpo=rbox(w+.012,h+.02,.018,.004,M.plasticaNera);corpo.position.set(0,h/2,-.009);sch.add(corpo);
+  const sc=new T.Mesh(new T.PlaneGeometry(w,h),schermoMat(s));sc.position.set(0,h/2+.004,.0012);sch.add(sc);
+  const collo=rbox(.05,.17,.025,.006,M.alluScuro);collo.position.set(0,.085,-.05);g.add(collo);
+  const piede=rbox(.22,.012,.16,.005,M.alluScuro);piede.position.set(0,.006,-.04);g.add(piede);
+  const tast=rbox(.36,.015,.12,.004,M.plasticaNera);tast.position.set(0,.008,.17);g.add(tast);
+  const mouse=rbox(.06,.02,.1,.01,M.plasticaNera);mouse.position.set(.26,.01,.17);g.add(mouse);return g}
+function codice(g,x,y,w,h){g.fillStyle='#000';for(let i=0;i<60;i++){const b=((i*37+11)%5===0)?3:((i*13)%3===0?2:1);g.fillRect(x+(i/60)*w,y,b*1.6,h)}g.font='400 16px Consolas,monospace';g.fillText('8 053672 112004',x+40,y+h+18)}
+function disegnaEtichetta(g){g.fillStyle='#fff';g.fillRect(0,0,512,160);g.fillStyle='#111';g.font='700 30px Arial';g.fillText('RAY-BAN RB2132',14,36);g.font='400 20px Arial';g.fillText('55□18 · nero lucido',14,62);g.font='700 40px Arial';g.fillText('€ 112',14,112);codice(g,230,52,260,62)}
+let ETI=null;
+function dymo(){const g=new T.Group(),corpo=rbox(.125,.10,.187,.022,M.plastica);corpo.position.y=.05;g.add(corpo);
+  const cop=rbox(.118,.04,.14,.016,new T.MeshPhysicalMaterial({color:0x2a2c30,roughness:.35,clearcoat:.6}));cop.position.set(0,.108,-.015);g.add(cop);
+  const tasto=new T.Mesh(new T.CylinderGeometry(.009,.009,.004,20),new T.MeshStandardMaterial({color:0x6aa7d8,emissive:0x1f4e79,emissiveIntensity:.6}));tasto.position.set(.035,.101,.07);g.add(tasto);
+  const tx=cTex(512,160,disegnaEtichetta);const et=new T.Mesh(new T.PlaneGeometry(.089,.028),new T.MeshStandardMaterial({map:tx,roughness:.7,side:T.DoubleSide}));
+  et.position.set(0,.112,.105);et.rotation.x=-1.05;g.add(et);ETI=et;return g}
+let RAGGIO=null;
+function lettore(){const g=new T.Group(),base=new T.Mesh(new T.CylinderGeometry(.045,.05,.018,24),M.plasticaNera);base.position.y=.009;g.add(base);
+  const imp=rbox(.032,.12,.04,.012,M.plastica);imp.position.set(0,.085,0);imp.rotation.x=.35;g.add(imp);
+  const testa=rbox(.075,.05,.085,.016,M.plastica);testa.position.set(0,.15,.035);testa.rotation.x=.35;g.add(testa);
+  const fin=new T.Mesh(new T.PlaneGeometry(.06,.03),new T.MeshBasicMaterial({color:0xff3b2a,transparent:true,opacity:.75}));fin.position.set(0,.13,.08);fin.rotation.x=.35-Math.PI/2+.3;g.add(fin);RAGGIO=fin;return g}
+function plexiL(wcm,hcm,uri){const w=wcm/100,h=hcm/100,g=new T.Group(),pan=new T.Group();pan.rotation.x=-12*D2R;g.add(pan);
+  const lastra=new T.Mesh(new T.BoxGeometry(w+.012,h+.012,.003),M.plexi);lastra.position.set(0,(h+.012)/2,.004);pan.add(lastra);
+  const st=new T.Mesh(new T.PlaneGeometry(w,h),grafMat(uri));st.position.set(0,h/2+.006,.0022);pan.add(st);
+  const base=new T.Mesh(new T.BoxGeometry(w+.012,.003,.07),M.plexi);base.position.set(0,.0015,-.03);g.add(base);
+  const bb=new T.Mesh(new T.EdgesGeometry(new T.BoxGeometry(w+.012,h+.012,.006)),new T.LineBasicMaterial({color:0xe9f6f2,transparent:true,opacity:.6}));bb.position.set(0,(h+.012)/2,.003);pan.add(bb);return g}
+function cornice(wcm,hcm,uri){const w=wcm/100,h=hcm/100,p=.022,g=new T.Group(),fr=new T.Group();fr.rotation.x=-10*D2R;g.add(fr);const W=w+2*p,Hh=h+2*p;
+  [[0,Hh-p/2,W,p],[0,p/2,W,p]].forEach(a=>{const b=rbox(a[2],a[3],.016,.003,M.legno);b.position.set(a[0],a[1],0);fr.add(b)});
+  [[-W/2+p/2],[W/2-p/2]].forEach(a=>{const b=rbox(p,Hh-2*p,.016,.003,M.legno);b.position.set(a[0],Hh/2,0);fr.add(b)});
+  const st=new T.Mesh(new T.PlaneGeometry(w,h),grafMat(uri));st.position.set(0,Hh/2,.002);fr.add(st);
+  const cav=new T.Mesh(new T.BoxGeometry(.025,Hh*.7,.004),M.legno);cav.position.set(0,Hh*.33,-.06);cav.rotation.x=.42;g.add(cav);return g}
+let LOGO=null;{const im=new Image();im.onload=()=>{try{const c=document.createElement('canvas');c.width=c.height=8;const g=c.getContext('2d');g.drawImage(im,0,0,8,8);g.getImageData(0,0,1,1);LOGO=im}catch(e){LOGO=null}};im.src='../media/logo/marchi6/04-monocolo/04-monocolo-icona-notte.svg'}
+function disegnaApp(g,W,Hh){
+  g.fillStyle='#f4ede2';g.fillRect(0,0,W,Hh);g.fillStyle='#2b2118';g.fillRect(0,0,W,86);
+  if(LOGO){try{g.drawImage(LOGO,22,10,66,66)}catch(e){}}
+  g.fillStyle='#fffdf9';g.font='700 40px Rajdhani,Segoe UI,sans-serif';g.fillText('OTTICA MACRÌ',LOGO?104:28,56);
+  g.fillStyle='#d9a089';g.font='600 22px Consolas,monospace';g.textAlign='right';g.fillText('STORE // CRAFT',W-28,54);g.textAlign='left';
+  [['VENDO','#b5462c','scansiona e vendi'],['ARRIVA MERCE','#1f4e79','carico + etichette'],['CERCO','#6b5c4c','marca, modello, prezzo']].forEach((t,i)=>{const w=(W-56-40)/3,x=28+i*(w+20);g.fillStyle=t[1];g.fillRect(x,120,w,250);
+    g.fillStyle='#fff';g.font='700 58px Rajdhani,Segoe UI,sans-serif';g.textAlign='center';g.fillText(t[0],x+w/2,250);g.font='400 26px Segoe UI,sans-serif';g.fillText(t[2],x+w/2,300);g.textAlign='left'});
+  g.fillStyle='#fff';g.fillRect(28,410,620,190);g.strokeStyle='#cbbfae';g.lineWidth=3;g.strokeRect(28,410,620,190);
+  g.fillStyle='#2b2118';g.font='700 38px Rajdhani,Segoe UI,sans-serif';g.fillText('RAY-BAN RB2132 NEW WAYFARER',50,465);
+  g.fillStyle='#5e4f41';g.font='400 24px Consolas,monospace';g.fillText('Nero lucido · 55□18 · cod. 8053672',50,503);
+  g.fillStyle='#9e3b25';g.font='700 56px Rajdhani,Segoe UI,sans-serif';g.fillText('€ 112',50,575);codice(g,330,520,290,64);
+  g.fillStyle='#2b2118';g.fillRect(680,410,W-708,190);g.fillStyle='#d9c3a0';g.font='600 24px Consolas,monospace';g.fillText('VETRINA DIGITALE · ON',700,450);
+  g.fillStyle='#fffdf9';g.font='500 22px Segoe UI,sans-serif';g.fillText('Black Friday 24–30 nov.',700,500);g.fillText('Porta-prezzi 13×18: 4 pronti',700,540);g.fillText('Etichette DYMO: 18',700,580);
+  g.fillStyle='#6b5c4c';g.font='400 20px Consolas,monospace';g.fillText('Oggi: 3 vendite · 12 occhiali arrivati · etichette pronte',28,650);
+  g.fillStyle='#1f4e79';g.fillRect(28,680,W-56,8);g.fillStyle='#b5462c';g.fillRect(28,680,(W-56)*.62,8)}
+/* posa: oggetto con fronte +z messo nel sistema RILIEVO (fronte -z a rotY 0) */
+function posaSC(o,x,y,z,ry,nome){const w=new T.Group();w.position.set(x,y,z);w.rotation.y=ry;w.add(o);o.traverse(m=>{if(m.isMesh)m.castShadow=true});G.sc.add(w);
+  if(nome)G.eti.push({o:w,testo:nome,sc:true,v:new T.Vector3(x,y+.45,z)});return w}
+function trova(re){return (RIL.elementi||[]).filter(e=>re.test((e.tipo||'')+' '+(e.id||'')+' '+(e.nome||'')))}
+function nelMobile(el,dx,dy,dFronte){ /* punto in coordinate del mobile (x a destra guardandolo di fronte? no: x locale), dFronte = quanto verso il fronte */
+  const g=el._g;g.updateMatrixWorld(true);return g.localToWorld(new T.Vector3(dx,dy,-dFronte))}
+function costruisciSC(){
+  const P=RIL.storecraft||{};
+  const banc=trova(/bancone/i).filter(e=>e._g)[0];
+  if(banc){
+    const g=banc._g,d=num(banc.d,.6),w=num(banc.w,1.8),y=num(banc.piano,num(banc.h,1.0));
+    const ry=g.rotation.y; /* fronte del bancone = -z locale = verso i clienti; l'operatore sta dietro (+z locale) */
+    const q=k=>P[k]&&P[k].dx!=null?P[k]:null;
+    const xm=q('monitor')?P.monitor.dx:-Math.min(.75,w*.32); /* tra il tappetino e lo specchietto, lontano dallo specchio ovale */
+    const pm=nelMobile(banc,xm,y,d*.6);posaSC(monitor(),pm.x,pm.y,pm.z,0,'Monitor STORE // CRAFT').rotation.y=ry+.35; /* verso l'operatore (GIRO 2: prima +.9, da dietro il bancone si vedeva di taglio) */
+    const pd=nelMobile(banc,xm-.42,y,d*.55);posaSC(dymo(),pd.x,pd.y,pd.z,0,'DYMO LabelWriter 450').rotation.y=ry+.5;
+    const pl=nelMobile(banc,xm+.38,y,d*.6);posaSC(lettore(),pl.x,pl.y,pl.z,0,'Lettore codici').rotation.y=ry+Math.PI;
+    const pp=nelMobile(banc,.3,y,d*.15);posaSC(plexiL(13,18,BF['bf-cartellino-1']||BF['bf-cartello-1']),pp.x,pp.y,pp.z,0,'Porta-prezzi 13×18').rotation.y=ry+Math.PI;
+  }
+  /* vetrina su strada: tablet col loop Black Friday, rivolto verso fuori (+z scena) */
+  const vet=trova(/vetrina/i).filter(e=>e._g&&!/parete|muro/i.test(e.tipo||''));
+  const vt=vet.find(e=>/sinistra|sx/i.test((e.id||'')+(e.nome||'')))||vet[0];
+  if(vt&&!vt.allestimento){let p;const y=num(vt.ripiano,.95); /* VETRINE 5/11: se c'è allestimento.js il tablet lo mette lui */
+    if(vt._g.userData.mondo){ /* vetrina su strada: centro del poligono, vicino al vetro verso la strada (+z scena) */
+      const P=vt.poligono?vt.poligono.map(q=>[q[0],Z(q[1])]):[[vt.x,Z(vt.z)]];const c=P.reduce((s,q)=>[s[0]+q[0]/P.length,s[1]+q[1]/P.length],[0,0]);
+      const zmax=Math.max(...P.map(q=>q[1]));p=new T.Vector3(c[0]-.1,y,Math.max(c[1],zmax-.3))}
+    else p=nelMobile(vt,0,y,num(vt.d,.5)*.5);
+    posaSC(tablet(),p.x,p.y,p.z,0,'Tablet · loop Black Friday');
+    posaSC(plexiL(13,18,BF['bf-cartellino-2']||BF['bf-cartello-2']),p.x+.3,p.y,p.z+.02,0,'Porta-prezzi 13×18')}
+  /* porta-prezzi sulle mensole a parete e sul totem */
+  trova(/mensole|mobileBasso/i).filter(e=>e._g).slice(0,2).forEach((m,i)=>{const d=num(m.d,.3),y=num(m.ripiano,num(m.h,1)<1.3?num(m.h,1):1.0);const p=nelMobile(m,0,y,d*.6);
+    posaSC(plexiL(13,18,BF[i?'bf-cartellino-2':'bf-cartellino-1']),p.x,p.y,p.z,0,'Porta-prezzi 13×18').rotation.y=m._g.rotation.y+Math.PI});
+  G.sc.visible=false;
+}
+
+/* ================= comandi: prima persona tipo Street View ================= */
+const OCCHI=1.60;
+const S={modo:'fp',pos:new T.Vector3(BB.x0+BB.w/2,OCCHI,BB.z0+.6),yaw:Math.PI,pitch:0,fov:62,vy:0,vp:0,tween:null,camId:null,foto:null,fotoModo:'sopra',alpha:.5};
+const keys={};
+function yawDa(dx,dz){return Math.atan2(-dx,-dz)}
+function libero(x,z,r){
+  r=r==null?.22:r;
+  let ok=false;for(const P of CALP){if(dentro(P,x,z)&&distBordo(P,x,z)>r){ok=true;break}}
+  if(!ok){ /* tollera il passaggio fra poligoni contigui (porta) */
+    let n=0;for(const P of CALP)if(dentro(P,x,z))n++;if(!n)return false;
+    /* vicino al bordo: controlla i 4 punti attorno */
+    const pts=[[x+r,z],[x-r,z],[x,z+r],[x,z-r]];for(const p of pts){let d=false;for(const P of CALP)if(dentro(P,p[0],p[1])){d=true;break}if(!d)return false}
+  }
+  for(const o of OSTACOLI){const dx=x-o.cx,dz=z-o.cz;const lx=dx*o.c-dz*o.s,lz=dx*o.s+dz*o.c;if(Math.abs(lx)<o.hw+r*.8&&Math.abs(lz)<o.hd+r*.8)return false}
+  return true}
+function distBordo(P,x,z){let m=1e9;for(let i=0;i<P.length;i++)m=Math.min(m,distSeg([x,z],P[i],P[(i+1)%P.length]));return m}
+function muovi(dx,dz){const p=S.pos;if(libero(p.x+dx,p.z+dz)){p.x+=dx;p.z+=dz;return true}
+  /* 5/11: se il punto di partenza è già «incastrato» (punti di vista vicini a mobili/pareti), lascia uscire:
+     ci si muove purché si resti dentro un'area calpestabile, e si torna al controllo normale appena liberi */
+  if(!libero(p.x,p.z)){let dentroArea=false;for(const P of CALP)if(dentro(P,p.x+dx,p.z+dz)){dentroArea=true;break}
+    let quiArea=false;for(const P of CALP)if(dentro(P,p.x,p.z)){quiArea=true;break}
+    if(dentroArea||!quiArea||!CALP.length){p.x+=dx;p.z+=dz;return true}}
+  if(libero(p.x+dx,p.z)){p.x+=dx;return true}if(libero(p.x,p.z+dz)){p.z+=dz;return true}return false}
+
+let orbit=null;
+if(T.OrbitControls){orbit=new T.OrbitControls(camera,cv);orbit.enabled=false;orbit.enableDamping=true;orbit.dampingFactor=.08;orbit.maxPolarAngle=Math.PI*.47;orbit.minDistance=3;orbit.maxDistance=22;orbit.screenSpacePanning=true}
+
+let drag=null;const punt=new Map();
+cv.addEventListener('pointerdown',e=>{if(S.modo!=='fp')return;cv.setPointerCapture(e.pointerId);punt.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(punt.size===1){drag={x:e.clientX,y:e.clientY,x0:e.clientX,y0:e.clientY,t:performance.now(),mosso:false};S.vy=S.vp=0;S.tween=null}
+  else if(punt.size===2){const a=[...punt.values()];drag={pinch:Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y),fov0:S.fov,mosso:true}}
+  cv.classList.add('trascino');nascondiAiuto()});
+cv.addEventListener('pointermove',e=>{if(S.modo!=='fp'||!drag)return;if(punt.has(e.pointerId))punt.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(drag.pinch){const a=[...punt.values()];if(a.length<2)return;const d=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);S.fov=Math.max(22,Math.min(85,drag.fov0*drag.pinch/d));return}
+  const dx=e.clientX-drag.x,dy=e.clientY-drag.y;drag.x=e.clientX;drag.y=e.clientY;
+  if(Math.abs(e.clientX-drag.x0)+Math.abs(e.clientY-drag.y0)>5)drag.mosso=true;
+  const k=(S.fov*D2R)/Math.max(200,cv.clientHeight); /* il punto preso resta sotto il dito */
+  S.yaw+=dx*k;S.pitch=Math.max(-1.45,Math.min(1.45,S.pitch+dy*k));S.vy=dx*k*60;S.vp=dy*k*60;S.camId=null;segnaViste()});
+function fine(e){if(!punt.has(e.pointerId))return;punt.delete(e.pointerId);cv.classList.remove('trascino');
+  if(drag&&!drag.mosso&&!drag.pinch&&performance.now()-drag.t<450)clicPavimento(e);
+  if(punt.size===0)drag=null;else if(drag&&drag.pinch)drag={x:[...punt.values()][0].x,y:[...punt.values()][0].y,x0:0,y0:0,mosso:true}}
+cv.addEventListener('pointerup',fine);cv.addEventListener('pointercancel',fine);
+cv.addEventListener('wheel',e=>{if(S.modo!=='fp')return;e.preventDefault();S.fov=Math.max(22,Math.min(85,S.fov*Math.exp(e.deltaY*.0012)));nascondiAiuto()},{passive:false});
+addEventListener('keydown',e=>{if(e.target&&/INPUT|TEXTAREA/.test(e.target.tagName))return;keys[e.key.toLowerCase()]=true;if(/^arrow/.test(e.key.toLowerCase()))e.preventDefault();nascondiAiuto()});
+addEventListener('keyup',e=>{keys[e.key.toLowerCase()]=false});
+addEventListener('blur',()=>{for(const k in keys)keys[k]=false});
+const ray=new T.Raycaster(),mv=new T.Vector2();
+function clicPavimento(e){const r=cv.getBoundingClientRect();mv.set((e.clientX-r.left)/r.width*2-1,-((e.clientY-r.top)/r.height)*2+1);ray.setFromCamera(mv,camera);
+  const hit=ray.intersectObjects(PAV.concat(ELEM),true)[0];if(!hit)return;
+  let p=hit.point;if(!PAV.includes(hit.object)){ /* clic su un mobile: vai davanti, a 70 cm */
+    const dir=new T.Vector3(p.x-S.pos.x,0,p.z-S.pos.z);const L=dir.length();if(L<.8)return;dir.normalize();p=new T.Vector3(p.x-dir.x*.7,0,p.z-dir.z*.7)}
+  cammina(p.x,p.z)}
+function cammina(x,z){S.walk={x,z};S.camId=null;segnaViste();mostraBersaglio(x,z)}
+const bers=new T.Mesh(new T.RingGeometry(.12,.17,32),new T.MeshBasicMaterial({color:0x1f4e79,transparent:true,opacity:.8,depthWrite:false}));bers.rotation.x=-Math.PI/2;bers.visible=false;scene.add(bers);
+function mostraBersaglio(x,z){bers.position.set(x,.012,z);bers.visible=true;bers.userData.t=performance.now()}
+
+/* ================= punti di vista (camere del RILIEVO) ================= */
+function normCam(c,i){
+  const p=pt(c.pos||c.p||c.posizione||c.camera||(c.x!=null&&c.z!=null?{x:c.x,y:c.y,z:c.z}:null));if(!p)return null;
+  const y=num(p.y,OCCHI);let yaw,pitch=0;
+  const g=c.guarda||c.target||c.t||c.verso;
+  if(g){const q=pt(g);const dx=q.x-p.x,dz=q.z-p.z,dy=num(q.y,y)-y;yaw=yawDa(dx,dz);pitch=Math.atan2(dy,Math.hypot(dx,dz))}
+  else{ /* direzione in gradi: 0 = verso +z (dentro), 90 = verso +x */
+    const h=num(c.yaw,num(c.direzione,num(c.heading,0)))*D2R;yaw=yawDa(Math.sin(h),-Math.cos(h));pitch=num(c.pitch,num(c.inclinazione,0))*D2R}
+  let foto=c.foto||c.immagine||null;if(Array.isArray(foto))foto=foto[0];
+  if(foto&&/^IMG_\d+_\d+\.jpg$/i.test(foto))foto='../foto-negozio/fotogrammi/'+foto.split('_').slice(0,2).join('_')+'/'+foto;
+  else if(foto&&/^IMG_\d+\.jpg$/i.test(foto))foto='../foto-negozio/foto/'+foto;
+  else if(foto&&!/^(\.\.|data:|https?:|\/)/.test(foto))foto='../'+foto.replace(/^\.?\//,'');
+  return{id:c.id||('c'+i),nome:c.nome||c.titolo||c.id||('Vista '+(i+1)),breve:c.breve||null,gruppo:c.gruppo||'foto',x:p.x,y,z:p.z,yaw,pitch,fov:num(c.fov,62),foto,aspetto:c.aspetto||c.aspect||null}}
+/* PERCORSO VERO (dato di Fabrice): strada -> soglia -> vestibolo tra le vetrine -> porta a vetro sempre aperta -> negozio, bancone subito a sinistra */
+const PERCORSO=[
+  {id:'strada',nome:'Dalla strada',x:2.2,y:1.6,z:-5.1,guarda:[2.25,2.1,0],fov:60,gruppo:'percorso'},
+  {id:'soglia',nome:'Soglia',x:2.05,y:1.6,z:-1.75,guarda:[2.25,1.3,1.5],fov:66,gruppo:'percorso'},
+  {id:'vestibolo',nome:'Vestibolo vetrine',x:2.15,y:1.6,z:-0.65,guarda:[2.3,1.35,2.5],fov:66,gruppo:'percorso'},
+  {id:'porta',nome:'Porta a vetro',x:2.3,y:1.6,z:0.3,guarda:[2.3,1.35,3.5],fov:66,gruppo:'percorso'},
+  {id:'dentro',nome:'Dentro · bancone a sinistra',x:2.55,y:1.6,z:1.0,guarda:[1.2,1.15,2.0],fov:66,gruppo:'percorso'}
+];
+const CAM=PERCORSO.concat(RIL.camere||RIL.viste||[]).map(normCam).filter(Boolean);
+function segnaViste(){const sf=$('#selFoto');if(sf){const c=CAM.find(q=>q.id===S.camId);sf.value=c&&c.gruppo==='foto'?c.id:''}document.querySelectorAll('[data-cam]').forEach(b=>b.classList.toggle('on',b.dataset.cam===S.camId&&S.modo==='fp'));$('#bAlto').classList.toggle('on',S.modo==='alto')}
+function vaiCam(id,dur){const c=CAM.find(q=>q.id===id);if(!c)return;
+  if(S.modo!=='fp')modoFP();
+  S.walk=null;S.camId=id;S.tween={t0:performance.now(),d:dur==null?1300:dur,p0:S.pos.clone(),p1:new T.Vector3(c.x,c.y,c.z),y0:S.yaw,y1:S.yaw+angDiff(S.yaw,c.yaw),pi0:S.pitch,pi1:c.pitch,f0:S.fov,f1:c.fov};
+  segnaViste();if(S.foto)apriFoto(c)}
+function angDiff(a,b){let d=(b-a)%(2*Math.PI);if(d>Math.PI)d-=2*Math.PI;if(d<-Math.PI)d+=2*Math.PI;return d}
+const ease=k=>k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2;
+
+/* ================= dall'alto ================= */
+function modoAlto(){S.modo='alto';S.walk=null;S.tween=null;G.soff.visible=false;G.fuori.visible=false;cv.classList.add('alto');chiudiFoto();
+  if(orbit){orbit.enabled=true;const c=new T.Vector3((BB.x0+BB.x1)/2,0,(BB.z0+BB.z1)/2);orbit.target.copy(c);camera.fov=50;camera.updateProjectionMatrix();
+    camera.position.set(c.x-BB.w*.15,Math.max(BB.w,BB.d)*1.9+3.5,c.z+BB.d*.9);orbit.update()}
+  segnaViste()}
+function modoFP(){S.modo='fp';G.soff.visible=true;G.fuori.visible=true;cv.classList.remove('alto');if(orbit)orbit.enabled=false;segnaViste()}
+
+/* ================= confronto con la foto ================= */
+const foto=$('#foto');
+function apriFoto(c){c=c||CAM.find(q=>q.id===S.camId)||CAM.find(q=>q.foto);if(!c||!c.foto){avviso('Questo punto di vista non ha una foto: scegli una vista in basso.');return}
+  if(S.camId!==c.id){vaiCam(c.id,600)}
+  S.foto=c;foto.onload=()=>adatta();foto.src=c.foto;foto.style.display='block';$('#fotoBar').style.display='flex';$('#fotoNome').textContent=c.foto.split('/').pop();$('#bFoto').classList.add('on');adatta()}
+function chiudiFoto(){S.foto=null;foto.style.display='none';$('#fotoBar').style.display='none';$('#bFoto').classList.remove('on');adatta()}
+function avviso(t){const a=$('#avviso');a.textContent=t;a.style.display='block';clearTimeout(avviso.t);avviso.t=setTimeout(()=>a.style.display='none',3500)}
+
+/* ================= interfaccia ================= */
+const nv=$('#viste');
+CAM.forEach(c=>{const b=document.createElement('button');b.className='n3-btn'+(c.gruppo==='foto'?' piccolo':'');b.dataset.cam=c.id;b.textContent=c.breve||c.nome;b.title=c.foto?(c.nome+' · foto '+c.foto.split('/').pop()):c.nome;b.onclick=()=>{fermaPercorso();vaiCam(c.id)};if(c.gruppo==='foto'){const o=document.createElement('option');o.value=c.id;o.textContent=c.nome;$('#selFoto').appendChild(o)}else nv.appendChild(b)});
+$('#selFoto').onchange=e=>{const v=e.target.value;if(v){fermaPercorso();vaiCam(v);if(S.foto)apriFoto(CAM.find(q=>q.id===v))}};
+/* «Entra nel negozio»: il percorso animato */
+let PERC=null;
+function fermaPercorso(){if(PERC){clearTimeout(PERC);PERC=null;$('#bEntra').classList.remove('on')}}
+function entra(){fermaPercorso();$('#bEntra').classList.add('on');let i=0;vaiCam('strada',600);
+  const passo=()=>{i++;if(i>=PERCORSO.length){PERC=null;$('#bEntra').classList.remove('on');return}vaiCam(PERCORSO[i].id,2600);PERC=setTimeout(passo,3600)};PERC=setTimeout(passo,1600)}
+$('#bEntra').onclick=()=>{if(PERC)fermaPercorso();else entra()};
+$('#bAlto').onclick=()=>{if(S.modo==='alto'){modoFP();vaiCam(S.camId||(CAM[0]&&CAM[0].id),900)}else modoAlto()};
+$('#bFoto').onclick=()=>{if(S.foto)chiudiFoto();else{if(S.modo!=='fp'){modoFP()}apriFoto()}};
+$('#fChiudi').onclick=chiudiFoto;
+$('#fSopra').onclick=()=>{S.fotoModo='sopra';adatta()};$('#fAccanto').onclick=()=>{S.fotoModo='accanto';adatta()};
+$('#fAlpha').oninput=e=>{S.alpha=e.target.value/100;foto.style.opacity=S.fotoModo==='sopra'?S.alpha:1};
+let SCon=false;
+$('#bSC').onclick=()=>{SCon=!SCon;G.sc.visible=SCon;$('#bSC').classList.toggle('on',SCon);$('#tSC').textContent=SCon?'acceso':'spento'};
+let ETIon=false;$('#bEti').onclick=()=>{ETIon=!ETIon;$('#labs').classList.toggle('labs-off',!ETIon);$('#bEti').classList.toggle('on',ETIon)};
+(function(){var c=document.getElementById('comandi'),q=document.getElementById('comandiQ'),k='n3-comandi-nascosti';
+  function mostra(v){c.hidden=!v;q.hidden=v;try{localStorage.setItem(k,v?'0':'1')}catch(e){}}
+  try{if(localStorage.getItem(k)==='1'){c.hidden=true;q.hidden=false}}catch(e){}
+  document.getElementById('comandiX').onclick=function(){mostra(false)};q.onclick=function(){mostra(true);clearTimeout(tMin)};
+  /* 6/11: la legenda si minimizza da sola dopo qualche secondo (resta il tasto «? COMANDI» per riaprirla) */
+  var tMin=setTimeout(function(){if(!c.hidden){c.hidden=true;q.hidden=false}},7000);})();
+let aiutoT=null;function nascondiAiuto(){if(aiutoT)return;aiutoT=setTimeout(()=>$('#hint').classList.add('via'),2500)}
+
+/* layout: tela intera, oppure rettangolo con le proporzioni della foto (sovrapposta) / affiancato */
+let VIEW={x:0,y:0,w:innerWidth,h:innerHeight};
+function adatta(){
+  const W=innerWidth,Hh=innerHeight;let r={x:0,y:0,w:W,h:Hh};
+  if(S.foto&&S.modo==='fp'&&foto.naturalWidth){
+    const asp=foto.naturalWidth/foto.naturalHeight;
+    const top=70,bot=Math.min(160,$('.n3-dock').offsetHeight+20),avH=Hh-top-bot;
+    if(S.fotoModo==='accanto'){const avW=(W-30)/2;let h=avH,w=h*asp;if(w>avW){w=avW;h=w/asp}
+      r={x:W/2-w-5,y:top+(avH-h)/2,w,h};Object.assign(foto.style,{left:(W/2+5)+'px',top:r.y+'px',width:w+'px',height:h+'px',opacity:1})}
+    else{let h=avH,w=h*asp;if(w>W-20){w=W-20;h=w/asp}r={x:(W-w)/2,y:top+(avH-h)/2,w,h};Object.assign(foto.style,{left:r.x+'px',top:r.y+'px',width:w+'px',height:h+'px',opacity:S.alpha})}
+    foto.style.zIndex=S.fotoModo==='accanto'?3:3;
+    $('#fSopra').classList.toggle('on',S.fotoModo==='sopra');$('#fAccanto').classList.toggle('on',S.fotoModo==='accanto');
+  }
+  VIEW=r;renderer.setSize(r.w,r.h,false);Object.assign(cv.style,{left:r.x+'px',top:r.y+'px',width:r.w+'px',height:r.h+'px'});
+  camera.aspect=r.w/r.h;camera.updateProjectionMatrix()}
+addEventListener('resize',adatta);
+
+/* ================= costruzione ================= */
+try{
+  /* unità degli angoli: se nel rilievo compare un |rotY|>6.3 sono gradi; se tutti i valori sono piccoli e non interi sono radianti */
+  const rs=(RIL.elementi||[]).map(e=>e.rotY).filter(v=>typeof v==='number');
+  if(RIL.angoli==='rad'||RIL.unitaAngoli==='rad')ANG_GRADI=false;else if(RIL.angoli==='gradi'||RIL.unitaAngoli==='gradi')ANG_GRADI=true;
+  else ANG_GRADI=rs.some(v=>Math.abs(v)>6.3)||rs.every(v=>Number.isInteger(v));
+  costruisciStanza();costruisciZone();costruisciArredi();costruisciLuci();costruisciSC();
+}catch(e){console.error(e);errore('Errore nel costruire il negozio: '+e.message)}
+const labs=$('#labs');G.eti.forEach(l=>{const d=document.createElement('div');d.className='n3-lab'+(l.sc?' sc':'')+(l.ris?' riserva':'');d.textContent=l.testo;labs.appendChild(d);l.el=d});
+if(mancano.length)avviso('In preparazione: '+mancano.join(', ')+' (uso una versione provvisoria).');
+if(CAM.length){const c=CAM.find(q=>q.id==='strada')||CAM[0];S.pos.set(c.x,c.y,c.z);S.yaw=c.yaw;S.pitch=c.pitch;S.fov=c.fov;S.camId=c.id}
+adatta();segnaViste();
+
+/* ================= ciclo ================= */
+const tk=$('#ticker');let ultimo=0,fN=0,fT=0,fps=60,abbassato=false;const v3=new T.Vector3();
+function ciclo(t){
+  requestAnimationFrame(ciclo);if(document.hidden)return;
+  const dt=Math.min(.05,(t-(ultimo||t))/1000);ultimo=t;
+  if(S.modo==='fp'){
+    if(S.tween){const tw=S.tween,k=Math.min(1,(t-tw.t0)/tw.d),e=ease(k);S.pos.lerpVectors(tw.p0,tw.p1,e);S.yaw=tw.y0+(tw.y1-tw.y0)*e;S.pitch=tw.pi0+(tw.pi1-tw.pi0)*e;S.fov=tw.f0+(tw.f1-tw.f0)*e;if(k>=1)S.tween=null}
+    else{
+      /* inerzia del trascinamento */
+      if(!drag&&(Math.abs(S.vy)>1e-4||Math.abs(S.vp)>1e-4)){S.yaw+=S.vy*dt;S.pitch=Math.max(-1.45,Math.min(1.45,S.pitch+S.vp*dt));const f=Math.pow(.02,dt);S.vy*=f;S.vp*=f}
+      /* tastiera */
+      const av=(keys['w']||keys['arrowup']?1:0)-(keys['s']||keys['arrowdown']?1:0),lat=(keys['d']?1:0)-(keys['a']?1:0),gira=(keys['arrowleft']||keys['q']?1:0)-(keys['arrowright']||keys['e']?1:0);
+      if(gira){S.yaw+=gira*1.4*dt;S.camId=null;segnaViste()}
+      if(av||lat){S.walk=null;const v=1.5*dt,fx=-Math.sin(S.yaw),fz=-Math.cos(S.yaw),rx=Math.cos(S.yaw),rz=-Math.sin(S.yaw);muovi((fx*av+rx*lat)*v,(fz*av+rz*lat)*v);if(S.camId){S.camId=null;segnaViste()}}
+      /* camminata verso il punto cliccato */
+      if(S.walk){const dx=S.walk.x-S.pos.x,dz=S.walk.z-S.pos.z,L=Math.hypot(dx,dz);if(L<.05){S.walk=null}else{const v=Math.min(L,1.8*dt*Math.min(1,L+.3));if(!muovi(dx/L*v,dz/L*v))S.walk=null}
+        S.pos.y+=(OCCHI-S.pos.y)*Math.min(1,dt*4)}
+    }
+    camera.position.copy(S.pos);camera.rotation.set(S.pitch,S.yaw,0,'YXZ');if(Math.abs(camera.fov-S.fov)>.01){camera.fov=S.fov;camera.updateProjectionMatrix()}
+  }else if(orbit){
+    /* 6/11 Fabrice: anche DALL'ALTO si muove con WASD / frecce (sposta la pianta), Q/E gira intorno */
+    const av=(keys['w']||keys['arrowup']?1:0)-(keys['s']||keys['arrowdown']?1:0),lat=(keys['d']?1:0)-(keys['a']?1:0),gira=(keys['q']||keys['arrowleft']?1:0)-(keys['e']||keys['arrowright']?1:0);
+    if(av||lat||gira){const o=orbit.target,dx=o.x-camera.position.x,dz=o.z-camera.position.z,L=Math.hypot(dx,dz)||1,fx=dx/L,fz=dz/L,rx=-fz,rz=fx,
+      v=2.2*dt;let mx=(fx*av+rx*lat)*v,mz=(fz*av+rz*lat)*v;
+      const nx=Math.max(BB.x0-1,Math.min(BB.x1+1,o.x+mx)),nz=Math.max(BB.z0-1,Math.min(BB.z1+2,o.z+mz));mx=nx-o.x;mz=nz-o.z;   /* resta sopra il negozio */
+      o.x+=mx;o.z+=mz;camera.position.x+=mx;camera.position.z+=mz;
+      if(gira){const a=gira*1.2*dt,cx=camera.position.x-o.x,cz=camera.position.z-o.z,c=Math.cos(a),s=Math.sin(a);camera.position.x=o.x+cx*c-cz*s;camera.position.z=o.z+cx*s+cz*c}}
+    orbit.update()}
+  if(bers.visible){const a=(t-bers.userData.t)/900;bers.material.opacity=Math.max(0,.8-a*.8);bers.scale.setScalar(1+a*.5);if(a>1)bers.visible=false}
+  if(G.sc.visible){aggiornaSchermi(t);if(ETI){const c=(t%6000)/6000,u=c<.35?c/.35:c<.8?1:1-(c-.8)/.2;ETI.scale.set(1,Math.max(.02,u),1)}if(RAGGIO)RAGGIO.material.opacity=(Math.sin(t/90)>.2&&(t%4000)<1400)?.75:0}
+  if(window.__AVVIO&&!window.__AVVIO.pronto)return; /* AVVIO 5/11: nessun disegno finché gli shader non sono pronti (se no si compilano 4 volte, bloccando) */
+  if(!(window.__RESA&&window.__RESA.disegna(t)))renderer.render(scene,camera); /* RESA 5/11: post-processing e modo Foto in negozio3d/resa.js */
+  if(ETIon){const r=VIEW;for(const l of G.eti){if(l.sc&&!G.sc.visible){l.el.style.display='none';continue}v3.copy(l.v);const d=camera.position.distanceTo(v3);v3.project(camera);
+    if(v3.z>1||Math.abs(v3.x)>1||Math.abs(v3.y)>1||(S.modo==='fp'&&d>7)){l.el.style.display='none';continue}
+    l.el.style.display='';l.el.style.transform=`translate(${(r.x+(v3.x+1)/2*r.w).toFixed(1)}px,${(r.y+(1-v3.y)/2*r.h).toFixed(1)}px) translate(-50%,-100%)`}}
+  fN++;if(t-fT>1000){fps=fN*1000/(t-fT);fN=0;fT=t;
+    if(fps<32&&!abbassato&&PR>1&&!window.__RESA){abbassato=true;PR=1;renderer.setPixelRatio(1);adatta()}
+    const p=camera.position;tk.textContent=`POS ${p.x.toFixed(2)} ${p.y.toFixed(2)} ${p.z.toFixed(2)} · DIR ${((-S.yaw/D2R+180)%360+360)%360|0}° · ${Math.round(fps)} FPS${RIS?' · RILIEVO PROVVISORIO':''}`}
+}
+window.__N3D={scene,camera,renderer,S,CAM,vaiCam,modoAlto,modoFP,apriFoto,chiudiFoto,G,ELEM,OSTACOLI,libero,toggleSC:()=>$('#bSC').click(),
+  keys,fermaPercorso,profilo:window.N3D_PROFILO||'alta'}; /* VERSIONI 5/11: keys = frecce a schermo della versione universale (stesso percorso della tastiera) */
+requestAnimationFrame(t=>{ciclo(t);if(!window.__AVVIO)setTimeout(()=>$('#load').classList.add('via'),200)}); /* AVVIO 5/11: la schermata la toglie avvio.js */
+})();
+</script>
+<script>window.__AVVIO&&__AVVIO.fase('occhiali',30)</script>
+<!-- VETRINE 5/11: allestimento delle due vetrine su strada + totem (usa window.__N3D) -->
+<script src="negozio3d/allestimento.js"></script>
+<script>window.__AVVIO&&__AVVIO.fase('luci',38)</script>
+<!-- MIX REALTA 5/11: tasto rosso CRT, foto vere + giro video proiettati sul 3D (negozio3d/mix.js, dati mix-foto.js / mix-giro.js) -->
+<script src="negozio3d/mix.js"></script>
+<!-- RESA 5/11: resa fotorealistica (livelli Leggera/Media/Alta/Foto, Scatta foto). Deve restare l'ultimo script. -->
+<script src="negozio3d/resa.js"></script>
+<!-- VERSIONI 5/11: versione UNIVERSALE (frecce a schermo, menu a scorrimento, ombre di contatto finte, texture ridotte). Nella ALTA non fa niente. -->
+<script src="negozio3d/profilo.js"></script>
+<!-- AVVIO 5/11: compila gli shader UNA volta sola e in parallelo, poi toglie la schermata d'avvio (dopo resa.js) -->
+<script src="negozio3d/avvio.js"></script>
+<script>/* 6/11 header: orologio di Roma */(function(){var e=document.getElementById('hdrOra');if(!e)return;function o(){try{e.textContent='ROMA '+new Intl.DateTimeFormat('it-IT',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Rome'}).format(new Date())}catch(x){}}o();setInterval(o,15000)})();</script>
+</body>
+</html>

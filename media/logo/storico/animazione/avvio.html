@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Avvio draghetto · Ottica Macrì</title>
+<meta name="color-scheme" content="light">
+<link rel="stylesheet" href="../../../../tema-hud.css">
+<script src="draghetto-avvio.js"></script>
+<style>
+.barra{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+.eti{font:500 13px var(--h-mono);letter-spacing:2.6px;color:var(--h-gold);text-transform:uppercase}
+h1{margin:8px 0 6px;font:700 clamp(30px,4.4vw,54px)/1.04 var(--h-title);letter-spacing:2px;text-transform:uppercase;color:var(--h-ice)}
+.lead{font-size:18px;color:var(--h-mut);max-width:760px;margin:0 0 16px}
+.schermo{position:relative;width:100%;aspect-ratio:16/9;border:1px solid var(--h-line2);background:#efe6d8;overflow:hidden;box-shadow:var(--h-ombra)}
+.schermo.q{aspect-ratio:1;max-width:620px;margin:0 auto}
+.comandi{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}
+.comandi .hbtn[aria-pressed="true"]{background:linear-gradient(180deg,#b5462c,#9e3b25);border-color:#8a321f;color:#fffdf9}
+pre{background:#fffdf9;border:1px solid var(--h-line2);padding:14px;overflow:auto;font:400 13.5px/1.5 var(--h-mono);color:var(--h-text);white-space:pre-wrap}
+.nota{background:#fffdf9;border-left:4px solid var(--h-mat2);padding:12px 16px;color:var(--h-mut);font-size:16px;margin:14px 0}
+h2{font:700 26px/1.1 var(--h-title);letter-spacing:1.4px;text-transform:uppercase;color:var(--h-ice);margin:36px 0 8px}
+</style>
+</head>
+<body class="hud">
+<div class="hud-pag stretta">
+ <div class="barra"><div style="display:flex;gap:10px;flex-wrap:wrap"><a class="hbtn piccolo" href="../../../../index.html">☰ Menu</a><a class="hbtn piccolo" href="../confronto.html">← Draghetto storico</a></div><span class="eti">Schermata d'avvio · HTML/SVG</span></div>
+ <h1 style="margin-top:24px">Animazione d'avvio</h1>
+ <p class="lead">La stessa animazione dei video, ma «viva»: pesa circa 40 kB, non ha bisogno di internet e si adatta a qualsiasi schermo.</p>
+ <div class="comandi" role="group" aria-label="Opzioni">
+  <button class="hbtn piccolo pri" type="button" id="rip">▶ Riproduci</button>
+  <button class="hbtn piccolo" type="button" data-tema="chiaro" aria-pressed="true">Fondo chiaro</button>
+  <button class="hbtn piccolo" type="button" data-tema="scuro" aria-pressed="false">Fondo scuro</button>
+  <button class="hbtn piccolo" type="button" data-formato="largo" aria-pressed="true">16:9</button>
+  <button class="hbtn piccolo" type="button" data-formato="quadrato" aria-pressed="false">Quadrato</button>
+  <button class="hbtn piccolo" type="button" id="velo">Prova come schermata d'avvio</button>
+ </div>
+ <div class="schermo" id="schermo"></div>
+
+ <h2>Come si usa nell'app</h2>
+ <p class="nota">Basta una riga nella pagina: il velo compare all'apertura (una volta per sessione), si chiude da solo dopo l'animazione o con un clic/tasto. Con «riduci movimento» attivo sul dispositivo mostra subito il logo fermo.</p>
+<pre>&lt;script src="media/logo/storico/animazione/draghetto-avvio.js"
+        data-avvio="auto" data-tema="chiaro"&gt;&lt;/script&gt;
+
+&lt;!-- oppure, a mano, dentro un contenitore: --&gt;
+&lt;script&gt;
+  const a = DraghettoAvvio.crea(document.querySelector('#logo'),
+                                {tema: 'scuro', formato: 'quadrato'});
+  a.play();          // a.render(secondi) mostra un istante preciso
+&lt;/script&gt;</pre>
+ <p style="margin-top:30px"><a class="hbtn piccolo" href="../confronto.html">← Torna al draghetto storico</a></p>
+</div>
+<script>
+(function(){
+ var st={tema:'chiaro',formato:'largo'},box=document.getElementById('schermo'),a=null;
+ function monta(){box.innerHTML='';box.className='schermo'+(st.formato==='quadrato'?' q':'');a=DraghettoAvvio.crea(box,st);a.play();}
+ document.querySelectorAll('[data-tema],[data-formato]').forEach(function(b){
+  b.addEventListener('click',function(){
+   var k=b.hasAttribute('data-tema')?'tema':'formato';st[k]=b.getAttribute('data-'+k);
+   document.querySelectorAll('[data-'+k+']').forEach(function(x){x.setAttribute('aria-pressed',x===b)});monta();});
+ });
+ document.getElementById('rip').addEventListener('click',function(){a.play()});
+ document.getElementById('velo').addEventListener('click',function(){DraghettoAvvio.splash({tema:st.tema})});
+ monta();
+})();
+</script>
+<script src="../../../../nascondi-note.js"></script>
+</body>
+</html>

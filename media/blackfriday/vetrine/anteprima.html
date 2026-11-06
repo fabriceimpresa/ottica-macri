@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8">
+<link rel="icon" type="image/svg+xml" href="../../../media/logo/marchi6/04-monocolo/04-monocolo-icona-colori.svg">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Grafiche vetrine · Black Friday</title>
+<style>
+:root{--bg:#f4ede2;--card:#fffaf3;--tx:#3a2e26;--tx2:#7c6a5a;--li:#d8c8b0;--acc:#b5462c;--blu:#1f4e79}
+body.scuro{--bg:#100d0b;--card:#1c1714;--tx:#efe6d8;--tx2:#a8977f;--li:#3a2f27;--acc:#d4a373;--blu:#e8d6b8}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.45 "Segoe UI",system-ui,sans-serif}
+header{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--li);padding:10px 16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+header h1{font:400 20px "Bodoni MT",Georgia,serif;letter-spacing:.08em;margin:0;flex:1;min-width:220px;color:var(--blu)}
+a{color:var(--acc)}
+.btn{border:1px solid var(--li);background:var(--card);color:var(--tx);padding:6px 12px;cursor:pointer;font:inherit;text-decoration:none}
+.btn.on{background:var(--acc);border-color:var(--acc);color:#fff}
+main{max-width:1280px;margin:0 auto;padding:16px}
+.intro{color:var(--tx2);font-size:14px;margin:0 0 8px}
+.avviso{border-left:4px solid var(--acc);background:var(--card);padding:10px 14px;margin:10px 0 20px;font-size:14px}
+h2{font:400 22px "Bodoni MT",Georgia,serif;letter-spacing:.04em;color:var(--blu);margin:34px 0 4px;border-bottom:1px solid var(--li);padding-bottom:6px}
+h2 small{display:block;font:13px "Segoe UI",sans-serif;color:var(--tx2);letter-spacing:0;margin-top:4px}
+.griglia{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px;margin-top:14px;align-items:start}
+.card{background:var(--card);border:1px solid var(--li);padding:10px}
+.card .im{display:flex;align-items:center;justify-content:center;background:repeating-conic-gradient(rgba(127,127,127,.08) 0 25%,transparent 0 50%) 0 0/16px 16px;min-height:150px}
+.card img{max-width:100%;max-height:300px;display:block;box-shadow:0 2px 10px rgba(0,0,0,.25)}
+.card b{display:block;margin-top:8px;font-size:14px}
+.card .m{color:var(--tx2);font-size:12.5px}
+.card .m code{font-size:12px}
+.card a.dl{font-size:12.5px}
+#vuoto{padding:30px;text-align:center;color:var(--tx2)}
+</style></head>
+<body>
+<header>
+ <a class="btn" href="../../../index.html">☰ Menu</a>
+ <h1>Grafiche vetrine · Black Friday</h1>
+ <button class="btn" data-t="scuro">Versioni scure</button><button class="btn" data-t="chiaro">Versioni chiare</button><button class="btn" data-t="tutte">Tutte</button>
+</header>
+<main>
+ <p class="intro">Inserti da stampare per le due vetrine su strada e l'ingresso di Ottica Macrì, alle misure esatte dei supporti (<code>dispositivi.js</code>). Clic sull'immagine = PNG a 300 dpi pronto per la stampa.</p>
+ <div class="avviso nota">I prezzi sono <b>ESEMPI da confermare</b> con Aldo (vedi <a href="LEGGIMI.md">LEGGIMI.md</a>). I marchi Ray-Ban, Persol e Oakley sono scritte disegnate in stile, non i loghi ufficiali.</div>
+ <div id="lista"><div id="vuoto">Caricamento…</div></div>
+</main>
+<script src="bf-vetrine-data.js"></script>
+<script src="../../../nascondi-note.js"></script>
+<script>
+(function(){
+  var D = window.BF_VETRINE, R = window.BF_VETRINE_RIPIANI || {}, L = document.getElementById('lista');
+  if(!D){ L.innerHTML = '<div id="vuoto">Manca bf-vetrine-data.js</div>'; return; }
+  function get(){ try{ return localStorage.getItem('bfvetrine-tema') || 'scuro'; }catch(e){ return 'scuro'; } }
+  function set(v){ try{ localStorage.setItem('bfvetrine-tema', v); }catch(e){} }
+  var tema = new URLSearchParams(location.search).get('tema') || get();
+  function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  function disegna(){
+    document.body.classList.toggle('scuro', tema !== 'chiaro');
+    [].forEach.call(document.querySelectorAll('[data-t]'), function(b){ b.classList.toggle('on', b.dataset.t === tema); });
+    var gruppi = {}, ordine = Object.keys(R);
+    Object.keys(D).forEach(function(k){
+      var e = D[k]; if(tema !== 'tutte' && e.tema !== tema) return;
+      (gruppi[e.ripiano] = gruppi[e.ripiano] || []).push([k, e]);
+    });
+    var h = '';
+    ordine.forEach(function(r){
+      var g = gruppi[r]; if(!g) return;
+      h += '<h2>' + esc(R[r]) + '<small>' + g.length + ' pezzi · codice ripiano <code>' + esc(r) + '</code></small></h2><div class="griglia">';
+      g.forEach(function(x){
+        var k = x[0], e = x[1];
+        var mis = e.mm ? e.mm[0] + '×' + e.mm[1] + ' mm' : 'schermo';
+        h += '<div class="card"><a class="im" href="' + esc(e.file) + '" target="_blank"><img loading="lazy" src="' + esc(e.anteprima || e.png) + '" alt="' + esc(e.titolo) + '"></a>' +
+             '<b>' + esc(e.titolo) + '</b><div class="m">' + esc(e.nomeSupporto || e.supporto) + '<br>' + mis + ' · ' + e.px[0] + '×' + e.px[1] + ' px' +
+             (e.mm ? ' (300 dpi)' : '') + '<br><code>' + esc(k) + '</code></div>' +
+             '<a class="dl" href="' + esc(e.file) + '" download>Scarica PNG</a> · <a class="dl" href="sorgenti/' + esc(k) + '.html" target="_blank">sorgente</a></div>';
+      });
+      h += '</div>';
+    });
+    L.innerHTML = h || '<div id="vuoto">Nessun pezzo</div>';
+  }
+  [].forEach.call(document.querySelectorAll('[data-t]'), function(b){ b.onclick = function(){ tema = b.dataset.t; set(tema); disegna(); }; });
+  disegna();
+})();
+</script>
+</body></html>

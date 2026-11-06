@@ -1,0 +1,465 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<link rel="icon" type="image/svg+xml" href="../media/logo/marchi6/04-monocolo/04-monocolo-icona-colori.svg">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ottica Macrì Piano B</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  :root{
+    --nero:#121212; --carta:#f6f3ee; --carta2:#ece6dc; --oro:#d4a373; --oro-scuro:#a8784a;
+    --blu:#1d5c8f; --testo:#24221f; --grigio:#6b655d; --bianco:#fffdf9;
+    --serif: Georgia, "Times New Roman", serif;
+    --sans: system-ui, "Segoe UI", Arial, sans-serif;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ background:#8a857d; }
+  body{ font-family:var(--sans); color:var(--testo); -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .slide{ width:297mm; height:210mm; position:relative; overflow:hidden; background:var(--carta);
+          break-after:page; page-break-after:always; margin:0 auto; }
+  .slide:last-child{ break-after:auto; page-break-after:auto; }
+  @media screen{ .slide{ margin:8mm auto; box-shadow:0 4px 24px rgba(0,0,0,.25);} }
+  @media print{ html,body{ background:none; } }
+
+  .top{ position:absolute; left:22mm; right:22mm; top:11mm; display:flex; justify-content:space-between;
+        align-items:center; font-size:9pt; letter-spacing:.28em; text-transform:uppercase; color:var(--grigio); }
+  .top b{ font-family:var(--serif); font-weight:normal; color:var(--testo); letter-spacing:.32em; }
+  .top b i{ font-style:normal; color:var(--oro); }
+  .top::after{ content:""; position:absolute; left:0; right:0; bottom:-3.5mm; height:.4mm; background:linear-gradient(90deg,var(--oro),rgba(212,163,115,.15)); }
+  .num{ position:absolute; right:22mm; bottom:10mm; font-family:var(--serif); font-size:10pt; color:var(--oro-scuro); letter-spacing:.2em; }
+  .foot{ position:absolute; left:22mm; bottom:10mm; font-size:9pt; color:var(--grigio); letter-spacing:.06em; }
+
+  .body{ position:absolute; left:22mm; right:22mm; top:26mm; bottom:19mm; display:flex; gap:11mm; }
+  .body.v{ flex-direction:column; gap:0; justify-content:center; }
+  .col{ flex:1; display:flex; flex-direction:column; justify-content:center; min-width:0; }
+  .col.text{ flex:0 0 40%; }
+
+  .kicker{ font-size:10.5pt; letter-spacing:.3em; text-transform:uppercase; color:var(--blu); font-weight:600; margin-bottom:4mm; }
+  h2{ font-family:var(--serif); font-weight:normal; text-transform:uppercase; letter-spacing:.12em;
+      font-size:27pt; line-height:1.15; color:var(--testo); margin-bottom:6mm; }
+  h2 em{ font-style:normal; color:var(--oro-scuro); }
+  .rule{ width:22mm; height:.8mm; background:var(--oro); margin:0 0 7mm; }
+  p.lead{ font-size:17pt; line-height:1.45; margin-bottom:5mm; }
+  ul.punti{ list-style:none; }
+  ul.punti li{ font-size:16.5pt; line-height:1.35; padding-left:9mm; position:relative; margin-bottom:4mm; }
+  ul.punti li::before{ content:""; position:absolute; left:0; top:.5em; width:3.6mm; height:3.6mm; border-radius:50%; border:.6mm solid var(--oro); }
+  ul.punti li b{ color:var(--blu); font-weight:600; }
+  .nota{ font-size:13.5pt; color:var(--grigio); line-height:1.4; margin-top:3mm; border-left:.8mm solid var(--oro); padding-left:4mm; }
+
+  /* immagini con segnaposto */
+  .shot{ position:relative; background:var(--bianco); border-radius:2.5mm; overflow:hidden; margin:0;
+         box-shadow:0 1.5mm 6mm rgba(40,30,20,.16), 0 0 0 .3mm rgba(0,0,0,.06); }
+  .shot img{ display:block; width:100%; height:100%; object-fit:cover; object-position:top center; }
+  .shot.contain img{ object-fit:contain; background:var(--bianco); }
+  .shot .ph{ display:none; position:absolute; inset:0; align-items:center; justify-content:center; flex-direction:column;
+             text-align:center; padding:6mm; color:var(--oro-scuro); font-family:var(--serif); font-size:11pt;
+             letter-spacing:.18em; text-transform:uppercase; line-height:1.5;
+             background:repeating-linear-gradient(135deg, #f1ebe1 0 4mm, #f6f1e8 4mm 8mm); border:.5mm dashed rgba(168,120,74,.55); border-radius:2.5mm; }
+  .shot .ph small{ display:block; margin-top:2mm; font-family:var(--sans); font-size:8.5pt; letter-spacing:.1em; text-transform:none; color:var(--grigio); }
+  .shot.missing img{ visibility:hidden; }
+  .shot.missing .ph{ display:flex; }
+  .desk{ aspect-ratio:16/10; width:100%; }
+  .phone{ aspect-ratio:390/844; border-radius:5mm; border:1.6mm solid #1b1b1b; background:#1b1b1b; }
+  .phone .ph{ border-radius:3mm; font-size:8.5pt; letter-spacing:.12em; }
+  .phone img{ border-radius:3mm; }
+  .tablet{ aspect-ratio:1180/820; border-radius:4mm; border:2.2mm solid #1b1b1b; background:#1b1b1b; }
+  .tablet img{ border-radius:2mm; }
+  .cap{ font-size:10pt; color:var(--grigio); letter-spacing:.08em; margin-top:2.5mm; text-align:center; }
+  .duo{ position:relative; width:100%; }
+  .duo .desk{ width:86%; }
+  .duo .phone{ position:absolute; right:0; bottom:-8mm; width:23%; }
+
+  /* copertina e chiusura scure */
+  .dark{ background:var(--nero); color:#efe9df; }
+  .dark::before{ content:""; position:absolute; inset:9mm; border:.7mm solid var(--oro); pointer-events:none; }
+  .dark::after{ content:""; position:absolute; inset:12mm; border:.25mm solid rgba(212,163,115,.4); pointer-events:none; }
+  .cover{ position:absolute; inset:12mm; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; }
+  .logo{ font-family:var(--serif); font-size:44pt; letter-spacing:.32em; color:#f4efe6; margin-right:-.32em; }
+  .logo i{ font-style:normal; color:var(--oro); letter-spacing:.12em; }
+  .claim{ margin-top:6mm; font-size:11pt; letter-spacing:.55em; color:var(--oro); margin-right:-.55em; }
+  .claim2{ margin-top:2.5mm; font-family:var(--serif); font-style:italic; font-size:12.5pt; letter-spacing:.2em; color:#bdb3a5; }
+  .per{ margin-top:14mm; font-family:var(--serif); font-size:15pt; letter-spacing:.4em; text-transform:uppercase; color:#cfc6b8; margin-right:-.4em; }
+  .cliente{ margin-top:3mm; font-family:var(--serif); font-size:36pt; letter-spacing:.14em; text-transform:uppercase; color:#fff; margin-right:-.14em; }
+  .pianob{ margin-top:6mm; display:inline-block; border:.4mm solid var(--oro); padding:2.5mm 8mm; font-family:var(--serif);
+           font-size:15pt; letter-spacing:.4em; text-transform:uppercase; color:var(--oro); padding-right:calc(8mm - .4em); }
+  .sotto{ margin-top:7mm; font-size:17pt; line-height:1.45; color:#e7dfd2; }
+  .sep{ width:30mm; height:.4mm; background:var(--oro); margin:9mm auto 6mm; }
+  .meta{ font-size:11pt; letter-spacing:.3em; text-transform:uppercase; color:#a99f91; margin-right:-.3em; }
+
+  /* tre tessere (slide 2) */
+  .tre{ display:flex; flex-direction:column; gap:5mm; }
+  .big3{ display:flex; gap:5mm; align-items:center; background:var(--bianco); border-radius:3mm; padding:5mm 6mm;
+         box-shadow:0 1mm 4mm rgba(40,30,20,.08); border-left:1.6mm solid var(--oro); }
+  .big3.blu{ border-left-color:var(--blu); }
+  .big3 .n{ font-family:var(--serif); font-size:26pt; color:var(--oro); width:9mm; text-align:center; line-height:1; }
+  .big3 svg{ flex:0 0 13mm; width:13mm; height:13mm; }
+  .big3 h3{ font-family:var(--serif); font-weight:normal; text-transform:uppercase; letter-spacing:.08em; font-size:16pt; line-height:1.15; }
+  .big3 p{ font-size:13pt; color:var(--grigio); margin-top:1mm; }
+
+  /* grafica (slide 3) */
+  .galleria{ display:flex; gap:4.5mm; height:100mm; justify-content:center; }
+  .galleria .shot{ height:100%; flex:0 0 auto; aspect-ratio:1588/2246; }
+  .striscia{ display:flex; gap:4mm; height:31mm; margin-top:4.5mm; justify-content:center; }
+  .striscia .shot{ height:100%; flex:0 0 auto; }
+
+  /* flusso vetrina (slide 4) */
+  .flusso{ display:flex; align-items:center; gap:5mm; }
+  .flusso .passo-f{ flex:1; text-align:center; }
+  .flusso .passo-f .lab{ font-family:var(--serif); text-transform:uppercase; letter-spacing:.12em; font-size:12.5pt; margin-top:3mm; }
+  .flusso .passo-f .lab b{ color:var(--oro-scuro); font-weight:normal; margin-right:2mm; }
+  .freccia{ flex:0 0 18mm; }
+  .confronto{ display:flex; gap:6mm; margin-top:7mm; }
+  .strada{ flex:1; background:var(--bianco); border-radius:3mm; padding:5mm 6mm; box-shadow:0 1mm 4mm rgba(40,30,20,.08); border-top:1.2mm solid var(--oro); display:flex; gap:5mm; align-items:flex-start; }
+  .strada.blu{ border-top-color:var(--blu); }
+  .strada svg{ flex:0 0 13mm; width:13mm; height:13mm; }
+  .strada h3{ font-family:var(--serif); font-weight:normal; text-transform:uppercase; letter-spacing:.1em; font-size:15pt; margin-bottom:2mm; }
+  .strada p{ font-size:13pt; line-height:1.4; color:var(--grigio); }
+  .strada p b{ color:var(--testo); font-weight:600; }
+
+  /* fasce (slide 5) */
+  .fasce{ display:flex; gap:5mm; align-items:stretch; margin-top:2mm; }
+  .fascia{ flex:1; background:var(--bianco); border-radius:3mm; padding:6mm 6mm 5mm; box-shadow:0 1mm 4mm rgba(40,30,20,.08);
+           border-top:1.2mm solid var(--oro); display:flex; flex-direction:column; position:relative; }
+  .fascia .liv{ font-size:10pt; letter-spacing:.3em; text-transform:uppercase; color:var(--oro-scuro); font-weight:600; }
+  .fascia h3{ font-family:var(--serif); font-weight:normal; font-size:17pt; letter-spacing:.04em; margin:3mm 0 1.5mm; line-height:1.2; }
+  .fascia .cosa-f{ font-size:12.5pt; color:var(--grigio); line-height:1.4; flex:1; }
+  .fascia .cosa-f b{ color:var(--testo); font-weight:600; }
+  .fascia .tot{ margin-top:4mm; padding-top:3.5mm; border-top:.3mm solid #e6ddcf; }
+  .fascia .tot .eur{ font-family:var(--serif); font-size:24pt; color:var(--testo); white-space:nowrap; }
+  .fascia .tot small{ display:block; font-size:10.5pt; color:var(--grigio); margin-top:1mm; line-height:1.35; }
+  .fascia.top-pick{ background:var(--blu); border-top-color:var(--blu); color:#fff; transform:translateY(-3mm); box-shadow:0 2mm 7mm rgba(29,92,143,.3); }
+  .fascia.top-pick .liv{ color:#cfe0ee; }
+  .fascia.top-pick .cosa-f, .fascia.top-pick .tot small{ color:#e4edf5; }
+  .fascia.top-pick .cosa-f b, .fascia.top-pick .tot .eur{ color:#fff; }
+  .fascia.top-pick .tot{ border-top-color:rgba(255,255,255,.25); }
+  .badge{ position:absolute; top:-4.2mm; right:5mm; background:var(--oro); color:#fff; font-size:9pt; letter-spacing:.22em; text-transform:uppercase; padding:1.5mm 3.5mm; border-radius:1mm; font-weight:600; }
+  .avviso{ margin-top:6mm; font-size:11pt; color:var(--grigio); display:flex; gap:3mm; align-items:center; }
+  .avviso .tag{ background:var(--carta2); color:var(--oro-scuro); font-size:9pt; letter-spacing:.2em; text-transform:uppercase; padding:1.3mm 3mm; border-radius:1mm; white-space:nowrap; }
+
+  /* consigli (slide 6) */
+  .consigli{ display:grid; grid-template-columns:repeat(4,1fr); gap:5mm; }
+  .consiglio{ background:var(--bianco); border-radius:3mm; padding:8mm 5mm 7mm; text-align:center; box-shadow:0 1mm 4mm rgba(40,30,20,.08); border-top:1.2mm solid var(--oro); }
+  .consiglio:nth-child(even){ border-top-color:var(--blu); }
+  .consiglio svg{ width:20mm; height:20mm; margin:0 auto 5mm; display:block; }
+  .consiglio h3{ font-family:var(--serif); font-weight:normal; text-transform:uppercase; letter-spacing:.08em; font-size:15pt; line-height:1.2; margin-bottom:3mm; }
+  .consiglio p{ font-size:13pt; line-height:1.4; color:var(--grigio); }
+
+  /* scheda cliente (slide 7) */
+  .scheda{ background:var(--bianco); border-radius:3mm; box-shadow:0 1.5mm 6mm rgba(40,30,20,.16); overflow:hidden; width:80%; }
+  .scheda .hd{ background:var(--blu); color:#fff; padding:5mm 7mm; display:flex; align-items:center; gap:4mm; }
+  .scheda .av{ width:13mm; height:13mm; border-radius:50%; background:rgba(255,255,255,.18); display:flex; align-items:center; justify-content:center; font-family:var(--serif); font-size:15pt; }
+  .scheda .hd b{ font-family:var(--serif); font-weight:normal; font-size:17pt; letter-spacing:.06em; display:block; }
+  .scheda .hd span{ font-size:11pt; color:#d6e3ef; }
+  .tl{ padding:5mm 7mm 3mm 7mm; }
+  .ev{ position:relative; padding-left:9mm; padding-bottom:4.2mm; }
+  .ev::before{ content:""; position:absolute; left:1.6mm; top:2mm; bottom:-1mm; width:.5mm; background:#e3d8c6; }
+  .ev:last-child::before{ display:none; }
+  .ev::after{ content:""; position:absolute; left:0; top:1.2mm; width:3.6mm; height:3.6mm; border-radius:50%; background:var(--bianco); border:.7mm solid var(--oro); }
+  .ev.ult::after{ background:var(--oro); }
+  .ev .d{ font-size:10pt; letter-spacing:.15em; text-transform:uppercase; color:var(--oro-scuro); font-weight:600; }
+  .ev .t{ font-size:13pt; line-height:1.35; margin-top:.6mm; }
+  .scheda .add{ margin:0 7mm 5mm; border:.4mm dashed #cdbfa9; border-radius:2mm; padding:2.8mm 4mm; font-size:11.5pt; color:var(--grigio); }
+  .scheda-wrap{ position:relative; }
+  .scheda-wrap .phone{ position:absolute; right:0; bottom:-8mm; width:24%; }
+
+  /* cosa serve (slide 8) */
+  .serve{ display:grid; grid-template-columns:1fr 1fr; gap:4mm 5mm; }
+  .cosa{ display:flex; gap:4mm; align-items:center; background:var(--bianco); border-radius:2.5mm; padding:5.5mm 5mm; box-shadow:0 .8mm 3mm rgba(40,30,20,.07); }
+  .cosa svg{ flex:0 0 12mm; width:12mm; height:12mm; }
+  .cosa b{ display:block; font-size:15pt; font-weight:600; }
+  .cosa span{ font-size:12pt; color:var(--grigio); line-height:1.3; display:block; }
+  .box{ background:var(--bianco); border-radius:3mm; padding:6mm 7mm; box-shadow:0 1mm 4mm rgba(40,30,20,.08); }
+  .box.oro{ background:#efe5d6; box-shadow:none; }
+  .box h3{ font-family:var(--serif); font-weight:normal; text-transform:uppercase; letter-spacing:.12em; font-size:14pt; color:var(--oro-scuro); margin-bottom:3mm; }
+  .box p{ font-size:14pt; line-height:1.45; }
+
+  /* crescita (slide 9) */
+  .crescita{ display:flex; align-items:center; gap:6mm; margin-top:4mm; }
+  .piano{ flex:1; border-radius:3mm; padding:7mm 7mm 6mm; }
+  .piano.b{ background:var(--blu); color:#fff; box-shadow:0 2mm 7mm rgba(29,92,143,.3); }
+  .piano.a{ border:.6mm dashed var(--oro); background:rgba(255,253,249,.6); }
+  .piano .quando{ font-size:10pt; letter-spacing:.3em; text-transform:uppercase; font-weight:600; }
+  .piano.b .quando{ color:#cfe0ee; } .piano.a .quando{ color:var(--oro-scuro); }
+  .piano h3{ font-family:var(--serif); font-weight:normal; text-transform:uppercase; letter-spacing:.14em; font-size:22pt; margin:2.5mm 0 5mm; }
+  .piano ul{ list-style:none; }
+  .piano li{ font-size:15.5pt; padding:2.8mm 0; border-top:.3mm solid rgba(0,0,0,.08); display:flex; align-items:center; gap:4mm; }
+  .piano.b li{ border-top-color:rgba(255,255,255,.2); }
+  .piano li svg{ width:8mm; height:8mm; flex:0 0 8mm; }
+  .piano.a li{ color:var(--testo); }
+  .piano .fine{ margin-top:4mm; font-size:12pt; line-height:1.4; }
+  .piano.b .fine{ color:#e4edf5; } .piano.a .fine{ color:var(--grigio); }
+  .crescita .freccia{ flex:0 0 26mm; text-align:center; font-family:var(--serif); font-size:10pt; letter-spacing:.2em; text-transform:uppercase; color:var(--oro-scuro); }
+  .crescita .freccia svg{ width:26mm; height:14mm; display:block; margin-bottom:2mm; }
+
+  /* passi finali */
+  .passi{ display:flex; gap:6mm; width:100%; margin-top:9mm; }
+  .passo{ flex:1; border-top:.5mm solid rgba(212,163,115,.6); padding-top:5mm; text-align:left; }
+  .passo .n{ font-family:var(--serif); font-size:30pt; color:var(--oro); line-height:1; }
+  .passo h3{ font-family:var(--serif); font-weight:normal; text-transform:uppercase; letter-spacing:.1em; font-size:15pt; color:#fff; margin:3mm 0 2mm; }
+  .passo p{ font-size:13.5pt; line-height:1.4; color:#bdb3a5; }
+  .grazie{ font-family:var(--serif); font-size:40pt; letter-spacing:.3em; text-transform:uppercase; color:#fff; margin-right:-.3em; }
+</style>
+</head>
+<body>
+
+<!-- 1 COPERTINA -->
+<section class="slide dark">
+  <div class="cover">
+    <div class="logo">STORE <i>//</i> CRAFT</div>
+    <div class="claim">COOL · EASY · SMART</div>
+    <div class="claim2">bello · utile · facile</div>
+    <div class="per">per</div>
+    <div class="cliente">Ottica Macrì</div>
+    <div class="pianob">Piano Essenziale</div>
+    <div class="sotto">Poca spesa. Niente complicazioni.<br>Si comincia subito.</div>
+    <div class="sep"></div>
+    <div class="meta">Roma · Via Poggi D'Oro 23 · novembre 2026 · a cura di Fabrice</div>
+  </div>
+</section>
+
+<!-- 2 TRE COSE -->
+<section class="slide">
+  <div class="top"><b>STORE <i>//</i> CRAFT</b><span>Ottica Macrì · Piano Essenziale</span></div>
+  <div class="body">
+    <div class="col text" style="flex-basis:46%">
+      <div class="kicker">Il Piano Essenziale</div>
+      <h2>Tre cose <em>semplici</em></h2>
+      <div class="tre">
+        <div class="big3"><div class="n">1</div><svg viewBox="0 0 24 24" fill="none" stroke="#a8784a" stroke-width="1.5"><rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><div><h3>Grafica negozio</h3><p>Cartelli, cartellini, etichette.</p></div></div>
+        <div class="big3 blu"><div class="n">2</div><svg viewBox="0 0 24 24" fill="none" stroke="#1d5c8f" stroke-width="1.5"><rect x="3" y="4" width="18" height="13" rx="1.5"/><path d="M8 21h8M12 17v4"/><path d="M10 8.5v5l4-2.5z" fill="#1d5c8f"/></svg><div><h3>Video vetrina</h3><p>Cartelli animati in vetrina.</p></div></div>
+        <div class="big3"><div class="n">3</div><svg viewBox="0 0 24 24" fill="none" stroke="#a8784a" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.5 4.5-6.5 8-6.5s7 2 8 6.5"/></svg><div><h3>Archivio clienti</h3><p>Le schede, con le sue note.</p></div></div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="duo">
+        <figure class="shot desk"><img src="../media/demo-b/home-desktop.png" alt="" onerror="this.parentNode.classList.add('missing')"><span class="ph">Schermata iniziale<small>immagine in arrivo</small></span></figure>
+        <figure class="shot phone"><img src="../media/demo-b/home-telefono.png" alt="" onerror="this.parentNode.classList.add('missing')"><span class="ph">Dal<br>telefono</span></figure>
+      </div>
+      <div class="cap" style="width:86%; margin-top:5mm">Tre tessere grandi. Si tocca e si entra.</div>
+    </div>
+  </div>
+  <div class="num">02</div>
+</section>
+
+<!-- 3 GRAFICA -->
+<section class="slide">
+  <div class="top"><b>STORE <i>//</i> CRAFT</b><span>Ottica Macrì · Piano Essenziale</span></div>
+  <div class="body">
+    <div class="col text" style="flex-basis:30%">
+      <div class="kicker">1 · Grafica negozio</div>
+      <h2>Cartelli belli,<br><em>fatti da lei</em></h2>
+      <div class="rule"></div>
+      <ul class="punti">
+        <li><b>Cartelli</b> e promozioni.</li>
+        <li><b>Cartellini</b> con il prezzo.</li>
+        <li><b>Etichette</b> DYMO.</li>
+      </ul>
+      <p class="nota">Sceglie un modello, scrive due parole, stampa.</p>
+    </div>
+    <div class="col">
+      <div class="galleria">
+        <figure class="shot contain"><img src="../media/storecraft/cartello-saldi.png" alt="" onerror="this.parentNode.classList.add('missing')"><span class="ph">Cartello<br>saldi</span></figure>
+        <figure class="shot contain"><img src="../media/storecraft/cartello-promo.png" alt="" onerror="this.parentNode.classList.add('missing')"><span class="ph">Cartello<br>promo</span></figure>
+      </div>
+      <div class="striscia">
+        <figure class="shot contain" style="aspect-ratio:16/10"><img src="../media/storecraft/dashboard.png" alt="" onerror="this.parentNode.classList.add('missing')"><span class="ph">STORE // CRAFT</span></figure>
+        <figure class="shot contain" style="aspect-ratio:2132/1484"><img src="../media/storecraft/cartellino.png" alt="" onerror="this.parentNode.classList.add('missing')"><span class="ph">Cartellino</span></figure>
+        <figure class="shot contain" style="aspect-ratio:912/512"><img src="../media/storecraft/dymo.png" alt="" onerror="this.parentNode.classList.add('missing')"><span class="ph">Etichetta DYMO</span></figure>
+      </div>
+      <div class="cap">Esempi veri, fatti con STORE // CRAFT</div>
+    </div>
+  </div>
+  <div class="num">03</div>
+</section>
+
+<!-- 4 VIDEO VETRINA -->
+<section class="slide">
+  <div class="top"><b>STORE <i>//</i> CRAFT</b><span>Ottica Macrì · Piano Essenziale</span></div>
+  <div class="body v">
+    <div class="kicker">2 · Video vetrina</div>
+    <h2 style="margin-bottom:5mm">Una vetrina <em>che si muove</em></h2>
+    <div class="flusso">
+      <div class="passo-f">
+        <figure class="shot desk" style="width:78%; margin:0 auto"><img src="../media/demo-b/vetrina-desktop.png" alt="" onerror="this.parentNode.classList.add('missing')"><span class="ph">La grafica sul PC<small>immagine in arrivo</small></span></figure>
+        <div class="lab"><b>1</b>Prepara la grafica sul PC</div>
+      </div>
+      <svg class="freccia" viewBox="0 0 60 24"><path d="M2 12h50" stroke="#d4a373" stroke-width="2.4" fill="none"/><path d="M46 4l10 8-10 8" stroke="#d4a373" stroke-width="2.4" fill="none" stroke-linejoin="round"/></svg>
+      <div class="passo-f">
+        <figure class="shot tablet" style="width:72%; margin:0 auto"><img src="../media/demo-b/vetrina-tablet.png" alt="" onerror="this.parentNode.classList.add('missing')"><span class="ph">In vetrina<small>immagine in arrivo</small></span></figure>
+        <div class="lab"><b>2</b>Appare in vetrina</div>
+      </div>
+    </div>
+    <div class="confronto">
+      <div class="strada"><svg viewBox="0 0 24 24" fill="none" stroke="#a8784a" stroke-width="1.5"><rect x="3" y="4" width="18" height="14" rx="1"/><rect x="5.5" y="6.5" width="13" height="9"/><path d="M7 14l3-3 2 2 2-2 3 3M9 21l3-3 3 3"/></svg>
+        <div><h3>Cornice digitale</h3><p><b>La più economica.</b> Si caricano foto e video dal telefono. Gira da sola.</p></div></div>
+      <div class="strada blu"><svg viewBox="0 0 24 24" fill="none" stroke="#1d5c8f" stroke-width="1.5"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M11 18h2"/><path d="M10 8.5v5l4-2.5z" fill="#1d5c8f"/></svg>
+        <div><h3>Tablet</h3><p><b>Si comanda dal PC o dal telefono.</b> Si accende da solo, mostra i cartelli animati.</p></div></div>
+    </div>
+  </div>
+  <div class="num">04</div>
+</section>
+
+<!-- 5 QUALE SCHERMO -->
+<section class="slide">
+  <div class="top"><b>STORE <i>//</i> CRAFT</b><span>Ottica Macrì · Piano Essenziale</span></div>
+  <div class="body v">
+    <div class="kicker">Video vetrina</div>
+    <h2 style="margin-bottom:9mm">Quale schermo <em>scegliere</em></h2>
+    <div class="fasce">
+      <div class="fascia">
+        <div class="liv">Economico</div>
+        <h3>Cornice digitale 10"</h3>
+        <div class="cosa-f">Cornice <b>Frameo</b> (es. Denver PFF-1026) + timer per la presa.<br>Solo foto e video.</div>
+        <div class="tot"><div class="eur">60 – 90 €</div><small>con la cornice grande 15,6": 140 – 185 €</small></div>
+      </div>
+      <div class="fascia top-pick">
+        <span class="badge">Consigliato</span>
+        <div class="liv">Medio</div>
+        <h3>Tablet Samsung<br>12,4"–13" (es. Galaxy Tab S9 FE+)</h3>
+        <div class="cosa-f">Con <b>app kiosk</b> (si accende da sola sulla vetrina), <b>timer</b>, supporto e cavo lungo.</div>
+        <div class="tot"><div class="eur">180 – 255 €</div><small>con supporto antifurto: 300 – 400 €</small></div>
+      </div>
+      <div class="fascia">
+        <div class="liv">Alto</div>
+        <h3>Schermo grande 32"</h3>
+        <div class="cosa-f"><b>Samsung Smart Monitor M5</b> in verticale, con supporto e timer. Si vede di più dalla strada.</div>
+        <div class="tot"><div class="eur">220 – 270 €</div><small>oppure iPad con antifurto: 470&nbsp;–&nbsp;545&nbsp;€</small></div>
+      </div>
+    </div>
+    <div class="avviso"><span class="tag">Nota</span>Prezzi indicativi rilevati online a novembre 2026, da verificare al momento dell'acquisto. Schermo e accessori, lavoro escluso.</div>
+  </div>
+  <div class="num">05</div>
+</section>
+
+<!-- 6 CONSIGLI -->
+<section class="slide">
+  <div class="top"><b>STORE <i>//</i> CRAFT</b><span>Ottica Macrì · Piano Essenziale</span></div>
+  <div class="body v">
+    <div class="kicker">Video vetrina</div>
+    <h2 style="margin-bottom:9mm">Quattro <em>consigli pratici</em></h2>
+    <div class="consigli">
+      <div class="consiglio"><svg viewBox="0 0 24 24" fill="none" stroke="#a8784a" stroke-width="1.3"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>
+        <h3>All'ombra<br>o di sera</h3><p>Al sole diretto lo schermo quasi non si vede.</p></div>
+      <div class="consiglio"><svg viewBox="0 0 24 24" fill="none" stroke="#1d5c8f" stroke-width="1.3"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
+        <h3>Timer<br>di notte</h3><p>Si accende all'apertura e si spegne da solo.</p></div>
+      <div class="consiglio"><svg viewBox="0 0 24 24" fill="none" stroke="#a8784a" stroke-width="1.3"><path d="M10 14.5V5a2 2 0 0 1 4 0v9.5a4 4 0 1 1-4 0z"/><path d="M12 9v7"/><path d="M18 5h3M18 9h2"/></svg>
+        <h3>Caldo<br>d'estate</h3><p>Niente sole sul vetro. Lasciare passare l'aria.</p></div>
+      <div class="consiglio"><svg viewBox="0 0 24 24" fill="none" stroke="#1d5c8f" stroke-width="1.3"><rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18.5h2"/><path d="M3 7l2 1M2.5 12h2M3 17l2-1"/></svg>
+        <h3>Prima<br>una prova</h3><p>Un telefono acceso in vetrina, a mezzogiorno.</p></div>
+    </div>
+  </div>
+  <div class="num">06</div>
+</section>
+
+<!-- 7 ARCHIVIO CLIENTI -->
+<section class="slide">
+  <div class="top"><b>STORE <i>//</i> CRAFT</b><span>Ottica Macrì · Piano Essenziale</span></div>
+  <div class="body">
+    <div class="col text" style="flex-basis:38%">
+      <div class="kicker">3 · Archivio clienti</div>
+      <h2>Ogni cliente,<br><em>ricordato bene</em></h2>
+      <div class="rule"></div>
+      <ul class="punti">
+        <li>Una <b>scheda</b> per cliente.</li>
+        <li>Le sue <b>note</b>, scritte come su un quaderno.</li>
+        <li>Tutto <b>in ordine di data</b>.</li>
+      </ul>
+      <p class="nota">Semplice come una rubrica. Non è un gestionale.</p>
+    </div>
+    <div class="col">
+      <div class="scheda-wrap">
+        <div class="scheda">
+          <div class="hd"><div class="av">MR</div><div><b>Maria Rossi</b><span>cliente dal 2014 · tel. 333 …</span></div></div>
+          <div class="tl">
+            <div class="ev ult"><div class="d">Oggi</div><div class="t">Ritirati gli occhiali nuovi. Contenta.</div></div>
+            <div class="ev"><div class="d">12 ottobre 2026</div><div class="t">Scelta la montatura in tartaruga.</div></div>
+            <div class="ev"><div class="d">3 marzo 2025</div><div class="t">Lenti progressive. Preferisce le aste leggere.</div></div>
+            <div class="ev"><div class="d">20 maggio 2023</div><div class="t">Occhiali da sole graduati.</div></div>
+          </div>
+          <div class="add">+ Scrivi una nota…</div>
+        </div>
+        <figure class="shot phone"><img src="../media/demo-b/clienti-telefono.png" alt="" onerror="this.parentNode.classList.add('missing')"><span class="ph">Clienti<small>dal telefono</small></span></figure>
+      </div>
+      <div class="cap" style="width:80%; margin-top:4mm">Esempio di scheda (nome di fantasia)</div>
+    </div>
+  </div>
+  <div class="num">07</div>
+</section>
+
+<!-- 8 COSA SERVE -->
+<section class="slide">
+  <div class="top"><b>STORE <i>//</i> CRAFT</b><span>Ottica Macrì · Piano Essenziale</span></div>
+  <div class="body v">
+    <div class="kicker">Cosa serve in negozio</div>
+    <h2 style="margin-bottom:7mm">Poche cose, <em>quasi tutte già sue</em></h2>
+    <div style="display:flex; gap:8mm">
+      <div style="flex:1.2">
+        <div class="serve">
+          <div class="cosa"><svg viewBox="0 0 24 24" fill="none" stroke="#1d5c8f" stroke-width="1.5"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16v4"/></svg><div><b>Il PC</b><span>quello che ha già</span></div></div>
+          <div class="cosa"><svg viewBox="0 0 24 24" fill="none" stroke="#1d5c8f" stroke-width="1.5"><rect x="5" y="8" width="14" height="10" rx="1.5"/><path d="M8 8V4h8v4M8 18v2h8v-2"/></svg><div><b>Stampante DYMO</b><span>LabelWriter 450</span></div></div>
+          <div class="cosa"><svg viewBox="0 0 24 24" fill="none" stroke="#1d5c8f" stroke-width="1.5"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M11 18h2"/></svg><div><b>Lo schermo</b><span>per la vetrina (pagina 5)</span></div></div>
+          <div class="cosa"><svg viewBox="0 0 24 24" fill="none" stroke="#1d5c8f" stroke-width="1.5"><path d="M2 9a15 15 0 0 1 20 0M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0"/><circle cx="12" cy="19" r="1" fill="#1d5c8f"/></svg><div><b>Internet</b><span>la connessione del negozio</span></div></div>
+        </div>
+      </div>
+      <div style="flex:1; display:flex; flex-direction:column; gap:4mm; justify-content:center">
+        <div class="box oro"><h3>Come oggi</h3><p>Scontrini e Tessera Sanitaria restano come adesso: con la sua cassa e il suo commercialista.</p></div>
+        <div class="box"><h3>Fabrice</h3><p>Installa tutto in negozio e le insegna, con calma.</p></div>
+      </div>
+    </div>
+  </div>
+  <div class="num">08</div>
+</section>
+
+<!-- 9 CRESCITA -->
+<section class="slide">
+  <div class="top"><b>STORE <i>//</i> CRAFT</b><span>Ottica Macrì · Piano Essenziale</span></div>
+  <div class="body v">
+    <div class="kicker">Passo dopo passo</div>
+    <h2 style="margin-bottom:5mm; font-size:23pt; white-space:nowrap">Si comincia subito, <em>si cresce quando vuole</em></h2>
+    <div class="crescita">
+      <div class="piano b">
+        <div class="quando">Oggi · Piano B</div>
+        <h3>Piano Essenziale</h3>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6"><path d="M5 12l4.5 4.5L19 7"/></svg>Grafica negozio</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6"><path d="M5 12l4.5 4.5L19 7"/></svg>Video vetrina</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6"><path d="M5 12l4.5 4.5L19 7"/></svg>Archivio clienti</li>
+        </ul>
+        <div class="fine">Poca spesa, niente complicazioni.</div>
+      </div>
+      <div class="freccia"><svg viewBox="0 0 60 24"><path d="M2 12h50" stroke="#d4a373" stroke-width="2.4" fill="none"/><path d="M46 4l10 8-10 8" stroke="#d4a373" stroke-width="2.4" fill="none" stroke-linejoin="round"/></svg>quando<br>vuole</div>
+      <div class="piano a">
+        <div class="quando">Domani, se vuole · Piano A</div>
+        <h3>Piano Completo</h3>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#a8784a" stroke-width="1.5"><path d="M3 8l9-5 9 5v10l-9 5-9-5z"/><path d="M3 8l9 5 9-5M12 13v10"/></svg>Magazzino</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#a8784a" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/></svg>Social</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#a8784a" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="1.5"/><path d="M3 6l9 7 9-7"/></svg>Newsletter</li>
+        </ul>
+        <div class="fine">Si aggiunge sopra. Non si rifà niente.</div>
+      </div>
+    </div>
+  </div>
+  <div class="num">09</div>
+</section>
+
+<!-- 10 PROSSIMI PASSI -->
+<section class="slide dark">
+  <div class="cover" style="padding:0 18mm">
+    <div class="claim" style="margin-top:0">PROSSIMI PASSI</div>
+    <div class="passi">
+      <div class="passo"><div class="n">1</div><h3>Sceglie</h3><p>lo schermo per la vetrina.</p></div>
+      <div class="passo"><div class="n">2</div><h3>Installiamo</h3><p>tutto in negozio.</p></div>
+      <div class="passo"><div class="n">3</div><h3>Prova</h3><p>con calma, insieme.</p></div>
+      <div class="passo"><div class="n">4</div><h3>Cresce</h3><p>quando vuole lei.</p></div>
+    </div>
+    <div class="claim2" style="margin-top:9mm; font-size:12pt">Il prezzo del lavoro è nel preventivo a parte.</div>
+    <div class="sep" style="margin:10mm auto 8mm"></div>
+    <div class="grazie">Grazie</div>
+    <div class="claim2" style="margin-top:4mm">Fabrice · STORE // CRAFT</div>
+  </div>
+</section>
+
+</body>
+</html>

@@ -1,0 +1,800 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<link rel="icon" type="image/svg+xml" href="../media/logo/marchi6/04-monocolo/04-monocolo-icona-colori.svg">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Il tuo negozio con STORE // CRAFT · Ottica Macrì</title>
+<meta name="color-scheme" content="light">
+<!--
+  «Street View aumentata» (5/11/2026, versione 2; la versione precedente è vetrina-aumentata.v1.html).
+  - Sotto: Street View DAL VIVO in un iframe di Google (URL svembed senza chiave, come l'app CASA). Nessuna immagine di Google viene scaricata o salvata.
+  - Sopra: canvas three.js trasparente con gli oggetti STORE // CRAFT in scala reale. La camera three.js usa la stessa direzione/inclinazione/zoom
+    che diamo noi all'iframe (cbp=11,direzione,0,zoom,inclinazione) -> gli oggetti restano ancorati.
+  - Calibrazione (misurata con screenshot il 5/11): campo orizzontale = 2*atan(1/2^zoom) -> zoom 0 = 90°, zoom 1 = 53,1°, zoom 2 = 28,1°;
+    il campo orizzontale non dipende dalla forma del riquadro; inclinazione cbp positiva = guarda in basso.
+  - Le foto sferiche sono di Luigi Avantaggiato (2015) e collegate tra loro: P0 marciapiede, P2 tra le vetrine, P3 dentro, al bancone.
+-->
+<link rel="stylesheet" href="../tema-hud.css">
+<script src="../tema-hud.js"></script>
+<script src="../media/blackfriday/bf-data.js"></script>
+<script src="../media/blackfriday/bf-loop-data.js"></script>
+<script src="../ricerca/display-vetrina.js"></script>
+<script src="../dispositivi.js"></script>
+<script src="../proposta-schermo.js"></script>
+<script src="../vendor/three/three-bundle.js"></script>
+<script src="chiave-google.js"></script>
+<style>
+:root{--va-bianco:var(--h-bianco,#fffdf9);--va-beige:var(--h-beige,#efe6d8);--va-beige2:var(--h-beige2,#e6dac6);--va-fango:var(--h-fango,#a89a86);
+  --va-testo:var(--h-text,#2b2118);--va-mut:var(--h-mut,#5e4f41);--va-mat:#b5462c;--va-mat-d:#9e3b25;--va-blu:#1f4e79;--va-linea:rgba(110,92,72,.32)}
+body{margin:0;background:var(--va-beige);color:var(--va-testo);font:400 18px/1.5 var(--h-font,"Segoe UI",system-ui,sans-serif)}
+*{box-sizing:border-box}
+.va{max-width:1440px;margin:0 auto;padding:14px 18px 50px}
+.va-top{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.va-torna{display:inline-flex;align-items:center;gap:8px;min-height:50px;padding:10px 18px;font:700 17px/1 var(--h-title,sans-serif);letter-spacing:1.2px;text-transform:uppercase;
+  color:var(--va-blu);text-decoration:none;border:1px solid var(--va-linea);background:var(--va-bianco);
+  clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px))}
+.va-torna:hover{border-color:var(--va-blu)}
+.va-logo{height:46px;width:auto}
+.va-tit{flex:1;min-width:260px}
+.va-tit h1{margin:0;font:700 clamp(24px,3vw,36px)/1.05 var(--h-title,sans-serif);letter-spacing:1.4px;text-transform:uppercase;color:#2a1d12}
+.va-tit h1 b{color:var(--va-mat)}
+.va-tit p{margin:4px 0 0;color:var(--va-mut);font-size:18px}
+.va-firma{font:600 13px var(--h-mono,monospace);letter-spacing:2px;color:var(--va-mat);border:1px solid rgba(181,70,44,.45);padding:7px 11px;background:rgba(181,70,44,.06)}
+
+/* punti di vista */
+.va-punti{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 10px}
+.va-p{appearance:none;cursor:pointer;min-height:56px;padding:10px 18px;font:700 18px/1.1 var(--h-title,sans-serif);letter-spacing:1px;text-transform:uppercase;color:var(--va-mut);
+  background:var(--va-bianco);border:1px solid var(--va-linea);display:flex;flex-direction:column;align-items:flex-start;gap:3px;
+  clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));transition:.15s}
+.va-p small{font:500 11.5px var(--h-mono,monospace);letter-spacing:.8px;color:var(--va-fango);text-transform:none}
+.va-p:hover{border-color:var(--va-blu);color:var(--va-blu)}
+.va-p[aria-pressed="true"]{background:linear-gradient(180deg,#b5462c,#9e3b25);color:#fffdf9;border-color:#8a321f}
+.va-p[aria-pressed="true"] small{color:#f6dccf}
+
+/* la vista */
+.va-vista{position:relative;width:100%;aspect-ratio:16/9;max-height:76vh;background:#2b2118;overflow:hidden;border:1px solid var(--va-linea);user-select:none}
+/* strato più grande della finestra (K=1,4): trascinando col mouse si sposta in modo fluido, poi Google ricarica la vista nuova dietro le quinte */
+.va-strato{position:absolute;left:-20%;top:-20%;width:140%;height:140%;will-change:transform}
+.va-vista iframe{position:absolute;inset:0;width:100%;height:100%;border:0;transition:filter .5s,opacity .35s;opacity:0;pointer-events:none;z-index:0}
+.va-vista iframe.on{opacity:1;pointer-events:auto}
+.va-vista iframe.top{z-index:1}
+.va-vista .va-velo,.va-vista canvas.va-3d{z-index:2}
+.va-vista .va-presa{z-index:3;touch-action:none}
+.va-vista.trascino .va-presa{cursor:grabbing!important}
+/* modo FLUIDO 360° (Google Maps JavaScript API): Google gestisce il mouse, gli oggetti leggono la direzione a ogni fotogramma */
+.va-vista.api .va-strato{left:0;top:0;width:100%;height:100%;transform:none!important}
+.va-vista.api iframe,.va-vista.api .va-presa{display:none}
+.va-vista.api canvas.va-3d,.va-vista.api .va-velo{pointer-events:none}
+.va-gsv{position:absolute;inset:0;z-index:0}
+.va-gsv.su-oggetto,.va-gsv.su-oggetto *{cursor:pointer!important}
+.va-vista.dopo .va-gsv{filter:contrast(1.05) saturate(1.05) brightness(1.01)}
+.va-vista.dopo iframe{filter:contrast(1.05) saturate(1.05) brightness(1.01)}
+.va-vista canvas.va-3d{position:absolute;inset:0;width:100%;height:100%;filter:blur(.35px) saturate(.96);transition:opacity .6s}
+.va-vista .va-velo{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .5s;background:radial-gradient(120% 90% at 50% 50%,transparent 60%,rgba(40,25,10,.22))}
+.va-vista.dopo .va-velo{opacity:1}
+.va-vista .va-presa{position:absolute;inset:0;cursor:pointer}
+.va-vista.libera .va-presa,.va-vista.libera canvas.va-3d,.va-vista.libera .va-etis{display:none}
+.va-vista.carica canvas.va-3d,.va-vista.carica .va-etis{opacity:0}
+.va-vista.prima canvas.va-3d,.va-vista.prima .va-etis{opacity:0}
+/* staffe HUD */
+.va-staffe{position:absolute;inset:8px;pointer-events:none;z-index:6;background:
+  linear-gradient(#b5462c,#b5462c) left top/34px 2px no-repeat,linear-gradient(#b5462c,#b5462c) left top/2px 34px no-repeat,
+  linear-gradient(#1f4e79,#1f4e79) right top/34px 2px no-repeat,linear-gradient(#1f4e79,#1f4e79) right top/2px 34px no-repeat,
+  linear-gradient(#1f4e79,#1f4e79) left bottom/34px 2px no-repeat,linear-gradient(#1f4e79,#1f4e79) left bottom/2px 34px no-repeat,
+  linear-gradient(#b5462c,#b5462c) right bottom/34px 2px no-repeat,linear-gradient(#b5462c,#b5462c) right bottom/2px 34px no-repeat}
+.va-msg{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:9;background:rgba(255,253,249,.94);color:#2a1d12;padding:20px 26px;max-width:min(560px,90%);
+  font-size:19px;text-align:center;border:1px solid var(--va-linea);box-shadow:0 18px 40px -20px rgba(60,40,20,.5)}
+.va-msg[hidden]{display:none}
+.va-attesa{position:absolute;left:16px;bottom:16px;z-index:7;font:600 13px var(--h-mono,monospace);letter-spacing:1.5px;color:#fffdf9;background:rgba(43,33,24,.72);padding:8px 12px;opacity:0;transition:opacity .3s;pointer-events:none}
+.va-vista.carica .va-attesa{opacity:1}
+.va-hudpos{position:absolute;right:14px;top:12px;z-index:7;font:600 12.5px var(--h-mono,monospace);letter-spacing:1px;color:#fffdf9;background:rgba(43,33,24,.66);padding:7px 10px;pointer-events:none}
+.va-vista.libera .va-hudpos{display:none}
+
+/* etichette sugli oggetti */
+.va-etis{position:absolute;inset:0;pointer-events:none;z-index:5;transition:opacity .5s}
+.va-eti{position:absolute;left:0;top:0;transform:translate(-50%,-100%);pointer-events:auto;cursor:pointer;white-space:nowrap;
+  background:rgba(255,253,249,.93);color:#2a1d12;border:1px solid rgba(110,92,72,.45);padding:5px 10px 5px 9px;font:600 14px/1.2 var(--h-title,sans-serif);letter-spacing:.6px;
+  box-shadow:0 8px 18px -10px rgba(40,25,10,.55);clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,0 100%)}
+.va-eti::after{content:"";position:absolute;left:50%;top:100%;width:1px;height:16px;background:rgba(255,253,249,.9);box-shadow:0 0 2px rgba(0,0,0,.4)}
+.va-eti b{color:#9e3b25;font-family:var(--h-mono,monospace);font-size:12px;margin-left:6px}
+.va-eti small{display:block;font:500 11.5px var(--h-mono,monospace);color:#1f4e79;letter-spacing:.3px}
+.va-eti:hover{border-color:#b5462c}
+.va-noeti .va-eti{display:none}
+
+/* prima / dopo */
+.va-taglio{position:absolute;top:0;bottom:0;width:0;z-index:8;display:none}
+.va-vista.confronta .va-taglio{display:block}
+.va-taglio::before{content:"";position:absolute;top:0;bottom:0;left:-1px;width:3px;background:#fffdf9;box-shadow:0 0 8px rgba(0,0,0,.45)}
+.va-taglio span{position:absolute;top:50%;left:0;transform:translate(-50%,-50%);width:58px;height:58px;border-radius:50%;background:#b5462c;color:#fff;display:grid;place-items:center;
+  font:700 20px var(--h-title,sans-serif);cursor:ew-resize;box-shadow:0 6px 18px rgba(0,0,0,.35);border:3px solid #fffdf9;touch-action:none}
+.va-taglio em{position:absolute;top:52px;font:700 14px var(--h-title,sans-serif);letter-spacing:2px;color:#fff;background:rgba(43,33,24,.7);padding:5px 10px;font-style:normal;white-space:nowrap}
+.va-taglio em.a{right:12px}.va-taglio em.b{left:12px;background:rgba(158,59,37,.9)}
+
+/* comandi */
+.va-comandi{display:grid;grid-template-columns:auto 1fr;gap:14px;margin-top:12px;align-items:start}
+@media(max-width:900px){.va-comandi{grid-template-columns:1fr}}
+.va-croce{display:grid;grid-template-columns:repeat(3,72px);grid-template-rows:repeat(3,62px);gap:6px;padding:12px;background:var(--va-bianco);border:1px solid var(--va-linea)}
+.va-k{appearance:none;cursor:pointer;border:1px solid var(--va-linea);background:var(--va-beige);color:#2a1d12;font:700 24px/1 var(--h-title,sans-serif);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+.va-k small{font:600 10.5px var(--h-mono,monospace);letter-spacing:.5px;color:var(--va-mut)}
+.va-k:hover{border-color:#1f4e79;background:#fffdf9}
+.va-k:disabled{opacity:.35;cursor:default}
+.va-k.c{background:#1f4e79;color:#fff}.va-k.c small{color:#d6e3ef}
+.va-pannello{display:flex;flex-direction:column;gap:12px}
+.va-riga{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.va-riga>.va-rl{font:600 13px var(--h-mono,monospace);letter-spacing:1.6px;text-transform:uppercase;color:var(--va-mut);min-width:118px}
+.va-seg{appearance:none;cursor:pointer;min-height:50px;padding:10px 16px;font:700 17px/1 var(--h-title,sans-serif);letter-spacing:.8px;color:#2a1d12;background:var(--va-bianco);border:1px solid var(--va-linea)}
+.va-seg:hover{border-color:#1f4e79}
+.va-seg[aria-pressed="true"]{background:#1f4e79;color:#fff;border-color:#173c5e}
+.va-seg.rosso[aria-pressed="true"]{background:#b5462c;border-color:#8a321f}
+.va-seg:disabled{opacity:.4;cursor:default}
+.va-aiuto{margin:0;color:var(--va-mut);font-size:17px}
+.va-aiuto b{color:#2a1d12}
+
+/* scheda flottante */
+.va-scheda{position:absolute;z-index:10;width:min(420px,calc(100% - 24px));max-height:calc(100% - 24px);overflow:auto;background:rgba(255,253,249,.97);color:#2a1d12;
+  border:1px solid rgba(110,92,72,.45);box-shadow:0 26px 60px -24px rgba(40,25,10,.65);padding:18px 18px 16px;
+  clip-path:polygon(0 0,calc(100% - 18px) 0,100% 18px,100% 100%,18px 100%,0 calc(100% - 18px));
+  transform-origin:var(--ox,50%) var(--oy,50%);animation:va-apri .32s cubic-bezier(.22,.9,.24,1)}
+.va-scheda[hidden]{display:none}
+@keyframes va-apri{from{opacity:0;transform:scale(.86) translateY(8px)}to{opacity:1;transform:none}}
+.va-scheda::before{content:"";position:absolute;left:0;top:0;width:44px;height:3px;background:#b5462c}
+.va-scheda .x{position:absolute;right:10px;top:10px;width:44px;height:44px;border:1px solid var(--va-linea);background:var(--va-beige);font:700 22px/1 sans-serif;cursor:pointer;color:#2a1d12}
+.va-scheda h3{margin:0 50px 2px 0;font:700 24px/1.1 var(--h-title,sans-serif);letter-spacing:.8px;text-transform:uppercase}
+.va-scheda .mis{font:600 13px var(--h-mono,monospace);color:#1f4e79;letter-spacing:.5px}
+.va-scheda .fig{display:flex;gap:12px;margin:12px 0 8px;align-items:flex-start}
+.va-scheda .fig img{width:120px;height:auto;max-height:170px;object-fit:contain;background:#2b2118;border:1px solid var(--va-linea)}
+.va-scheda .fig p{margin:0;font-size:16.5px}
+.va-scheda h4{margin:10px 0 4px;font:700 14px var(--h-mono,monospace);letter-spacing:1.6px;text-transform:uppercase;color:#9e3b25}
+.va-scheda ul{margin:0;padding-left:20px;font-size:16.5px}
+.va-scheda li{margin:3px 0}
+.va-scheda .prezzo{margin-top:10px;padding:9px 11px;background:var(--va-beige);border-left:3px solid #1f4e79;font-size:16px}
+.va-scheda .prezzo b{font-family:var(--h-mono,monospace);font-size:14.5px}
+.va-scheda .azioni{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.va-scheda .come{display:none;margin-top:10px;font-size:16px;background:#fbf6ee;border:1px dashed var(--va-linea);padding:10px 12px}
+.va-scheda .come.on{display:block}
+.va-scheda .come ol{margin:0;padding-left:20px}
+/* mini anteprima dell'app */
+.va-app{margin:10px 0 4px;border:1px solid #cbbfae;background:#f7f1e7;font-family:var(--h-title,sans-serif)}
+.va-app .barra{display:flex;align-items:center;gap:8px;background:#2b2118;color:#fffdf9;padding:6px 9px;font:700 13px var(--h-mono,monospace);letter-spacing:1.4px}
+.va-app .barra img{height:20px}
+.va-app .barra span{flex:1}
+.va-app .tess{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:8px}
+.va-app .tess div{padding:10px 6px;text-align:center;font:700 15px var(--h-title,sans-serif);letter-spacing:1px;color:#fff;background:#b5462c}
+.va-app .tess div:nth-child(2){background:#1f4e79}.va-app .tess div:nth-child(3){background:#6b5c4c}
+.va-app .tess small{display:block;font:500 10.5px var(--h-mono,monospace);opacity:.85;letter-spacing:.3px}
+.va-app .eti{margin:0 8px 8px;background:#fff;border:1px solid #cbbfae;padding:7px 9px;display:flex;gap:10px;align-items:center}
+.va-app .eti .t{flex:1;font:700 14px/1.15 var(--h-title,sans-serif)}
+.va-app .eti .t small{display:block;font:500 11px var(--h-mono,monospace);color:#5e4f41}
+.va-app .eti .t b{color:#9e3b25;font-size:18px}
+.va-app .eti svg{width:120px;height:34px}
+.va-app .piede{font:500 11px var(--h-mono,monospace);color:#5e4f41;padding:0 8px 7px}
+.va-note{margin:14px 0 0;color:var(--va-mut);font-size:16px}
+.hbtn.va-big{min-height:52px;font-size:17px}
+</style>
+</head>
+<body class="hud">
+<main class="va">
+ <div class="va-top">
+  <a class="va-torna" href="../index.html">← Torna al portale</a>
+  <img class="va-logo" src="../media/logo/marchi6/06-ovale/06-ovale-colori.svg" alt="" onerror="this.remove()">
+  <div class="va-tit"><h1>Il tuo negozio <b>con STORE // CRAFT</b></h1>
+   <p>Street View dal vivo, con sopra gli espositori e la postazione, in misura vera. Guardati intorno trascinando col mouse, o con i pulsanti grandi qui sotto.</p></div>
+  <span class="va-firma">OTTICA MACRÌ · VIA POGGI D’ORO 23</span>
+ </div>
+
+ <nav class="va-punti" aria-label="Punti di vista"></nav>
+
+ <div class="va-vista carica dopo" id="vista">
+  <div class="va-strato" id="strato">
+  <iframe id="sv" class="on" title="Google Street View dal vivo: Ottica Macrì" referrerpolicy="no-referrer-when-downgrade" allow="accelerometer; gyroscope; fullscreen" allowfullscreen></iframe>
+  <iframe id="sv2" title="Google Street View dal vivo (vista successiva)" referrerpolicy="no-referrer-when-downgrade" allow="accelerometer; gyroscope; fullscreen" allowfullscreen></iframe>
+  <div class="va-velo"></div>
+  <canvas class="va-3d" id="c3d"></canvas>
+  <div class="va-presa" id="presa"></div>
+  <div class="va-etis" id="etis"></div>
+  </div>
+  <div class="va-taglio" id="taglio" style="left:50%"><em class="a">PRIMA · oggi</em><em class="b">DOPO · con STORE // CRAFT</em><span>⟷</span></div>
+  <div class="va-staffe"></div>
+  <div class="va-hudpos mono" id="hudpos"></div>
+  <div class="va-attesa">CARICO LA VISTA…</div>
+  <div class="va-msg" id="msg" hidden></div>
+  <section class="va-scheda" id="scheda" hidden></section>
+ </div>
+
+ <div class="va-comandi">
+  <div class="va-croce" aria-label="Muoversi">
+   <button class="va-k" data-m="su" title="Guarda più in alto">▲<small>SU</small></button>
+   <button class="va-k" data-m="av" title="Fai un passo avanti">⇧<small>AVANTI</small></button>
+   <button class="va-k" data-m="zi" title="Avvicina (zoom)">＋<small>ZOOM</small></button>
+   <button class="va-k" data-m="sx" title="Girati a sinistra di 30°">↺<small>SINISTRA</small></button>
+   <button class="va-k c" data-m="cx" title="Torna dritto">◎<small>DRITTO</small></button>
+   <button class="va-k" data-m="dx" title="Girati a destra di 30°">↻<small>DESTRA</small></button>
+   <button class="va-k" data-m="giu" title="Guarda più in basso">▼<small>GIÙ</small></button>
+   <button class="va-k" data-m="in" title="Fai un passo indietro">⇩<small>INDIETRO</small></button>
+   <button class="va-k" data-m="zo" title="Allontana (zoom)">－<small>ZOOM</small></button>
+  </div>
+  <div class="va-pannello">
+   <div class="va-riga"><span class="va-rl">Vista</span>
+    <button class="va-seg rosso" data-vista="dopo" aria-pressed="true">DOPO · con STORE // CRAFT</button>
+    <button class="va-seg" data-vista="prima" aria-pressed="false">PRIMA · oggi</button>
+    <button class="va-seg" data-vista="confronta" aria-pressed="false">⟷ Confronta</button></div>
+   <div class="va-riga"><span class="va-rl">Modo</span>
+    <button class="va-seg" data-modo="aumentata" aria-pressed="true">Aumentata (con gli oggetti)</button>
+    <button class="va-seg" data-modo="libera" aria-pressed="false">Libera (Street View di Google)</button></div>
+   <div class="va-riga"><span class="va-rl">Misura</span>
+    <button class="va-seg" data-mis="10x15" aria-pressed="false">10×15</button>
+    <button class="va-seg" data-mis="13x18" aria-pressed="true">13×18</button>
+    <button class="va-seg" data-mis="A5" aria-pressed="false">A5</button>
+    <button class="va-seg" data-mis="A4" aria-pressed="false">A4 <small>(solo bancone)</small></button></div>
+   <div class="va-riga"><span class="va-rl">Grafiche</span>
+    <button class="va-seg" data-graf="scure" aria-pressed="true">Scure</button>
+    <button class="va-seg" data-graf="chiare" aria-pressed="false">Chiare</button>
+    <span class="va-rl" style="min-width:0;margin-left:14px">Etichette</span>
+    <button class="va-seg" data-eti="1" aria-pressed="true">Sì</button>
+    <button class="va-seg" data-eti="0" aria-pressed="false">No</button></div>
+   <p class="va-aiuto" id="aiuto"></p>
+  </div>
+ </div>
+ <p class="va-note">Le foto sono quelle pubbliche di Google Street View (foto sferiche di Luigi Avantaggiato), mostrate dal vivo e non salvate.
+  Gli oggetti aggiunti sono ricostruzioni 3D in scala reale: le misure sono vere, la posizione è un’ipotesi da decidere insieme. Prezzi indicativi da rivedere.</p>
+</main>
+
+<script>
+(function(){
+'use strict';
+var $=function(s){return document.querySelector(s)};
+var BF=window.BF||{}, LOOP=window.BF_LOOP||null, PREZZI=window.DISPLAY_PREZZI||null;
+var S={pano:'P0',h:90,p:0,z:0,mis:'13x18',graf:'scure',vista:'dopo',modo:'aumentata',eti:true,taglio:0.5};
+try{var sv=JSON.parse(localStorage.getItem('va2-pref')||'{}');['mis','graf','eti'].forEach(function(k){if(sv[k]!=null)S[k]=sv[k]})}catch(e){}
+function salvaPref(){try{localStorage.setItem('va2-pref',JSON.stringify({mis:S.mis,graf:S.graf,eti:S.eti}))}catch(e){}}
+
+/* ---------------- foto sferiche (coordinate esatte dei punti di Google: l'iframe si aggancia a quelle) ---------------- */
+var PANO={
+ P0:{nome:'Davanti al negozio',lat:41.8711568,lon:12.529688,luce:'fuori'},
+ P2:{nome:'Ingresso, tra le vetrine',lat:41.8711527,lon:12.5297236,luce:'fuori'},
+ P3:{nome:'Dentro, al bancone',lat:41.8711402,lon:12.5297359,luce:'dentro'}
+};
+var CATENA=['P0','P2','P3'];
+var PUNTI=[
+ {id:'fuori',  nome:'Davanti al negozio', sub:'vetrine e ingresso', pano:'P0',h:90,p:0,z:0},
+ {id:'vetrina',nome:'Vetrina da vicino',  sub:'il tablet acceso',   pano:'P0',h:112,p:2,z:1},
+ {id:'ingr',   nome:'Ingresso',           sub:'tra le due vetrine', pano:'P2',h:90,p:0,z:0},
+ {id:'banco',  nome:'Bancone',            sub:'postazione STORE // CRAFT',pano:'P3',h:80,p:0,z:0},
+ {id:'parete', nome:'Parete occhiali',    sub:'porta-prezzi',       pano:'P3',h:165,p:6,z:0},
+ {id:'vdentro',nome:'Vetrina da dentro',  sub:'il cartello nuovo',  pano:'P3',h:265,p:0,z:0}
+];
+function svUrl(h,p){var P=PANO[S.pano];if(h==null){h=S.h;p=S.p}return 'https://www.google.com/maps?layer=c&cbll='+P.lat+','+P.lon+'&cbp=11,'+h.toFixed(1)+',0,'+S.z+','+(+p).toFixed(1)+'&output=svembed&hl=it'}
+
+/* ---------------- grafiche ---------------- */
+function graf(k){var c=BF[k+'-chiaro'],s=BF[k];return (S.graf==='chiare'&&c)?c:(s||c||null)}
+function grafA4(){return graf('bf-a4-modella')||graf('bf-cartello-2')}
+function slideList(vert){
+  var L=LOOP&&(S.graf==='chiare'?(vert?LOOP.chiareV:LOOP.chiare):(vert?LOOP.scureV:LOOP.scure));
+  if(L&&L.length)return L;
+  var out=[],ks=vert?['bf-slide-v1','bf-slide-v2','bf-slide-v3']:['bf-slide-1','bf-slide-2','bf-slide-3','bf-slide-4','bf-slide-5','bf-slide-6'];
+  ks.forEach(function(k){var g=graf(k);if(g)out.push(g)});return out}
+var LOGO=null;(function(){var im=new Image();im.onload=function(){ /* su file:// l'SVG può "sporcare" il canvas: si prova prima, se non va si usa solo nell'HUD */
+  try{var c=document.createElement('canvas');c.width=c.height=8;var g=c.getContext('2d');g.drawImage(im,0,0,8,8);g.getImageData(0,0,1,1);LOGO=im;if(window.__vaRidisegna)window.__vaRidisegna()}catch(e){LOGO=null}};
+  im.src='../media/logo/marchi6/04-monocolo/04-monocolo-icona-rosso.svg'})();
+
+/* ---------------- misure (cm) ---------------- */
+var MIS={'10x15':{w:10,h:15,n:'10×15 cm'},'13x18':{w:13,h:18,n:'13×18 cm'},'A5':{w:14.8,h:21,n:'A5 · 14,8×21 cm'},'A4':{w:21,h:29.7,n:'A4 · 21×29,7 cm'}};
+function prezzo(k){return PREZZI&&PREZZI[k]?PREZZI[k]:null}
+
+if(!window.THREE){$('#msg').hidden=false;$('#msg').textContent='Non riesco a caricare il motore 3D (file ../vendor/three/three-bundle.js). La vista di Google funziona lo stesso in modo «Libera».';}
+var T=window.THREE;
+var vista=$('#vista'),cv=$('#c3d'),strato=$('#strato'),IFR=[$('#sv'),$('#sv2')],att=0,K=1.4;
+var R=new T.WebGLRenderer({canvas:cv,alpha:true,antialias:true,preserveDrawingBuffer:true});
+R.setClearColor(0x000000,0);R.outputColorSpace=T.SRGBColorSpace;R.toneMapping=T.ACESFilmicToneMapping;R.toneMappingExposure=1.0;
+R.shadowMap.enabled=true;R.shadowMap.type=T.PCFSoftShadowMap;
+var scena=new T.Scene();
+var cam=new T.PerspectiveCamera(50,16/9,0.03,60);cam.rotation.order='YXZ';
+/* environment: stanza neutra con PMREM, poi tinta per la luce del posto */
+var pm=new T.PMREMGenerator(R);
+var envRoom=pm.fromScene(new T.RoomEnvironment(),0.04).texture;
+scena.environment=envRoom;
+
+/* ---------- utilità di posizione: dal pixel di uno screenshot di riferimento 1280×720 alla posizione nel mondo ----------
+   mondo: x = est, y = su (0 = occhio della camera), z = sud (nord = -z). Ogni foto sferica ha il suo gruppo con la camera nell'origine. */
+var D2R=Math.PI/180;
+function dirDa(h,z,px,py){var f=640*Math.pow(2,z),x=(px-640)/f,y=-(py-360)/f,hr=h*D2R;
+  return new T.Vector3(Math.sin(hr)+Math.cos(hr)*x,y,-Math.cos(hr)+Math.sin(hr)*x)}
+function punto(ref,px,py,prof){return dirDa(ref[0],ref[1],px,py).multiplyScalar(prof)}
+function versoCamera(pos){return Math.atan2(-pos.x,-pos.z)} /* rotation.y che gira il fronte (+z) verso la camera */
+function versoDir(head){return Math.PI-head*D2R}               /* fronte rivolto verso la direzione (gradi bussola) */
+
+/* ---------- texture ---------- */
+var texCache={};
+function texDa(uri,cb){if(!uri)return null;if(texCache[uri])return texCache[uri];
+  var t=new T.Texture();t.colorSpace=T.SRGBColorSpace;t.anisotropy=8;var im=new Image();im.onload=function(){t.image=im;t.needsUpdate=true;if(cb)cb()};im.src=uri;texCache[uri]=t;return t}
+function texLegno(chiaro){var c=document.createElement('canvas');c.width=512;c.height=128;var g=c.getContext('2d');
+  g.fillStyle=chiaro?'#c99b66':'#7a4a28';g.fillRect(0,0,512,128);
+  for(var i=0;i<140;i++){var y=Math.random()*128,a=Math.random()*.16;g.strokeStyle=(Math.random()<.5?'rgba(60,30,10,':'rgba(255,220,170,')+a+')';g.lineWidth=.6+Math.random()*1.8;
+    g.beginPath();g.moveTo(0,y);for(var x=0;x<=512;x+=16)g.lineTo(x,y+Math.sin(x/(30+Math.random()*4)+i)*2.2+Math.sin(x/97+i*.3)*3);g.stroke()}
+  for(var k=0;k<3;k++){var cx=Math.random()*512,cy=Math.random()*128;var gr=g.createRadialGradient(cx,cy,1,cx,cy,10);gr.addColorStop(0,'rgba(50,25,8,.5)');gr.addColorStop(1,'rgba(50,25,8,0)');g.fillStyle=gr;g.fillRect(cx-12,cy-12,24,24)}
+  var t=new T.CanvasTexture(c);t.colorSpace=T.SRGBColorSpace;t.wrapS=t.wrapT=T.RepeatWrapping;t.anisotropy=8;return t}
+var BLOB=(function(){var c=document.createElement('canvas');c.width=c.height=128;var g=c.getContext('2d');var gr=g.createRadialGradient(64,64,4,64,64,62);
+  gr.addColorStop(0,'rgba(0,0,0,.85)');gr.addColorStop(.45,'rgba(0,0,0,.45)');gr.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gr;g.fillRect(0,0,128,128);
+  var t=new T.CanvasTexture(c);return t})();
+
+/* ---------- materiali ---------- */
+var M={
+ plexi:new T.MeshPhysicalMaterial({color:0xffffff,metalness:0,roughness:0.04,transparent:true,opacity:0.08,clearcoat:.6,clearcoatRoughness:0.05,ior:1.49,specularIntensity:.6,envMapIntensity:0.7,side:T.DoubleSide,depthWrite:false}),
+ plexiBordo:new T.MeshPhysicalMaterial({color:0xd8ece6,metalness:0,roughness:0.08,transparent:true,opacity:0.55,clearcoat:1,envMapIntensity:1.8}),
+ allu:new T.MeshStandardMaterial({color:0xc9ccd0,metalness:1,roughness:0.32}),
+ alluScuro:new T.MeshStandardMaterial({color:0x5b5e63,metalness:1,roughness:0.38}),
+ vetroNero:new T.MeshPhysicalMaterial({color:0x07080a,metalness:0,roughness:0.06,clearcoat:1,clearcoatRoughness:0.02,envMapIntensity:1.4}),
+ plastica:new T.MeshPhysicalMaterial({color:0x34363a,metalness:0,roughness:0.55,clearcoat:.25,clearcoatRoughness:.5}),
+ plasticaNera:new T.MeshStandardMaterial({color:0x151618,metalness:0,roughness:0.45}),
+ carta:new T.MeshStandardMaterial({color:0xfdfcf8,roughness:0.75}),
+ legno:new T.MeshPhysicalMaterial({map:texLegno(false),roughness:0.5,clearcoat:.35,clearcoatRoughness:.4}),
+ legnoChiaro:new T.MeshPhysicalMaterial({map:texLegno(true),roughness:0.5,clearcoat:.35,clearcoatRoughness:.4}),
+ acciaio:new T.MeshStandardMaterial({color:0x9a9da2,metalness:1,roughness:0.25})
+};
+function box(w,h,d,m){return new T.Mesh(new T.BoxGeometry(w,h,d),m)}
+function rbox(w,h,d,r,m){return new T.Mesh(new T.RoundedBoxGeometry(w,h,d,4,r),m)}
+function grafMat(uri){return new T.MeshStandardMaterial({map:texDa(uri),roughness:0.6,metalness:0})}
+function ombre(g,w,d,forza){
+  var b=new T.Mesh(new T.PlaneGeometry(w*1.7,d*2.4),new T.MeshBasicMaterial({map:BLOB,transparent:true,opacity:forza||.55,depthWrite:false,toneMapped:false,color:0x000000}));
+  b.rotation.x=-Math.PI/2;b.position.y=0.0015;b.renderOrder=-1;g.add(b);
+  var s=new T.Mesh(new T.PlaneGeometry(w*1.6,d*2.2+0.06),new T.ShadowMaterial({opacity:.26,depthWrite:false}));s.rotation.x=-Math.PI/2;s.position.y=0.001;s.receiveShadow=true;g.add(s)}
+function ombreggia(o){o.traverse(function(m){if(m.isMesh&&!(m.material&&m.material.isShadowMaterial)&&m.material.map!==BLOB){m.castShadow=true}})}
+
+/* ---------- costruttori di oggetti (misure in metri, base al centro sul piano d'appoggio, fronte verso +z) ---------- */
+function plexiL(wcm,hcm,uri){ /* espositore a L: lastra 3 mm inclinata di 12°, base 3 mm, stampa dietro la lastra */
+  var w=wcm/100,h=hcm/100,g=new T.Group(),inc=12*D2R,t=0.003;
+  var pan=new T.Group();pan.rotation.x=-inc;g.add(pan);
+  var lastra=box(w+0.012,h+0.012,t,M.plexi);lastra.position.set(0,(h+0.012)/2,0.004);pan.add(lastra);
+  var retro=box(w+0.012,h+0.012,t,M.plexi);retro.position.set(0,(h+0.012)/2,-0.0015);pan.add(retro);
+  var bordo=new T.Mesh(new T.EdgesGeometry(new T.BoxGeometry(w+0.012,h+0.012,0.0085)),new T.LineBasicMaterial({color:0xe9f6f2,transparent:true,opacity:.55}));bordo.position.set(0,(h+0.012)/2,0.001);pan.add(bordo);
+  var st=new T.Mesh(new T.PlaneGeometry(w,h),grafMat(uri));st.position.set(0,h/2+0.006,0.0022);pan.add(st);st.userData.grafica=true;
+  var base=box(w+0.012,t,Math.max(0.06,h*0.32),M.plexi);base.position.set(0,t/2,-Math.max(0.06,h*0.32)/2+0.004);g.add(base);
+  var bb=new T.Mesh(new T.EdgesGeometry(base.geometry),new T.LineBasicMaterial({color:0xe9f6f2,transparent:true,opacity:.45}));bb.position.copy(base.position);g.add(bb);
+  ombre(g,w+0.02,Math.max(0.06,h*0.32));ombreggia(g);g.userData.stampa=st;return g}
+function cornice(wcm,hcm,uri,chiaro){ /* cornicetta da banco in legno, profilo 2,2 cm, vetro, cavalletto */
+  var w=wcm/100,h=hcm/100,p=0.022,sp=0.016,g=new T.Group(),inc=10*D2R,fr=new T.Group();fr.rotation.x=-inc;g.add(fr);
+  var W=w+2*p,H=h+2*p,mat=chiaro?M.legnoChiaro:M.legno;
+  [[0,H-p/2,W,p],[0,p/2,W,p]].forEach(function(a){var b=rbox(a[2],a[3],sp,0.003,mat);b.position.set(a[0],a[1],0);fr.add(b)});
+  [[-W/2+p/2,H/2],[W/2-p/2,H/2]].forEach(function(a){var b=rbox(p,H-2*p+0.002,sp,0.003,mat);b.position.set(a[0],a[1],0);fr.add(b)});
+  var st=new T.Mesh(new T.PlaneGeometry(w,h),grafMat(uri));st.position.set(0,H/2,-0.002);fr.add(st);
+  var vetro=box(w,h,0.002,M.plexi);vetro.position.set(0,H/2,0.002);fr.add(vetro);
+  var retro=box(W-0.01,H-0.01,0.003,new T.MeshStandardMaterial({color:0x4a3a2c,roughness:.9}));retro.position.set(0,H/2,-0.007);fr.add(retro);
+  var cav=box(0.025,H*0.7,0.004,new T.MeshStandardMaterial({color:0x4a3a2c,roughness:.9}));cav.position.set(0,H*0.33,-0.06);cav.rotation.x=0.42;g.add(cav);
+  ombre(g,W,0.1);ombreggia(g);g.userData.stampa=st;return g}
+/* schermo con slide che sfumano: canvas 1024 */
+var schermi=[];
+function schermo(wPx,hPx,vert,disegno){var c=document.createElement('canvas');c.width=wPx;c.height=hPx;var t=new T.CanvasTexture(c);t.colorSpace=T.SRGBColorSpace;t.anisotropy=8;
+  var s={c:c,g:c.getContext('2d'),t:t,vert:vert,i:0,t0:performance.now(),imgs:[],disegno:disegno};schermi.push(s);caricaSlide(s);return s}
+function caricaSlide(s){if(s.disegno)return;s.imgs=slideList(s.vert).map(function(u){var im=new Image();im.src=u;return im});s.i=0;s.t0=performance.now()}
+function aggiornaSchermi(now){schermi.forEach(function(s){var g=s.g,W=s.c.width,H=s.c.height;
+  if(s.disegno){if(!s.fatto||now-s.fatto>1000){s.disegno(g,W,H,now);s.t.needsUpdate=true;s.fatto=now}return}
+  if(!s.imgs.length)return;var dur=4000,fade=900,el=now-s.t0;if(el>dur+fade){s.i=(s.i+1)%s.imgs.length;s.t0=now;el=0}
+  var a=s.imgs[s.i],b=s.imgs[(s.i+1)%s.imgs.length];g.fillStyle='#000';g.fillRect(0,0,W,H);
+  if(a.complete&&a.naturalWidth)copri(g,a,W,H,1);
+  if(el>dur&&b.complete&&b.naturalWidth)copri(g,b,W,H,(el-dur)/fade);s.t.needsUpdate=true})}
+function copri(g,im,W,H,al){var r=Math.max(W/im.naturalWidth,H/im.naturalHeight),w=im.naturalWidth*r,h=im.naturalHeight*r;g.globalAlpha=al;g.drawImage(im,(W-w)/2,(H-h)/2,w,h);g.globalAlpha=1}
+function schermoMat(s){return new T.MeshBasicMaterial({map:s.t,toneMapped:false,color:new T.Color(0.86,0.86,0.86)})}
+function tablet(){ /* tablet 12,4"–13" (es. Galaxy Tab S9 FE+: 28,5×18,5×0,65 cm, schermo 16:10 26,7×16,7) orizzontale su supporto in alluminio, inclinato 15° */
+  var g=new T.Group(),w=0.285,h=0.185,d=0.0065,inc=15*D2R,tb=new T.Group();tb.position.set(0,0.035,0.02);tb.rotation.x=-inc;g.add(tb);
+  var corpo=rbox(w,h,d,0.0028,M.allu);corpo.position.y=h/2;tb.add(corpo);
+  var vetro=rbox(w-0.002,h-0.002,0.0012,0.0025,M.vetroNero);vetro.position.set(0,h/2,d/2);tb.add(vetro);
+  var s=schermo(1024,640,false);var sc=new T.Mesh(new T.PlaneGeometry(0.267,0.167),schermoMat(s));sc.position.set(0,h/2,d/2+0.0008);tb.add(sc);
+  var riflesso=new T.Mesh(new T.PlaneGeometry(w-0.004,h-0.004),new T.MeshPhysicalMaterial({color:0xffffff,transparent:true,opacity:0.06,roughness:0.02,clearcoat:1,depthWrite:false}));riflesso.position.set(0,h/2,d/2+0.0014);tb.add(riflesso);
+  var cam1=new T.Mesh(new T.CircleGeometry(0.0016,16),new T.MeshBasicMaterial({color:0x222428}));cam1.position.set(0,h-0.004,d/2+0.0009);tb.add(cam1);
+  /* supporto */
+  var pied=rbox(0.13,0.008,0.11,0.003,M.allu);pied.position.set(0,0.004,0);g.add(pied);
+  var asta=rbox(0.05,0.11,0.008,0.003,M.allu);asta.position.set(0,0.06,-0.03);asta.rotation.x=-0.42;g.add(asta);
+  var lab=rbox(w*0.55,0.006,0.02,0.002,M.allu);lab.position.set(0,0.036,0.028);g.add(lab);
+  ombre(g,0.24,0.14,.6);ombreggia(g);g.userData.schermo=s;return g}
+function monitor(){ /* monitor 24" (53×31 cm area visibile) con l'app */
+  var g=new T.Group(),w=0.548,h=0.33,s=schermo(1280,770,false,disegnaApp);
+  var sch=new T.Group();sch.position.y=0.12;sch.rotation.x=-5*D2R;g.add(sch);
+  var corpo=rbox(w+0.012,h+0.02,0.018,0.004,M.plasticaNera);corpo.position.set(0,h/2,-0.009);sch.add(corpo);
+  var sc=new T.Mesh(new T.PlaneGeometry(w,h),schermoMat(s));sc.position.set(0,h/2+0.004,0.0012);sch.add(sc);
+  var rif=new T.Mesh(new T.PlaneGeometry(w,h),new T.MeshPhysicalMaterial({color:0xffffff,transparent:true,opacity:0.05,roughness:0.15,clearcoat:.6,depthWrite:false}));rif.position.set(0,h/2+0.004,0.0016);sch.add(rif);
+  var collo=rbox(0.05,0.17,0.025,0.006,M.alluScuro);collo.position.set(0,0.085,-0.05);g.add(collo);
+  var piede=rbox(0.22,0.012,0.16,0.005,M.alluScuro);piede.position.set(0,0.006,-0.04);g.add(piede);
+  ombre(g,0.24,0.16,.6);ombreggia(g);g.userData.schermo=s;return g}
+function dymo(){ /* DYMO LabelWriter 450: 12,5×18,7×13,4 cm, grigio scuro, etichetta 89×28 mm che esce */
+  var g=new T.Group(),corpo=rbox(0.125,0.10,0.187,0.022,M.plastica);corpo.position.y=0.05;g.add(corpo);
+  var cop=rbox(0.118,0.04,0.14,0.016,new T.MeshPhysicalMaterial({color:0x2a2c30,roughness:.35,clearcoat:.6,transparent:true,opacity:.92}));cop.position.set(0,0.108,-0.015);g.add(cop);
+  var tasto=new T.Mesh(new T.CylinderGeometry(0.009,0.009,0.004,24),new T.MeshStandardMaterial({color:0x6aa7d8,emissive:0x1f4e79,emissiveIntensity:.6,roughness:.4}));tasto.position.set(0.035,0.101,0.07);g.add(tasto);
+  var c=document.createElement('canvas');c.width=512;c.height=160;disegnaEtichetta(c.getContext('2d'),512,160);var tx=new T.CanvasTexture(c);tx.colorSpace=T.SRGBColorSpace;
+  var et=new T.Mesh(new T.PlaneGeometry(0.089,0.028),new T.MeshStandardMaterial({map:tx,roughness:.7,side:T.DoubleSide}));
+  et.position.set(0,0.112,0.105);et.rotation.x=-1.05;g.add(et);
+  ombre(g,0.13,0.19,.6);ombreggia(g);return g}
+function lettore(){ /* lettore di codici a barre su base */
+  var g=new T.Group(),base=new T.Mesh(new T.CylinderGeometry(0.045,0.05,0.018,32),M.plasticaNera);base.position.y=0.009;g.add(base);
+  var cul=new T.Mesh(new T.CylinderGeometry(0.03,0.035,0.05,32,1,true),M.plasticaNera);cul.position.y=0.04;g.add(cul);
+  var imp=rbox(0.032,0.12,0.04,0.012,M.plastica);imp.position.set(0,0.085,0.0);imp.rotation.x=0.35;g.add(imp);
+  var testa=rbox(0.075,0.05,0.085,0.016,M.plastica);testa.position.set(0,0.15,0.035);testa.rotation.x=0.35;g.add(testa);
+  var fin=new T.Mesh(new T.PlaneGeometry(0.06,0.03),new T.MeshBasicMaterial({color:0xff3b2a,transparent:true,opacity:.75}));fin.position.set(0,0.13,0.08);fin.rotation.x=0.35-Math.PI/2+0.3;g.add(fin);
+  ombre(g,0.1,0.1,.6);ombreggia(g);return g}
+function totem(uri){ /* espositore da terra A4: base tonda in acciaio, asta, porta-A4 in plexiglass a 120 cm */
+  var g=new T.Group(),base=new T.Mesh(new T.CylinderGeometry(0.15,0.16,0.012,48),M.acciaio);base.position.y=0.006;g.add(base);
+  var asta=new T.Mesh(new T.CylinderGeometry(0.009,0.009,1.0,20),M.acciaio);asta.position.y=0.51;g.add(asta);
+  var tes=new T.Group();tes.position.y=1.0;tes.rotation.x=-15*D2R;g.add(tes);
+  var w=0.21,h=0.297;var st=new T.Mesh(new T.PlaneGeometry(w,h),grafMat(uri));st.position.set(0,h/2,0.002);tes.add(st);
+  var l=box(w+0.016,h+0.016,0.003,M.plexi);l.position.set(0,h/2,0.005);tes.add(l);
+  var r=box(w+0.016,h+0.016,0.003,M.plexi);r.position.set(0,h/2,-0.001);tes.add(r);
+  var bo=new T.Mesh(new T.EdgesGeometry(new T.BoxGeometry(w+0.016,h+0.016,0.009)),new T.LineBasicMaterial({color:0xe9f6f2,transparent:true,opacity:.6}));bo.position.set(0,h/2,0.002);tes.add(bo);
+  var att=box(0.04,0.03,0.02,M.acciaio);att.position.set(0,-0.005,-0.01);tes.add(att);
+  ombre(g,0.32,0.32,.65);ombreggia(g);g.userData.stampa=st;return g}
+function manifesto(wm,hm,uri,chiave){ /* cornice a scatto in alluminio con lastra antiriflesso, appesa al muro */
+  var g=new T.Group(),p=0.025,W=wm+2*p,H=hm+2*p;
+  var c=document.createElement('canvas');c.width=700;c.height=Math.round(700*hm/wm);var gg=c.getContext('2d');
+  var tx=new T.CanvasTexture(c);tx.colorSpace=T.SRGBColorSpace;tx.anisotropy=8;
+  function dis(){var Wc=c.width,Hc=c.height;var chiaro=S.graf==='chiare';gg.fillStyle=chiaro?'#f3ece0':'#0d0a08';gg.fillRect(0,0,Wc,Hc);
+    var u=chiave?graf(chiave):grafA4(),im=new Image();im.onload=function(){var r=Wc/im.naturalWidth,h=im.naturalHeight*r;gg.drawImage(im,0,0,Wc,h);
+      var y=h,rest=Hc-h;gg.fillStyle=chiaro?'#2b2118':'#d9c3a0';gg.textAlign='center';
+      if(LOGO){try{var lh=rest*.42;gg.drawImage(LOGO,Wc/2-lh/2,y+rest*.08,lh,lh)}catch(e){}}
+      gg.font='600 '+Math.round(Wc*.052)+'px Georgia,serif';gg.fillText('OTTICA MACRÌ',Wc/2,y+rest*.68);
+      gg.font='400 '+Math.round(Wc*.03)+'px Georgia,serif';gg.fillStyle=chiaro?'#6b5c4c':'#a8916e';gg.fillText('VIA POGGI D’ORO 23 · ROMA · 06 7834 6705',Wc/2,y+rest*.84);
+      tx.needsUpdate=true};im.src=u}
+  dis();g.userData.ridisegna=dis;
+  var st=new T.Mesh(new T.PlaneGeometry(wm,hm),new T.MeshStandardMaterial({map:tx,roughness:.65}));st.position.set(0,0,0.004);g.add(st);
+  [[0,H/2-p/2,W,p],[0,-H/2+p/2,W,p]].forEach(function(a){var b=rbox(a[2],a[3],0.012,0.004,M.allu);b.position.set(a[0],a[1],0.006);g.add(b)});
+  [[-W/2+p/2],[W/2-p/2]].forEach(function(a){var b=rbox(p,H,0.012,0.004,M.allu);b.position.set(a[0],0,0.006);g.add(b)});
+  var la=box(wm,hm,0.0015,new T.MeshPhysicalMaterial({color:0xffffff,transparent:true,opacity:.07,roughness:.12,clearcoat:.5,depthWrite:false}));la.position.z=0.008;g.add(la);
+  var dorso=box(W,H,0.004,new T.MeshStandardMaterial({color:0x777777,roughness:.8}));dorso.position.z=0.0;g.add(dorso);
+  /* ombra portata sul muro */
+  var om=new T.Mesh(new T.PlaneGeometry(W*1.12,H*1.08),new T.MeshBasicMaterial({map:BLOB,transparent:true,opacity:.35,depthWrite:false,color:0x000000}));om.position.set(0.02,-0.03,-0.002);om.renderOrder=-1;g.add(om);
+  return g}
+function pannelloAppeso(wm,hm,uri){ /* cartello in plexiglass 5 mm appeso con due cavetti d'acciaio */
+  var g=new T.Group();var st=new T.Mesh(new T.PlaneGeometry(wm,hm),grafMat(uri));g.add(st);g.userData.stampa=st;
+  var l=box(wm+0.01,hm+0.01,0.005,M.plexi);l.position.z=0.004;g.add(l);
+  var bo=new T.Mesh(new T.EdgesGeometry(new T.BoxGeometry(wm+0.01,hm+0.01,0.006)),new T.LineBasicMaterial({color:0xeaf7f3,transparent:true,opacity:.6}));bo.position.z=0.002;g.add(bo);
+  [-1,1].forEach(function(s){var f=new T.Mesh(new T.CylinderGeometry(0.0008,0.0008,0.6,6),M.acciaio);f.position.set(s*(wm/2-0.04),hm/2+0.3,0);g.add(f);
+    var mor=new T.Mesh(new T.CylinderGeometry(0.004,0.004,0.012,12),M.acciaio);mor.rotation.x=Math.PI/2;mor.position.set(s*(wm/2-0.04),hm/2-0.012,0.004);g.add(mor)});
+  return g}
+
+/* ---------- testi delle schede ---------- */
+var COME_STAMPA=['Apri STORE // CRAFT e tocca <b>VENDO</b> (o la promozione del momento).','Scegli il modello di cartello e la misura: il testo e il prezzo si compilano da soli.','Stampa sulla tua stampante (o in copisteria) e infila il foglio nel plexiglass: fatto in 2 minuti.'];
+var COME_TABLET=['In STORE // CRAFT tocca <b>VETRINA DIGITALE</b>.','Scegli le slide (offerte, marchi, Black Friday) e quanto restano a schermo.','Il tablet le mostra subito, anche a negozio chiuso: si cambiano dal telefono.'];
+
+/* ---------- oggetti per ciascuna foto sferica (posizioni dagli screenshot di riferimento) ---------- */
+var REF={P2:[90,0],P0:[90,0],P0z:[112,1],P3b:[80,0],P3d:[265,0],P3p:[165,0]};
+var OGG=[];
+function metti(pano,o,pos,rotY){o.position.copy(pos);o.rotation.y=rotY;GR[pano].add(o);return o}
+var GR={};Object.keys(PANO).forEach(function(k){GR[k]=new T.Group();GR[k].visible=false;scena.add(GR[k])});
+function registra(o,info){o.userData.info=info;OGG.push(o);return o}
+
+/* P0 — davanti al negozio */
+var ogTablet=registra(tablet(),{id:'tablet',nome:'Tablet 12,4"–13" in vetrina',mis:'28,5×18,5 cm (schermo 26,7×16,7) · su supporto',chiave:null,
+  serve:'Sta sul ripiano più alto della vetrina e fa scorrere le offerte (qui: Black Friday) giorno e notte.',
+  pro:['Lavora anche a negozio chiuso, di sera e la domenica.','Le offerte si cambiano dal telefono in un minuto, senza stampare.','Il movimento attira lo sguardo di chi passa sul marciapiede.','Consuma pochissimo: si accende e spegne da solo all’orario scelto.'],
+  proposta:true,come:COME_TABLET});
+metti('P0',ogTablet,punto(REF.P0z,1000,456,2.35),versoDir(270));
+var ogPlexV=registra(new T.Group(),{id:'plexV',nome:'Porta-prezzi in plexiglass',misVar:true,vetrina:true,chiave:'bf-cartello-1',
+  serve:'Accanto agli occhiali in vetrina: mostra il prezzo o l’offerta a chi guarda da fuori.',
+  pro:['Il prezzo si vede subito: il cliente non deve chiedere.','Si cambia la grafica in un minuto con STORE // CRAFT.','Costa pochi euro e dura anni.','Tutti uguali, ordinati: la vetrina sembra più curata.'],come:COME_STAMPA});
+metti('P0',ogPlexV,punto(REF.P0z,808,470,2.3),versoDir(275));
+var ogCornV=registra(cornice(13,18,graf('bf-cartello-2'),false),{id:'cornV',nome:'Cornicetta in legno',mis:'13×18 cm · legno noce',chiave:'bf-cartello-2',prezzoK:'cornice-legno-13x18',
+  serve:'Sul ripiano nero della vetrina di sinistra, tra gli occhiali: una promo che sembra un quadretto.',
+  pro:['Fa “negozio di qualità”: calda, elegante, non sembra un volantino.','Dentro va la stampa fatta con STORE // CRAFT.','Si trova ovunque, costa poco.'],come:COME_STAMPA});
+metti('P0',ogCornV,punto(REF.P0z,250,474,3.0),versoDir(250));
+var ogPlex10=registra(plexiL(10,15,graf('bf-cartellino-1')),{id:'plex10',nome:'Porta-prezzi piccolo',mis:'10×15 cm · plexiglass a L',chiave:'bf-cartellino-1',prezzoK:'10x15',
+  serve:'Il cartellino del singolo modello: nome, prezzo, prezzo Black Friday.',
+  pro:['Il cliente vede marca e prezzo senza entrare.','Con STORE // CRAFT il cartellino si stampa dal codice dell’occhiale.','Conf. da 10: costano 2 € l’uno.'],come:COME_STAMPA});
+metti('P0',ogPlex10,punto(REF.P0z,118,476,3.0),versoDir(255));
+var ogTotem=registra(totem(grafA4()),{id:'totem',nome:'Espositore da terra A4',mis:'A4 · 21×29,7 cm · alto 130 cm',chiave:'A4',prezzoK:'A4',
+  serve:'Appena entrati, ben in vista: la promozione più forte del momento.',
+  pro:['È la prima cosa che il cliente legge entrando.','Il foglio A4 si cambia in un attimo: si stampa da STORE // CRAFT.','Leggero: si sposta dove serve (ingresso, vetrina, bancone).'],prezzo:'espositore da terra A4 circa 25–45 €',come:COME_STAMPA});
+metti('P0',ogTotem,punto(REF.P0,862,568,4.6),versoDir(260));
+var ogManif=registra(manifesto(0.70,1.30,null),{id:'manif',nome:'Manifesto nuovo in cornice',mis:'70×130 cm · cornice a scatto',chiave:'A4',
+  serve:'Copre il vecchio manifesto sul muro accanto all’ingresso con la grafica Black Friday del negozio.',
+  pro:['Dice subito chi è: Ottica Macrì, con il suo stile.','La cornice a scatto si apre davanti: si cambia la stampa in un minuto.','La grafica è la stessa del tablet e dei cartelli: tutto coordinato.'],prezzo:'cornice a scatto 70×100/130 da circa 40–70 € + stampa',come:COME_STAMPA});
+metti('P0',ogManif,punto(REF.P0,412,298,2.2),versoDir(270));
+
+/* il murale dipinto a mano a destra dell'ingresso (cabina rossa «Ottica Macrì»): coperto da un secondo manifesto, sul piano del muro */
+function sulMuro(ref,px,py,xEst){var d=dirDa(ref[0],ref[1],px,py);return d.multiplyScalar(xEst/d.x)}
+var mA=sulMuro([120,0],859,140,2.2),mB=sulMuro([120,0],1037,483,2.2);
+var ogMur=registra(manifesto(Math.abs(mB.z-mA.z)+0.06,Math.abs(mA.y-mB.y)+0.06,null,'bf-cartello-1'),{id:'murale',nome:'Secondo manifesto (al posto del murale)',mis:'cornice a scatto grande',chiave:'bf-cartello-1',
+  serve:'Copre il vecchio dipinto della cabina telefonica con una grafica stampata, coordinata con il resto.',
+  pro:['Chi arriva dalla fermata vede subito l’offerta del momento.','Si cambia ad ogni stagione: stampa nuova, cornice uguale.','Tutto con lo stesso stile: tablet, cartelli, manifesti.'],prezzo:'cornice a scatto grande circa 60–90 € + stampa',come:COME_STAMPA});
+metti('P0',ogMur,new T.Vector3(2.2-0.01,(mA.y+mB.y)/2,(mA.z+mB.z)/2),versoDir(270));
+
+/* P2 — ingresso, tra le due vetrine */
+var ogCornI=registra(cornice(13,18,graf('bf-cartello-4'),true),{id:'cornI',nome:'Cornicetta in legno chiaro',mis:'13×18 cm · legno naturale',chiave:'bf-cartello-4',prezzoK:'cornice-legno-13x18',
+  serve:'Tra gli occhiali da sole della vetrina: le date del Black Friday, come un quadretto.',
+  pro:['Calda ed elegante, si intona al legno della vetrina.','Dentro va la stampa fatta con STORE // CRAFT.','Costa pochi euro.'],come:COME_STAMPA});
+(function(){var q=punto(REF.P2,468,642,1.0);metti('P2',ogCornI,q,versoCamera(q)+0.25)})();
+var ogA5I=registra(plexiL(14.8,21,graf('bf-cartello-3')),{id:'a5I',nome:'Porta-prezzi in plexiglass',mis:'A5 · 14,8×21 cm · plexiglass a L',chiave:'bf-cartello-3',prezzoK:'A5',
+  serve:'Davanti al marchio Ray-Ban: il prezzo speciale delle lenti, visibile da fuori e da dentro.',
+  pro:['Il prezzo si vede subito: il cliente non deve chiedere.','Si cambia la grafica in un minuto con STORE // CRAFT.','Costa pochi euro.'],come:COME_STAMPA});
+(function(){var q=punto(REF.P2,610,655,1.05);metti('P2',ogA5I,q,versoCamera(q)-0.15)})();
+
+/* P3 — dentro, al bancone */
+var ogMon=registra(monitor(),{id:'monitor',nome:'Postazione STORE // CRAFT',mis:'monitor 24" · PC · DYMO · lettore',app:true,
+  serve:'Il cuore del sistema: qui Aldo registra la merce, trova un occhiale, stampa cartellini, cartelli e slide.',
+  pro:['VENDO, ARRIVA MERCE, CERCO: tre tasti grandi, niente menu complicati.','Stampa le etichette con la DYMO LabelWriter 450 in un secondo.','Prepara i cartelli A4 e la vetrina digitale con le grafiche del negozio.'],prezzo:'si usa il PC che c’è o un mini-PC (circa 250–400 €)'});
+(function(){var q=punto(REF.P3b,330,470,2.95);metti('P3',ogMon,q,versoCamera(q)+0.35)})();
+var ogDymo=registra(dymo(),{id:'dymo',nome:'Stampante DYMO LabelWriter 450',mis:'12,5×18,7×13,4 cm · etichette 89×28 mm',app:true,
+  serve:'Stampa il cartellino con codice a barre per ogni occhiale che arriva.',
+  pro:['Niente più scritte a mano: tutte le etichette uguali e leggibili.','Il codice a barre si legge col lettore: vendita registrata in un clic.','Non usa inchiostro (stampa termica).'],prezzo:'circa 80–120 € (spesso si trova usata a meno)'});
+(function(){var q=punto(REF.P3b,470,512,2.2);metti('P3',ogDymo,q,versoCamera(q)+0.5)})();
+var ogLet=registra(lettore(),{id:'lettore',nome:'Lettore di codici a barre',mis:'su base, USB',app:true,
+  serve:'Si passa sul cartellino dell’occhiale: STORE // CRAFT lo trova subito.',
+  pro:['Vendita o reso in un secondo, senza digitare.','Sa sempre cosa c’è in negozio.'],prezzo:'circa 25–45 €'});
+(function(){var q=punto(REF.P3b,560,528,1.9);metti('P3',ogLet,q,versoCamera(q)+0.3)})();
+var ogPlexB=registra(new T.Group(),{id:'plexB',nome:'Plexiglass da banco',misVar:true,banco:true,chiave:'bf-cartello-2',
+  serve:'Sul bancone, accanto alla cassa: l’offerta del giorno mentre il cliente aspetta.',
+  pro:['Il cliente la legge mentre paga: vende un secondo paio.','In A4 si legge anche da lontano.','Stampa e cambio in un minuto con STORE // CRAFT.'],come:COME_STAMPA});
+(function(){var q=punto(REF.P3b,606,578,1.5);metti('P3',ogPlexB,q,versoCamera(q)-0.25)})();
+var ogAppeso=registra(pannelloAppeso(0.594,0.42,graf('bf-cartellino-1')),{id:'appeso',nome:'Cartello in vetrina (al posto di quello a mano)',mis:'A2 orizzontale · 59,4×42 cm · plexiglass 5 mm',chiave:'bf-cartellino-1',
+  serve:'Sostituisce il cartello scritto a mano «Super offerta €90» con una grafica stampata, appesa con due cavetti.',
+  pro:['Da fuori il negozio sembra subito più curato e moderno.','Stesso stile del tablet e dei cartellini.','Si cambia ad ogni promozione.'],prezzo:'pannello plexiglass A2 con cavetti circa 30–50 € + stampa',come:COME_STAMPA});
+metti('P3',ogAppeso,punto(REF.P3d,505,242,1.3),versoDir(265+180));
+var ogPar1=registra(plexiL(10,15,graf('bf-cartellino-2')),{id:'par1',nome:'Porta-prezzi tra gli occhiali',mis:'10×15 cm · plexiglass a L',chiave:'bf-cartellino-2',prezzoK:'10x15',
+  serve:'Sul ripiano della parete degli occhiali da sole: il prezzo e la promo del modello vicino.',
+  pro:['Il cliente sceglie da solo, con il prezzo davanti.','Si stampa con STORE // CRAFT insieme all’etichetta DYMO.','Costa circa 2 € a pezzo.'],come:COME_STAMPA});
+metti('P3',ogPar1,punto(REF.P3p,505,676,0.62),versoDir(165+180));
+var ogPar2=registra(plexiL(10,15,graf('bf-cartellino-1')),{id:'par2',nome:'Porta-prezzi tra gli occhiali',mis:'10×15 cm · plexiglass a L',chiave:'bf-cartellino-1',prezzoK:'10x15',
+  serve:'Un secondo cartellino, a distanza regolare: la parete sembra in ordine.',
+  pro:['Tutti uguali: aspetto professionale.','Cambio prezzo in un minuto.'],come:COME_STAMPA});
+metti('P3',ogPar2,punto(REF.P3p,960,690,0.66),versoDir(165+180));
+
+/* oggetti con misura variabile (selettore) */
+function misEffettiva(o){var m=S.mis;if(m==='A4'&&!o.userData.info.banco)m='A5';return m}
+function ricostruisciVar(){[ogPlexV,ogPlexB].forEach(function(o){
+  while(o.children.length)o.remove(o.children[0]);var m=misEffettiva(o),mm=MIS[m];
+  var n=plexiL(mm.w,mm.h,o.userData.info.chiave==='bf-cartello-1'?graf('bf-cartello-1'):graf('bf-cartello-2'));n.userData.info=o.userData.info;o.add(n);
+  o.userData.info.mis=mm.n+' · plexiglass a L'+(S.mis==='A4'&&m!=='A4'?' (A4 solo sul bancone)':'');o.userData.info.prezzoK=m})}
+
+/* ---------- luci: una serie per «fuori» (giorno) e una per «dentro» (alogeni caldi) ---------- */
+var LUCI={};
+function luci(pano){var P=PANO[pano],g=GR[pano];
+  if(P.luce==='fuori'){
+    g.add(new T.HemisphereLight(0xdfe8f4,0x8a7a64,0.9));
+    var sole=new T.DirectionalLight(0xfff1dc,1.3);sole.position.set(-2,4,1.5);sole.target.position.set(2,-0.5,0);g.add(sole,sole.target);
+    var faro=new T.SpotLight(0xffd2a0,9,6,0.7,0.6,1.5);faro.position.set(2.4,0.8,0.9);faro.target.position.set(2.4,-0.3,0.95);faro.castShadow=true;faro.shadow.mapSize.set(1024,1024);faro.shadow.radius=6;faro.shadow.bias=-0.0004;g.add(faro,faro.target);
+    var faro2=new T.SpotLight(0xffd2a0,7,6,0.8,0.6,1.5);faro2.position.set(2.8,0.9,-0.55);faro2.target.position.set(2.8,-0.3,-0.6);faro2.castShadow=true;faro2.shadow.mapSize.set(1024,1024);faro2.shadow.radius=6;faro2.shadow.bias=-0.0004;g.add(faro2,faro2.target);
+    var f3=new T.SpotLight(0xffe0b8,10,9,0.6,0.7,1.2);f3.position.set(4.3,1.6,0.15);f3.target.position.set(4.6,-1.4,0.2);f3.castShadow=true;f3.shadow.mapSize.set(1024,1024);f3.shadow.radius=8;g.add(f3,f3.target);
+  }else{
+    g.add(new T.HemisphereLight(0xfff0dc,0x7a5a3a,0.85));
+    var tubi=new T.DirectionalLight(0xfff6ea,1.1);tubi.position.set(0.6,3,0.4);tubi.target.position.set(0.6,-1,0.6);tubi.castShadow=true;tubi.shadow.mapSize.set(2048,2048);
+    var sc=tubi.shadow.camera;sc.left=-3;sc.right=3;sc.top=3;sc.bottom=-3;sc.near=0.1;sc.far=8;tubi.shadow.radius=7;tubi.shadow.bias=-0.0005;g.add(tubi,tubi.target);
+    var alog=new T.SpotLight(0xffc98a,6,6,0.9,0.7,1.4);alog.position.set(-1,1.4,0.6);alog.target.position.set(0.2,-0.6,-1.2);alog.castShadow=true;alog.shadow.mapSize.set(1024,1024);alog.shadow.radius=6;g.add(alog,alog.target);
+    var vetr=new T.SpotLight(0xffd8a8,8,4,0.9,0.6,1.3);vetr.position.set(-1.25,0.9,0.1);vetr.target.position.set(-1.3,-0.2,0.1);g.add(vetr,vetr.target);
+  }}
+Object.keys(PANO).forEach(luci);
+
+/* ---------- aggiornamento grafiche ---------- */
+function aggiornaGrafiche(){
+  ricostruisciVar();
+  [[ogCornI,'bf-cartello-4'],[ogA5I,'bf-cartello-3'],[ogCornV,'bf-cartello-2'],[ogPlex10,'bf-cartellino-1'],[ogAppeso,'bf-cartellino-1'],[ogPar1,'bf-cartellino-2'],[ogPar2,'bf-cartellino-1']].forEach(function(a){
+    var st=a[0].userData.stampa;if(st)st.material.map=texDa(graf(a[1]));if(st)st.material.needsUpdate=true});
+  var st=ogTotem.userData.stampa;st.material.map=texDa(grafA4());st.material.needsUpdate=true;
+  ogManif.userData.ridisegna();ogMur.userData.ridisegna();caricaSlide(ogTablet.userData.schermo);ombreggiaTutto()}
+function ombreggiaTutto(){OGG.forEach(ombreggia)}
+window.__vaRidisegna=function(){ogManif.userData.ridisegna()};
+
+/* ---------- app sul monitor (disegnata, stile del negozio) ---------- */
+var logoImg=null;
+function disegnaApp(g,W,H){
+  var chiaro=S.graf==='chiare';
+  g.fillStyle='#f4ede2';g.fillRect(0,0,W,H);
+  g.fillStyle='#2b2118';g.fillRect(0,0,W,86);
+  if(LOGO){try{g.drawImage(LOGO,22,10,66,66)}catch(e){}}
+  g.fillStyle='#fffdf9';g.font='700 40px Rajdhani,Segoe UI,sans-serif';g.fillText('OTTICA MACRÌ',LOGO?104:28,56);
+  g.fillStyle='#d9a089';g.font='600 22px Consolas,monospace';g.textAlign='right';g.fillText('STORE // CRAFT',W-28,54);g.textAlign='left';
+  var tile=[['VENDO','#b5462c','scansiona e vendi'],['ARRIVA MERCE','#1f4e79','carico + etichette'],['CERCO','#6b5c4c','marca, modello, prezzo']];
+  tile.forEach(function(t,i){var x=28+i*((W-56-40)/3+20),w=(W-56-40)/3;g.fillStyle=t[1];g.fillRect(x,120,w,250);
+    g.fillStyle='#fff';g.font='700 58px Rajdhani,Segoe UI,sans-serif';g.textAlign='center';g.fillText(t[0],x+w/2,250);
+    g.font='400 26px Segoe UI,sans-serif';g.fillText(t[2],x+w/2,300);g.textAlign='left'});
+  /* etichetta DYMO */
+  g.fillStyle='#fff';g.fillRect(28,410,620,190);g.strokeStyle='#cbbfae';g.lineWidth=3;g.strokeRect(28,410,620,190);
+  g.fillStyle='#2b2118';g.font='700 38px Rajdhani,Segoe UI,sans-serif';g.fillText('RAY-BAN RB2132 NEW WAYFARER',50,465);
+  g.fillStyle='#5e4f41';g.font='400 24px Consolas,monospace';g.fillText('Nero lucido · 55□18 · cod. 8053672',50,503);
+  g.fillStyle='#9e3b25';g.font='700 56px Rajdhani,Segoe UI,sans-serif';g.fillText('€ 112',50,575);
+  codice(g,330,520,290,64);
+  /* vetrina digitale */
+  g.fillStyle='#2b2118';g.fillRect(680,410,W-708,190);g.fillStyle='#d9c3a0';g.font='600 24px Consolas,monospace';g.fillText('VETRINA DIGITALE · 6 slide · ON',700,450);
+  var sl=slideList(false);if(sl.length){if(!disegnaApp.im){disegnaApp.im=new Image();disegnaApp.im.src=sl[0]}var im=disegnaApp.im;if(im.complete&&im.naturalWidth)g.drawImage(im,700,465,224,126)}
+  g.fillStyle='#fffdf9';g.font='500 22px Segoe UI,sans-serif';g.fillText('Black Friday 24–30 nov.',940,500);g.fillText('Cartelli A4: 4 pronti',940,540);g.fillText('Etichette DYMO: 18',940,580);
+  g.fillStyle='#6b5c4c';g.font='400 20px Consolas,monospace';g.fillText('Oggi: 3 vendite · 12 occhiali arrivati · stampa etichette pronta',28,650);
+  g.fillStyle='#1f4e79';g.fillRect(28,680,W-56,8);g.fillStyle='#b5462c';g.fillRect(28,680,(W-56)*.62,8)}
+function codice(g,x,y,w,h){g.fillStyle='#000';var s=7;for(var i=0;i<60;i++){var b=((i*37+11)%5===0)?3:((i*13)%3===0?2:1);g.fillRect(x+(i/60)*w,y,b*1.6,h);}g.font='400 16px Consolas,monospace';g.fillText('8 053672 112004',x+40,y+h+18)}
+function disegnaEtichetta(g,W,H){g.fillStyle='#fff';g.fillRect(0,0,W,H);g.fillStyle='#111';g.font='700 30px Arial';g.fillText('RAY-BAN RB2132',14,36);g.font='400 20px Arial';g.fillText('55□18 · nero lucido',14,62);
+  g.font='700 40px Arial';g.fillText('€ 112',14,112);codice(g,230,52,260,62)}
+
+/* ---------- camera e dimensioni ---------- */
+function misura(){var w=Math.max(10,strato.clientWidth),h=Math.max(10,strato.clientHeight);
+  R.setPixelRatio(Math.min(2,Math.max(1.25,window.devicePixelRatio||1)));R.setSize(w,h,false);cam.aspect=w/h;
+  var f=(w/2)*Math.pow(2,S.z);cam.fov=2*Math.atan((h/2)/f)/D2R;cam.updateProjectionMatrix();return{w:w,h:h}}
+function camera(){cam.position.set(0,0,0);cam.rotation.set(-S.p*D2R,-S.h*D2R,0,'YXZ')}
+
+/* ---------- iframe ---------- */
+var tCarica=null,tokR=0,tokP=0,pend=null,off={x:0,y:0};
+function ricarica(){if(API){ricaricaAPI();return}vista.classList.add('carica');chiudiScheda();pend=null;tokP++;off.x=off.y=0;applicaOff();
+  var a=IFR[att],b=IFR[1-att];b.classList.remove('on','top');a.classList.add('on');a.dataset.tok=String(++tokR);a.src=svUrl();
+  clearTimeout(tCarica);tCarica=setTimeout(function(){vista.classList.remove('carica')},9000);
+  Object.keys(GR).forEach(function(k){GR[k].visible=(k===S.pano)});aggiornaHud();}
+IFR.forEach(function(f,i){f.addEventListener('load',function(){
+  if(i===att&&f.dataset.tok===String(tokR)){f.dataset.tok='';clearTimeout(tCarica);tCarica=setTimeout(function(){vista.classList.remove('carica');if(S._apriApp){S._apriApp=false;apriScheda(ogMon)}},1800);return}
+  if(pend&&pend.i===i&&f.dataset.tok==='p'+pend.tok){var t=pend.tok;setTimeout(function(){if(pend&&pend.tok===t)scambia()},1300)}})});
+
+/* ---------- trascinamento fluido col mouse ----------
+   Lo strato (Street View + oggetti 3D) è 1,4 volte la finestra: trascinando si sposta TUTTO insieme (oggetti sempre agganciati).
+   Intanto un secondo iframe nascosto carica da Google la vista nella nuova direzione; quando è pronto si scambiano in dissolvenza. */
+function focale(){return (strato.clientWidth/2)*Math.pow(2,S.z)}
+function norm(h){return ((h%360)+360)%360}
+function vistaOff(){var f=focale();return{h:norm(S.h-Math.atan(off.x/f)/D2R),p:Math.max(-40,Math.min(40,S.p-Math.atan(off.y/f)/D2R))}}
+function margini(){return{x:(K-1)/2*vista.clientWidth,y:(K-1)/2*vista.clientHeight}}
+function applicaOff(){var m=margini();off.x=Math.max(-m.x,Math.min(m.x,off.x));off.y=Math.max(-m.y,Math.min(m.y,off.y));
+  strato.style.transform=(off.x||off.y)?'translate('+off.x.toFixed(1)+'px,'+off.y.toFixed(1)+'px)':'';applicaTaglio()}
+function fissaOff(){if(!off.x&&!off.y)return;var v=vistaOff();S.h=v.h;S.p=Math.round(v.p)}
+function richiedi(){if(pend)return;var v=vistaOff();if(Math.abs(off.x)<2&&Math.abs(off.y)<2)return;
+  var i=1-att,f=IFR[i];pend={i:i,tok:++tokP,h:v.h,p:v.p,ox:off.x,oy:off.y};f.dataset.tok='p'+pend.tok;f.classList.remove('on','top');f.src=svUrl(v.h,v.p);vista.classList.add('agg')}
+function scambia(){var P=pend;pend=null;var nuovo=IFR[P.i],vecchio=IFR[att];
+  S.h=P.h;S.p=P.p;off.x-=P.ox;off.y-=P.oy;att=P.i;nuovo.classList.add('on','top');applicaOff();aggiornaHud();vista.classList.remove('agg');
+  setTimeout(function(){if(IFR[att]!==nuovo)return;vecchio.classList.remove('on','top');nuovo.classList.remove('top')},420);
+  if(!drag&&(Math.abs(off.x)>2||Math.abs(off.y)>2))setTimeout(richiedi,60)}
+var drag=null,noClick=false,tFermo=null;
+(function(){var pr=strato;
+  pr.addEventListener('pointerdown',function(e){if(API||e.button!==0||S.modo!=='aumentata')return;drag={x:e.clientX,y:e.clientY,x0:e.clientX,y0:e.clientY,mosso:false};try{pr.setPointerCapture(e.pointerId)}catch(_){}});
+  pr.addEventListener('pointermove',function(e){if(!drag)return;
+    if(!drag.mosso&&Math.hypot(e.clientX-drag.x0,e.clientY-drag.y0)>5){drag.mosso=true;chiudiScheda();vista.classList.add('trascino')}
+    if(!drag.mosso)return;off.x+=e.clientX-drag.x;off.y+=e.clientY-drag.y;drag.x=e.clientX;drag.y=e.clientY;applicaOff();aggiornaHud();
+    var m=margini();if(Math.abs(off.x)>0.45*m.x||Math.abs(off.y)>0.45*m.y)richiedi();
+    clearTimeout(tFermo);tFermo=setTimeout(richiedi,250)});
+  function fine(){if(!drag)return;if(drag.mosso){noClick=true;setTimeout(function(){noClick=false},50);richiedi()}drag=null;vista.classList.remove('trascino')}
+  pr.addEventListener('pointerup',fine);pr.addEventListener('pointercancel',fine);
+  /* rotella = zoom */
+  var tRot=0;vista.addEventListener('wheel',function(e){if(API||S.modo!=='aumentata')return;e.preventDefault();var now=Date.now();if(now-tRot<700)return;
+    var z=S.z+(e.deltaY<0?1:-1);if(z<0||z>2)return;tRot=now;fissaOff();S.z=z;ricarica()},{passive:false});
+})();
+function aggiornaHud(){var P=PANO[S.pano],v=vistaOff();$('#hudpos').textContent=P.nome.toUpperCase()+' · DIREZIONE '+String(Math.round(v.h)%360).padStart(3,'0')+'° · ALTO/BASSO '+(-Math.round(v.p))+'° · ZOOM '+S.z;
+  document.querySelectorAll('.va-p').forEach(function(b){var p=PUNTI.find(function(x){return x.id===b.dataset.id});b.setAttribute('aria-pressed',p.pano===S.pano&&Math.abs(((p.h-S.h)%360+360)%360)<1&&p.z===S.z?'true':'false')});
+  var i=CATENA.indexOf(S.pano);document.querySelector('[data-m=av]').disabled=i>=CATENA.length-1;document.querySelector('[data-m=in]').disabled=i<=0;
+  document.querySelector('[data-m=zi]').disabled=S.z>=2;document.querySelector('[data-m=zo]').disabled=S.z<=0;}
+function vai(p){S.pano=p.pano;S.h=p.h;S.p=p.p;S.z=p.z;if(p.id==='banco')S._apriApp=true;ricarica()}
+
+/* punti rapidi */
+var nav=$('.va-punti');PUNTI.forEach(function(p){var b=document.createElement('button');b.className='va-p';b.dataset.id=p.id;b.innerHTML=p.nome+'<small>'+p.sub+'</small>';b.onclick=function(){vai(p)};nav.appendChild(b)});
+
+/* croce dei comandi */
+document.querySelector('.va-croce').addEventListener('click',function(e){var b=e.target.closest('[data-m]');if(!b||b.disabled)return;var m=b.dataset.m,i=CATENA.indexOf(S.pano);fissaOff();
+  if(m==='sx')S.h=(S.h+330)%360;else if(m==='dx')S.h=(S.h+30)%360;
+  else if(m==='su')S.p=Math.max(-40,S.p-10);else if(m==='giu')S.p=Math.min(40,S.p+10);
+  else if(m==='zi')S.z=Math.min(2,S.z+1);else if(m==='zo')S.z=Math.max(0,S.z-1);
+  else if(m==='cx'){S.p=0;S.z=0;}
+  else if(m==='av'&&i<CATENA.length-1){S.pano=CATENA[i+1];if(S.pano==='P3')S.h=80;}
+  else if(m==='in'&&i>0){S.pano=CATENA[i-1];}
+  ricarica()});
+document.addEventListener('keydown',function(e){if(e.target.closest&&e.target.closest('input,textarea'))return;var k={ArrowLeft:'sx',ArrowRight:'dx',ArrowUp:'su',ArrowDown:'giu'}[e.key];
+  if(k&&S.modo==='aumentata'){e.preventDefault();document.querySelector('[data-m='+k+']').click()}if(e.key==='Escape')chiudiScheda()});
+
+/* interruttori */
+function segna(sel,val,attr){document.querySelectorAll(sel).forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset[attr]===val))})}
+document.querySelectorAll('[data-vista]').forEach(function(b){b.onclick=function(){S.vista=b.dataset.vista;vista.classList.toggle('dopo',S.vista!=='prima');vista.classList.toggle('prima',S.vista==='prima');vista.classList.toggle('confronta',S.vista==='confronta');segna('[data-vista]',S.vista,'vista');applicaTaglio();testoAiuto()}});
+document.querySelectorAll('[data-modo]').forEach(function(b){b.onclick=function(){fissaOff();S.modo=b.dataset.modo;vista.classList.toggle('libera',S.modo==='libera');segna('[data-modo]',S.modo,'modo');chiudiScheda();ricarica();testoAiuto()}});
+document.querySelectorAll('[data-mis]').forEach(function(b){b.onclick=function(){S.mis=b.dataset.mis;segna('[data-mis]',S.mis,'mis');salvaPref();ricostruisciVar();ombreggiaTutto();creaEtichette()}});
+document.querySelectorAll('[data-graf]').forEach(function(b){b.onclick=function(){S.graf=b.dataset.graf;segna('[data-graf]',S.graf,'graf');salvaPref();aggiornaGrafiche()}});
+document.querySelectorAll('[data-eti]').forEach(function(b){b.onclick=function(){S.eti=b.dataset.eti==='1';segna('[data-eti]',S.eti?'1':'0','eti');vista.classList.toggle('va-noeti',!S.eti);salvaPref()}});
+segna('[data-mis]',S.mis,'mis');segna('[data-graf]',S.graf,'graf');segna('[data-eti]',S.eti?'1':'0','eti');vista.classList.toggle('va-noeti',!S.eti);
+function testoAiuto(){$('#aiuto').innerHTML=S.modo==='libera'
+  ?'<b>Modo libero:</b> trascina la foto con il mouse e clicca le frecce bianche per camminare, come su Google. Gli oggetti sono nascosti: per rivederli premi <b>Aumentata</b>.'
+  :'<b>Come si usa:</b> <b>tieni premuto il tasto sinistro e trascina</b> per guardarsi intorno'+(API?' a 360° (le frecce bianche per camminare)':'')+' (la rotella avvicina e allontana); i pulsanti grandi girano la vista di 30°, guardano su o giù e fanno un passo avanti o indietro. <b>Clicca su un oggetto</b> per sapere a cosa serve e quanto costa. '+(S.vista==='confronta'?'Trascina il cerchio rosso per confrontare <b>prima</b> e <b>dopo</b>.':'')}
+testoAiuto();
+
+/* prima / dopo: tendina */
+function applicaTaglio(){var Wv=vista.clientWidth,Ws=strato.clientWidth||1,pc=S.vista==='confronta'?Math.max(0,(S.taglio*Wv-strato.offsetLeft-off.x)/Ws*100):0;cv.style.clipPath=S.vista==='confronta'?'inset(0 0 0 '+pc+'%)':'';$('#etis').style.clipPath=cv.style.clipPath;$('#taglio').style.left=(S.taglio*100)+'%'}
+(function(){var t=$('#taglio span'),on=false;t.addEventListener('pointerdown',function(e){on=true;t.setPointerCapture(e.pointerId);e.preventDefault()});
+  t.addEventListener('pointermove',function(e){if(!on)return;var r=vista.getBoundingClientRect();S.taglio=Math.min(.98,Math.max(.02,(e.clientX-r.left)/r.width));applicaTaglio()});
+  t.addEventListener('pointerup',function(){on=false})})();
+
+/* ---------- etichette ---------- */
+var etis=[];
+function creaEtichette(){var box=$('#etis');box.innerHTML='';etis=OGG.map(function(o){var i=o.userData.info,d=document.createElement('div');d.className='va-eti';
+  var p=i.prezzoK&&prezzo(i.prezzoK);d.innerHTML=i.nome+'<small>'+(i.mis||'').split(' · ')[0]+'</small>';d.onclick=function(ev){ev.stopPropagation();if(noClick)return;apriScheda(o)};box.appendChild(d);return{o:o,d:d}})}
+var bb=new T.Box3(),tmp=new T.Vector3();
+function piazzaEtichette(w,h){etis.forEach(function(e){var o=e.o;if(!o.parent||!o.parent.visible){e.d.style.display='none';return}
+  bb.setFromObject(o);tmp.set((bb.min.x+bb.max.x)/2,bb.max.y+0.02,(bb.min.z+bb.max.z)/2);var v=tmp.clone().project(cam);var dietro=tmp.clone().applyMatrix4(cam.matrixWorldInverse).z>0;
+  if(dietro||v.x<-1.05||v.x>1.05||v.y<-1.05||v.y>1.1){e.d.style.display='none';return}
+  e.d.style.display='';e.d.style.transform='translate('+((v.x+1)/2*w)+'px,'+((1-v.y)/2*h-16)+'px) translate(-50%,-100%)'})}
+
+/* ---------- scheda flottante ---------- */
+var scheda=$('#scheda');
+function chiudiScheda(){scheda.hidden=true}
+function apriScheda(o){var i=o.userData.info,p=i.prezzoK?prezzo(i.prezzoK):null,img='';
+  if(i.id==='tablet'){var sl=slideList(false);img=sl[0]||''}else if(i.chiave==='A4')img=grafA4()||'';else if(i.chiave)img=graf(i.chiave)||'';
+  var pz=p||i.prezzo;var h='<button class="x" aria-label="Chiudi">×</button><h3>'+i.nome+'</h3><div class="mis">'+(i.mis||'')+'</div>';
+  if(i.app){h+=anteprimaApp()}else{h+='<div class="fig">'+(img?'<img src="'+img+'" alt="">':'')+'<p>'+i.serve+'</p></div>'}
+  if(i.app)h+='<p style="margin:6px 0 0;font-size:16.5px">'+i.serve+'</p>';
+  h+='<h4>Vantaggi per te</h4><ul>'+i.pro.map(function(x){return'<li>'+x+'</li>'}).join('')+'</ul>';
+  if(i.proposta&&window.PropostaSchermo)h+=PropostaSchermo.html();else if(pz)h+='<div class="prezzo">Prezzo indicativo: <b>'+pz+'</b><br><small>da verificare al momento dell’ordine</small></div>';
+  else h+='<div class="prezzo">Misura: <b>'+(i.mis||'')+'</b></div>';
+  h+='<div class="azioni">'+(i.app?'<a class="hbtn pri va-big" href="../demo/demo-app-v2.html">Apri la demo completa</a>':'<button class="hbtn pri va-big" data-come>Come si fa con STORE // CRAFT</button>')+'</div>';
+  if(i.come)h+='<div class="come"><ol>'+i.come.map(function(x){return'<li>'+x+'</li>'}).join('')+'</ol></div>';
+  scheda.innerHTML=h;scheda.hidden=false;
+  scheda.querySelector('.x').onclick=chiudiScheda;var cb=scheda.querySelector('[data-come]');if(cb)cb.onclick=function(){scheda.querySelector('.come').classList.toggle('on')};
+  if(i.proposta&&window.PropostaSchermo)PropostaSchermo.aggancia(scheda);
+  /* vicino all'oggetto */
+  var r=vista.getBoundingClientRect(),rs=strato.getBoundingClientRect();bb.setFromObject(o);var c=new T.Vector3();bb.getCenter(c);var v=c.project(cam),x=(v.x+1)/2*rs.width+rs.left-r.left,y=(1-v.y)/2*rs.height+rs.top-r.top;
+  var sw=Math.min(420,r.width-24),left=i.app?r.width-sw-12:(x>r.width/2?x-sw-40:x+40);left=Math.max(12,Math.min(r.width-sw-12,left));
+  scheda.style.left=left+'px';scheda.style.top='12px';scheda.style.setProperty('--ox',(x>r.width/2?'100%':'0%'));scheda.style.setProperty('--oy',Math.round(y)+'px');
+  scheda.style.animation='none';void scheda.offsetWidth;scheda.style.animation=''}
+function anteprimaApp(){var bars='';for(var i=0;i<46;i++){var b=((i*37+11)%5===0)?3:((i*13)%3===0?2:1);bars+='<rect x="'+(i*2.6)+'" y="0" width="'+(b*.9)+'" height="26"/>'}
+  return '<div class="va-app"><div class="barra"><img src="../media/logo/marchi6/04-monocolo/04-monocolo-icona-notte.svg" alt="" onerror="this.remove()"><span>OTTICA MACRÌ</span>STORE // CRAFT</div>'+
+  '<div class="tess"><div>VENDO<small>scansiona e vendi</small></div><div>ARRIVA MERCE<small>carico + etichette</small></div><div>CERCO<small>marca, prezzo</small></div></div>'+
+  '<div class="eti"><div class="t">RAY-BAN RB2132<small>55□18 · nero lucido</small><b>€ 112</b></div><svg viewBox="0 0 120 34"><g fill="#111">'+bars+'</g><text x="14" y="33" font-size="7" font-family="monospace">8 053672 112004</text></svg></div>'+
+  '<div class="piede">Stampa: DYMO LabelWriter 450 (etichette 89×28 mm) · cartelli A4 · vetrina digitale sul tablet</div></div>'}
+
+/* clic sugli oggetti */
+var ray=new T.Raycaster(),mouse=new T.Vector2();
+$('#presa').addEventListener('click',function(e){if(noClick)return;cliccaOggetto(e)});
+function cliccaOggetto(e){var r=strato.getBoundingClientRect(),rv=vista.getBoundingClientRect();mouse.set((e.clientX-r.left)/r.width*2-1,-((e.clientY-r.top)/r.height*2-1));
+  if(S.vista==='prima'||(S.vista==='confronta'&&(e.clientX-rv.left)/rv.width<S.taglio)){chiudiScheda();return false}
+  ray.setFromCamera(mouse,cam);var vis=OGG.filter(function(o){return o.parent&&o.parent.visible});var hit=ray.intersectObjects(vis,true).filter(function(h){return !(h.object.material&&(h.object.material.isShadowMaterial||h.object.material.map===BLOB))})[0];
+  if(!hit){chiudiScheda();return false}var o=hit.object;while(o&&!o.userData.info)o=o.parent;if(o&&OGG.indexOf(o)<0){while(o&&OGG.indexOf(o)<0)o=o.parent}if(o){apriScheda(o);return true}return false}
+$('#presa').addEventListener('mousemove',function(e){if(drag)return;var r=strato.getBoundingClientRect();mouse.set((e.clientX-r.left)/r.width*2-1,-((e.clientY-r.top)/r.height*2-1));ray.setFromCamera(mouse,cam);
+  var vis=OGG.filter(function(o){return o.parent&&o.parent.visible});var h=ray.intersectObjects(vis,true).some(function(h){return !(h.object.material&&(h.object.material.isShadowMaterial||h.object.material.map===BLOB))});$('#presa').style.cursor=h?'pointer':'default'});
+
+
+/* ---------- MODO FLUIDO 360° · Google Maps JavaScript API ----------
+   Si attiva da solo se in visita/chiave-google.js c'è la chiave di Google (window.GMAPS_KEY).
+   Senza chiave resta il modo di prima (iframe + trascinamento a scatti). Nessuna immagine di Google viene salvata.
+   Prova senza chiave (colori invertiti, solo per noi): vetrina-aumentata.html?gdev=1 */
+var API=null;
+function distM(a,b,c,d){var x=(d-b)*Math.cos((a+c)/2*D2R)*111320,y=(c-a)*110540;return Math.hypot(x,y)}
+function focaleVista(w){if(API){var z=API.pano.getZoom();if(!(z>=0))z=1;var hf=Math.min(150,180/Math.pow(2,z));return (w/2)/Math.tan(hf/2*D2R)}return (w/2)*Math.pow(2,S.z)}
+function leggiPov(){var pv=API.pano.getPov();if(!pv)return;S.h=norm(pv.heading||0);S.p=-(pv.pitch||0);var z=API.pano.getZoom();if(z>=0)S.z=Math.max(0,z-1)}
+function visibiliAPI(){Object.keys(GR).forEach(function(x){GR[x].visible=(!API.fuori&&x===S.pano)})}
+function ricaricaAPI(){chiudiScheda();var pano=API.pano,id=API.ids[S.pano];
+  pano.setPov({heading:S.h,pitch:-S.p});pano.setZoom(S.z+1);
+  if(id&&pano.getPano()!==id){vista.classList.add('carica');pano.setPano(id)}
+  else if(!id){var P=PANO[S.pano];vista.classList.add('carica');pano.setPosition({lat:P.lat,lng:P.lon})}
+  else{API.fuori=false;visibiliAPI();if(S._apriApp){S._apriApp=false;setTimeout(function(){apriScheda(ogMon)},300)}}
+  aggiornaHud()}
+function avviaAPI(){var k=String(window.GMAPS_KEY||'').trim();if(!k&&!/[?&]gdev=1/.test(location.search))return;
+  window.__gmOk=function(){try{initAPI()}catch(e){console.warn('Street View fluido non partito:',e)}};
+  window.gm_authFailure=function(){console.warn('Chiave Google non valida')};
+  var sc=document.createElement('script');sc.async=true;sc.src='https://maps.googleapis.com/maps/api/js?'+(k?'key='+encodeURIComponent(k)+'&':'')+'v=weekly&language=it&region=IT&loading=async&callback=__gmOk';
+  document.head.appendChild(sc)}
+function initAPI(){var g=google.maps,d=document.createElement('div');d.id='gsv';d.className='va-gsv';strato.insertBefore(d,strato.firstChild);
+  pend=null;tokP++;off.x=off.y=0;applicaOff();vista.classList.add('api','carica');IFR.forEach(function(f){f.removeAttribute('src')});dim=misura();
+  var P=PANO[S.pano];
+  var pano=new g.StreetViewPanorama(d,{position:{lat:P.lat,lng:P.lon},pov:{heading:S.h,pitch:-S.p},zoom:S.z+1,
+    addressControl:false,fullscreenControl:false,motionTracking:false,motionTrackingControl:false,showRoadLabels:false,
+    zoomControl:true,panControl:false,enableCloseButton:false,clickToGo:true,linksControl:true});
+  API={pano:pano,svc:new g.StreetViewService(),ids:{},fuori:false};
+  function quale(){var id=pano.getPano(),k=Object.keys(API.ids).find(function(x){return API.ids[x]===id});
+    if(!k){var pos=pano.getPosition();if(pos){var best=null,bd=1e9;Object.keys(PANO).forEach(function(x){var dd=distM(pos.lat(),pos.lng(),PANO[x].lat,PANO[x].lon);if(dd<bd){bd=dd;best=x}});if(bd<1.2)k=best}}
+    API.fuori=!k;if(k)S.pano=k;visibiliAPI();aggiornaHud()}
+  Object.keys(PANO).forEach(function(k){var Q=PANO[k];
+    API.svc.getPanorama({location:{lat:Q.lat,lng:Q.lon},radius:5,preference:g.StreetViewPreference.NEAREST},function(r,st){
+      if(st==='OK'&&r&&r.location&&distM(r.location.latLng.lat(),r.location.latLng.lng(),Q.lat,Q.lon)<1.5){API.ids[k]=r.location.pano;if(k===S.pano&&pano.getPano()!==r.location.pano)pano.setPano(r.location.pano);quale()}})});
+  pano.addListener('pano_changed',function(){chiudiScheda();quale();clearTimeout(tCarica);
+    tCarica=setTimeout(function(){vista.classList.remove('carica');if(S._apriApp&&!API.fuori){S._apriApp=false;apriScheda(ogMon)}},900)});
+  pano.addListener('pov_changed',function(){leggiPov();aggiornaHud()});pano.addListener('zoom_changed',function(){leggiPov();aggiornaHud()});
+  /* clic su un oggetto: lo intercetto prima di Google (così non «cammina» verso quel punto) */
+  var giu=null,preso=false;
+  function blocca(e){if(preso){e.stopPropagation();e.preventDefault()}}
+  d.addEventListener('pointerdown',function(e){giu={x:e.clientX,y:e.clientY};preso=false},true);
+  d.addEventListener('pointerup',function(e){if(!giu)return;var fermo=Math.hypot(e.clientX-giu.x,e.clientY-giu.y)<5;giu=null;
+    if(fermo&&S.modo==='aumentata'){preso=!!cliccaOggetto(e)}blocca(e)},true);
+  ['mouseup','click'].forEach(function(t){d.addEventListener(t,blocca,true)});
+  d.addEventListener('mousemove',function(e){if(giu||S.modo!=='aumentata')return;var r=strato.getBoundingClientRect();mouse.set((e.clientX-r.left)/r.width*2-1,-((e.clientY-r.top)/r.height*2-1));ray.setFromCamera(mouse,cam);
+    var vis=OGG.filter(function(o){return o.parent&&o.parent.visible});var h=ray.intersectObjects(vis,true).some(function(h){return !(h.object.material&&(h.object.material.isShadowMaterial||h.object.material.map===BLOB))});d.classList.toggle('su-oggetto',h)},true);
+  testoAiuto();aggiornaHud()}
+
+/* ---------- internet ---------- */
+function rete(){var m=$('#msg');if(navigator.onLine===false){m.hidden=false;m.innerHTML='<b>Sembra che manchi internet.</b><br>Street View arriva da Google dal vivo: appena torna la connessione la vista si carica da sola. Gli oggetti 3D restano qui.'}else if(m.textContent.indexOf('internet')>=0){m.hidden=true;ricarica()}}
+window.addEventListener('online',rete);window.addEventListener('offline',rete);rete();
+
+/* ---------- ciclo ---------- */
+var dim=misura();window.addEventListener('resize',function(){dim=misura()});
+new ResizeObserver(function(){dim=misura()}).observe(vista);
+function giro(now){requestAnimationFrame(giro);if(S.modo==='libera')return;dim=dim||misura();if(API)leggiPov();
+  var f=focaleVista(dim.w),fov=2*Math.atan((dim.h/2)/f)/D2R;if(Math.abs(fov-cam.fov)>1e-3){cam.fov=fov;cam.updateProjectionMatrix()}
+  camera();aggiornaSchermi(now);R.render(scena,cam);piazzaEtichette(dim.w,dim.h)}
+ricostruisciVar();aggiornaGrafiche();creaEtichette();
+var q=location.hash.match(/punto=(\w+)/);vai(PUNTI.find(function(p){return q&&p.id===q[1]})||PUNTI[0]);
+requestAnimationFrame(giro);avviaAPI();
+window.__va={api:function(){return API},S:S,off:off,IFR:IFR,pend:function(){return pend},vai:vai,PUNTI:PUNTI,ricarica:ricarica,apriScheda:apriScheda,OGG:OGG};
+})();
+</script>
+</body>
+</html>

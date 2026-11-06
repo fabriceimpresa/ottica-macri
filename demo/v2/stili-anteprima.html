@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stili delle stampe · Ottica Macrì</title>
+<link rel="icon" href="../../macri.ico">
+<!-- TAVOLA DEGLI STILI (5/11/2026): lo stesso set di stampe (A7, 10×15, 13×18, A5, A4, cubo, stanghetta, slide del tablet)
+     nei 3 stili dell'app affiancati: Bottega romana · Nero e oro · Luminoso moderno, in chiaro o scuro.
+     Le grafiche sono quelle vere dell'app (cartelli.js + stili.js), alla misura vera di dispositivi.js.
+     Prezzi = ESEMPI da confermare con Aldo (dati.js). Si apre col doppio clic: niente fetch. -->
+<link rel="stylesheet" href="../../tema-hud.css">
+<link rel="stylesheet" href="v2.css">
+<link rel="stylesheet" href="cartelli.css">
+<link rel="stylesheet" href="stili.css">
+<style>
+  body.hud{padding:0 0 60px}
+  .testa{position:sticky;top:0;z-index:20;display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;padding:10px 16px;background:linear-gradient(180deg,#fffdf9,#f1e8da);border-bottom:1px solid var(--h-line2);box-shadow:0 6px 18px -12px rgba(92,68,44,.5)}
+  .testa h1{margin:0;font:700 22px/1.1 var(--h-title);letter-spacing:2px;text-transform:uppercase;color:var(--h-text)}
+  .testa h1 small{display:block;font:500 11.5px var(--h-mono);letter-spacing:2px;color:var(--h-mat)}
+  .btn{display:inline-flex;align-items:center;gap:6px;min-height:42px;padding:6px 14px;font:600 14px var(--h-title);letter-spacing:1.2px;text-transform:uppercase;color:var(--h-blu);background:#fffdf9;border:1px solid rgba(31,78,121,.4);text-decoration:none;cursor:pointer}
+  .btn.on{background:var(--h-blu);color:#fffdf9;border-color:var(--h-blu)}
+  .btn.menu{background:var(--h-mat2);border-color:var(--h-mat2);color:#fffdf9}
+  .gruppo{display:inline-flex;align-items:center;gap:4px}
+  .gruppo>span{font:600 12px var(--h-title);letter-spacing:2px;text-transform:uppercase;color:var(--h-mut);margin-right:4px}
+  .sp{flex:1}
+  main{max-width:1500px;margin:0 auto;padding:16px}
+  .nota{margin:0 0 14px;padding:10px 14px;background:rgba(255,253,249,.8);border-left:4px solid var(--h-mat2);font-size:16px;line-height:1.45}
+  .griglia{display:grid;grid-template-columns:150px repeat(3,minmax(0,1fr));gap:12px;align-items:start}
+  .fam{position:sticky;top:64px;z-index:10;padding:10px 12px;background:var(--h-panel);border:1px solid var(--h-line2);box-shadow:var(--h-ombra)}
+  .fam h2{margin:0;font:700 19px/1.1 var(--h-title);letter-spacing:1.5px;text-transform:uppercase}
+  .fam p{margin:4px 0 6px;font-size:13.5px;line-height:1.35;color:var(--h-mut)}
+  .fam .pal{display:flex;gap:3px}
+  .fam .pal i{flex:1;height:14px;border:1px solid rgba(0,0,0,.15)}
+  .fam .fn{margin-top:6px;font:500 11.5px/1.4 var(--h-mono);color:var(--h-dim)}
+  .eti{padding-top:8px}
+  .eti b{display:block;font:700 16px/1.15 var(--h-title);letter-spacing:1px;text-transform:uppercase}
+  .eti span{display:block;margin-top:3px;font:600 14px var(--h-mono);color:var(--h-blu)}
+  .eti em{display:block;margin-top:4px;font-size:12.5px;font-style:normal;line-height:1.3;color:var(--h-mut)}
+  .cella{display:grid;justify-items:center;align-content:start;gap:6px;padding:12px 8px;background:repeating-linear-gradient(45deg,#f3ece0 0 10px,#ece3d5 10px 20px);border:1px solid var(--h-line);min-height:60px}
+  .cella>.vis{width:100%;box-shadow:0 12px 26px -14px rgba(60,40,20,.65),0 0 0 1px rgba(110,92,72,.22)}
+  .cubo{display:grid;grid-template-columns:1fr 1fr;gap:6px;width:100%}
+  .cubo>div{box-shadow:0 8px 18px -12px rgba(60,40,20,.6),0 0 0 1px rgba(110,92,72,.22)}
+  .stanghe{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;align-items:center;width:100%}
+  .stanghe>div{flex:0 1 auto;max-width:100%}
+  .cella,.fam{min-width:0}
+  .cella>*{min-width:0;max-width:100%}
+  .sg-vista{position:relative;overflow:hidden;width:100%}
+  .sg-scala{position:absolute;left:0;top:0;transform-origin:0 0}
+  .cap{font-size:12.5px;color:var(--h-mut);text-align:center}
+  .riga-sep{grid-column:1/-1;height:1px;background:var(--h-line2);margin:4px 0}
+  #prova{display:none}
+  @media (max-width:900px){
+    .griglia{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+    .cella{padding:8px 4px}
+    .fam{padding:8px}.fam h2{font-size:15px}
+    .eti{grid-column:1/-1;padding-top:12px}
+    .fam{position:static}.vuoto-fam{display:none}
+    .fam p,.fam .fn{display:none}
+  }
+  @media print{
+    @page{size:210mm 297mm;margin:0}
+    body.hud{background:#fff!important;padding:0}
+    body.hud::before,body.hud::after{display:none!important}
+    body>*:not(#prova){display:none!important}
+    #prova{display:block!important}
+    #prova .cv-pg{break-after:page}
+    #prova .cv-pg:last-child{break-after:auto}
+    #prova *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  }
+</style>
+</head>
+<body class="hud">
+<div class="testa">
+  <a class="btn menu" href="../../index.html">☰ Menu</a>
+  <h1><small>Ottica Macrì · app STORE // CRAFT</small>Stili delle stampe</h1>
+  <span class="sp"></span>
+  <div class="gruppo" role="group" aria-label="Contenuto"><span>Contenuto</span><button class="btn" type="button" data-c="giorni">Tutti i giorni</button><button class="btn" type="button" data-c="bf">Black Friday</button></div>
+  <div class="gruppo" role="group" aria-label="Fondo"><span>Fondo</span><button class="btn" type="button" data-v="consigliato">Consigliato</button><button class="btn" type="button" data-v="chiaro">☀ Chiaro</button><button class="btn" type="button" data-v="scuro">☾ Scuro</button></div>
+  <button class="btn" type="button" id="stampa">🖨 Prova di stampa A4</button>
+  <a class="btn" href="../demo-app-v2.html#creator">🛠 Apri l'app</a>
+</div>
+<main>
+  <p class="nota">Le stesse stampe nei <b>3 stili</b> dell'app, alla <b>misura vera</b> di ogni supporto del negozio. Lo stile si sceglie in ogni pagina (miniature «Stile della grafica») e quello di partenza in <b>Impostazioni › Stile grafiche</b>. Prezzi e sconti sono <b>esempi</b> da confermare con Aldo. Le etichette DYMO escono solo in nero: lì cambia solo il carattere.</p>
+  <div class="griglia" id="griglia"></div>
+</main>
+<div id="prova" aria-hidden="true"></div>
+
+<script src="../../dispositivi.js"></script>
+<script src="dati.js"></script>
+<script src="stili.js"></script>
+<script>window.BF_VETRINE = window.BF_VETRINE || {};   /* qui non servono le grafiche pronte: cartelli.js non le carica */</script>
+<script src="cartelli.js"></script>
+<script src="../../tema-hud.js"></script>
+<script src="../../nascondi-note.js"></script>
+<script>
+(function () {
+  'use strict';
+  var ST = window.STILI, PE = (window.DATI && window.DATI.PREZZI_ESEMPIO) || {}, MM = 96 / 25.4;
+  var RB = PE.RB2140 || { pieno: 109, sconto: 30 }, AV = PE.RB3025 || { pieno: 149, sconto: 25 }, PO = PE.PO0649 || { pieno: 320, sconto: 20 };
+  var stato = { c: 'giorni', v: 'consigliato' };
+  try { var m = JSON.parse(localStorage.getItem('om-stili-anteprima') || '{}'); if (m.c) stato.c = m.c; if (m.v) stato.v = m.v; } catch (e) {}
+  function salva() { try { localStorage.setItem('om-stili-anteprima', JSON.stringify(stato)); } catch (e) {} }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  var BFD = '24 — 30 NOVEMBRE';
+
+  /* lo stesso set per ogni stile (dati presi dai modelli dell'app e da dati.js) */
+  function set(bf) {
+    var rbf = { brand: 'Ray-Ban', nome: 'Wayfarer', cod: 'RB2140', pieno: RB.pieno, sconto: RB.sconto, data: BFD };
+    return [
+      { k: 'a7', sup: 'plexi-a7', w: 210, dati: bf ? Object.assign({ mod: 'bf-singolo', variante: 'nero lucido' }, rbf)
+          : { mod: 'outlet', brand: 'Ray-Ban', claimSx: 'SOLE', claimDx: '2026', desc: 'Aviator', cod: 'RB3025', pieno: AV.pieno, sconto: AV.sconto } },
+      { k: '10x15', sup: 'plexi-10x15', w: 240, dati: bf ? { mod: 'bf-brand', brand: 'Persol', cod: 'PO0649', pieno: PO.pieno, sconto: PO.sconto, data: BFD }
+          : { mod: 'semplice', brand: 'Ottica Macrì', claimSx: 'PROMO', claimDx: '2026', desc: 'Occhiali da vista completi', prezzo: 99 } },
+      { k: '13x18', sup: 'cornice-13x18', w: 270, dati: bf ? Object.assign({ mod: 'bf-focus' }, rbf)
+          : { mod: 'paio', brand: 'Ottica Macrì', claimSx: '2° PAIO', claimDx: 'PROMO', desc: 'Sul secondo paio', valore: '-50%', sotto: 'OCCHIALI DA VISTA E DA SOLE' } },
+      { k: 'a5', sup: 'plexi-a5', w: 290, dati: bf ? { mod: 'bf-reclame', valore: '−30%', desc: 'OCCHIALI DA SOLE', banda: 'SU TUTTA LA COLLEZIONE', data: BFD }
+          : { mod: 'percentuale', brand: 'Ottica Macrì', claimSx: 'SALDI', claimDx: 'ESTATE', desc: 'Occhiali da sole selezionati', sconto: 30 } },
+      { k: 'a4', sup: 'plexi-a4', w: 340, dati: bf ? { mod: 'bf-tutti', sconto: 30, data: BFD }
+          : { mod: 'multi', brand: 'Ottica Macrì', claimSx: 'NEW', claimDx: '2026', articoli: [['Ray-Ban Wayfarer', RB.pieno], ['Persol 649', PO.pieno], ['Carrera 1007/S', 129]] } },
+      { k: 'cubo', sup: 'cubo-10', w: 300, facce: [1, 2, 3, 4].map(function (f) {
+          if (!bf && f === 2) return { mod: 'percentuale', brand: 'Ray-Ban', desc: 'Ray-Ban Wayfarer', sconto: RB.sconto };
+          return Object.assign({ mod: 'bf-cubo', faccia: f }, rbf); }) },
+      { k: 'stanghetta', w: 360, righe: [{ brand: 'Ray-Ban', cod: 'RB2140', pieno: RB.pieno, sc: RB.sconto }, { brand: 'Persol', cod: 'PO0649', pieno: PO.pieno, sc: PO.sconto }], evento: bf ? 'BLACK FRIDAY' : '' },
+      { k: 'slide', w: 0, dati: bf ? { kicker: 'Black Friday · 24—30 novembre', titolo: 'Occhiali da sole', testo: 'Su tutta la collezione sole', prezzo: '−30%' }
+          : { kicker: 'Su appuntamento', titolo: 'Controllo della vista', testo: 'Chiami lo 06 78346705 o entri in negozio.', prezzo: 'Gratuito' } }
+    ];
+  }
+  var NOMI = { a7: 'Cavalierino A7', '10x15': 'Porta-prezzi 10×15', '13x18': 'Cornicetta 13×18', a5: 'Plexiglass A5', a4: 'Plexiglass A4', cubo: 'Cubo · 4 facce', stanghetta: 'Prezzi da stanghetta', slide: 'Slide del tablet' };
+  function sup(id) { return window.DISPOSITIVI.trova(id); }
+  function idDi(f) {
+    if (stato.v === 'chiaro') return f.chiaro;
+    if (stato.v === 'scuro') return f.scuro;
+    return f.id === 'oro' ? f.scuro : f.chiaro;   // consigliato: Nero e oro scuro, gli altri chiari
+  }
+  function nuovo(tag, cls) { var e = document.createElement(tag); if (cls) e.className = cls; return e; }
+
+  function disegna() {
+    var G = document.getElementById('griglia'); G.innerHTML = '';
+    var fams = ST.famiglie, bf = stato.c === 'bf';
+    G.appendChild(nuovo('div', 'vuoto-fam'));
+    fams.forEach(function (f) {
+      var id = idDi(f), E = ST.elenco[id], P = E.palette;
+      var d = nuovo('div', 'fam');
+      d.innerHTML = '<h2>' + esc(f.nome) + '</h2><p>' + esc(f.descr) + '</p><div class="pal">' + Object.keys(P).map(function (k) { return '<i title="' + k + ' ' + P[k] + '" style="background:' + P[k] + '"></i>'; }).join('') + '</div>' +
+        '<div class="fn">' + esc(E.nome) + ' · inchiostro: ' + esc(E.inchiostro) + '<br>Titoli: ' + esc(E.font.titolo) + '<br>Prezzi: ' + esc(E.font.numeri) + '<br>Scritte: ' + esc(E.font.etichette) + '</div>';
+      G.appendChild(d);
+    });
+    set(bf).forEach(function (r) {
+      var s = r.sup ? sup(r.sup) : null, e = nuovo('div', 'eti');
+      var mis = s ? s.stampa[0] + ' × ' + s.stampa[1] + ' mm' : (r.k === 'slide' ? '2560 × 1600 px · 16:10' : '30 × 20 · 25 × 15 mm');
+      e.innerHTML = '<b>' + esc(NOMI[r.k]) + '</b><span>' + mis + '</span><em>' + esc(s ? s.nome : (r.k === 'slide' ? 'Tablet 12,4"–13" in vetrina' : 'cartellino con filo · clip')) + '</em>';
+      G.appendChild(e);
+      fams.forEach(function (f) {
+        var id = idDi(f), c = nuovo('div', 'cella');
+        if (r.k === 'cubo') {
+          var q = nuovo('div', 'cubo'); q.style.maxWidth = r.w + 'px';
+          r.facce.forEach(function (dd) { var x = nuovo('div'); q.appendChild(x); ST.applica('inserto', Object.assign({ sup: r.sup, stile: id }, dd), x); });
+          c.appendChild(q); c.appendChild(Object.assign(nuovo('div', 'cap'), { textContent: '4 facce da 100 × 100 mm' }));
+        } else if (r.k === 'stanghetta') {
+          var w = nuovo('div', 'stanghe');
+          [['stanga-cartellino', 0], ['stanga-clip', 1]].forEach(function (z) {
+            var t = sup(z[0]), x = nuovo('div'); x.style.width = (t.stampa[0] * MM * 3.2) + 'px'; w.appendChild(x);
+            ST.applica('stanghetta', { sup: z[0], stile: id, riga: r.righe[z[1]], evento: r.evento }, x);
+          });
+          c.appendChild(w); c.appendChild(Object.assign(nuovo('div', 'cap'), { textContent: 'ingrandite ×3,2' }));
+        } else if (r.k === 'slide') {
+          var x = nuovo('div', 'vis'); c.appendChild(x); ST.applica('slide', Object.assign({ stile: id }, r.dati), x);
+        } else {
+          var y = nuovo('div', 'vis'); y.style.maxWidth = r.w + 'px'; c.appendChild(y); ST.applica('inserto', Object.assign({ sup: r.sup, stile: id }, r.dati), y);
+        }
+        G.appendChild(c);
+      });
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-c]'), function (b) { b.classList.toggle('on', b.dataset.c === stato.c); b.setAttribute('aria-pressed', b.dataset.c === stato.c); });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-v]'), function (b) { b.classList.toggle('on', b.dataset.v === stato.v); b.setAttribute('aria-pressed', b.dataset.v === stato.v); });
+    ST.adatta(G);
+  }
+
+  /* prova di stampa: gli inserti A7, 10×15 e le stanghette dei 3 stili, impaginati come nell'app (linee di taglio, righello 5 cm) */
+  function prova() {
+    var C = window.CARTELLI_V2._prova, L = [], bf = stato.c === 'bf', S = set(bf);
+    ST.famiglie.forEach(function (f) {
+      var id = idDi(f);
+      ['a7', '10x15'].forEach(function (k) { var r = S.filter(function (x) { return x.k === k; })[0], s = sup(r.sup); L.push({ dim: s.stampa, html: C.inserto(Object.assign({ stile: id }, r.dati), s), copie: 1, nome: s.nome + ' · 3 stili' }); });
+      var t = sup('stanga-cartellino'), rg = S.filter(function (x) { return x.k === 'stanghetta'; })[0];
+      for (var i = 0; i < 6; i++) L.push({ dim: t.stampa, html: '<div class="' + ST.classe(id) + '">' + C.stanga(t, rg.righe[i % 2], { sconto: 0, evento: rg.evento }) + '</div>', copie: 1, nome: t.nome + ' · 3 stili' });
+    });
+    var pag = C.impagina(L, 'A4');
+    document.getElementById('prova').innerHTML = pag.join('');
+    return pag.length;
+  }
+
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-c],[data-v]'); if (b) { if (b.dataset.c) stato.c = b.dataset.c; if (b.dataset.v) stato.v = b.dataset.v; salva(); disegna(); return; }
+    if (e.target.closest('#stampa')) { prova(); setTimeout(function () { window.print(); }, 80); }
+  });
+  window.addEventListener('beforeprint', function () { if (!document.getElementById('prova').innerHTML) prova(); });
+  var tR; window.addEventListener('resize', function () { clearTimeout(tR); tR = setTimeout(function () { ST.adatta(); }, 60); });
+  disegna();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { ST.adatta(); });
+  window.STILI_TAVOLA = { disegna: disegna, prova: prova, stato: stato };
+})();
+</script>
+</body>
+</html>

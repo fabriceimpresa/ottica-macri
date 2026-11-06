@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<link rel="icon" type="image/svg+xml" href="../media/logo/marchi6/04-monocolo/04-monocolo-icona-colori.svg">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ottica Macrì Riepilogo</title>
+<!-- Prezzi: SOLO da prezzi.js. Immagini: media/riepilogo/immagini.js (lo crea crea_riepilogo.py) -->
+<script src="../prezzi.js"></script>
+<script src="../media/riepilogo/immagini.js"></script>
+<style>
+  @page { size: A4 portrait; margin: 0; }
+  :root{
+    --nero:#121212; --carta:#f6f3ee; --carta2:#ece6dc; --oro:#d4a373; --oro-scuro:#a8784a;
+    --blu:#1d5c8f; --testo:#24221f; --grigio:#6b655d; --bianco:#fffdf9; --ciano:#2fb4c9;
+    --serif: Georgia, "Times New Roman", serif;
+    --sans: system-ui, "Segoe UI", Arial, sans-serif;
+    --mono: Consolas, "Courier New", monospace;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ background:#8a857d; }
+  body{ font-family:var(--sans); color:var(--testo); -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .pag{ width:210mm; height:297mm; position:relative; overflow:hidden; background:var(--carta);
+        break-after:page; page-break-after:always; margin:0 auto; }
+  .pag:last-child{ break-after:auto; page-break-after:auto; }
+  @media screen{ .pag{ margin:8mm auto; box-shadow:0 4px 24px rgba(0,0,0,.25);} }
+  @media print{ html,body{ background:none; } }
+
+  /* testata e piede */
+  .top{ position:absolute; left:16mm; right:16mm; top:10mm; display:flex; justify-content:space-between;
+        align-items:center; font-size:8.5pt; letter-spacing:.26em; text-transform:uppercase; color:var(--grigio); }
+  .top b{ font-family:var(--serif); font-weight:normal; color:var(--testo); letter-spacing:.32em; font-size:10pt; }
+  .top b i{ font-style:normal; color:var(--oro); }
+  .top::after{ content:""; position:absolute; left:0; right:0; bottom:-3.2mm; height:.4mm; background:linear-gradient(90deg,var(--oro),rgba(212,163,115,.12)); }
+  .top::before{ content:""; position:absolute; left:0; width:42mm; bottom:-4.4mm; height:.2mm; background:var(--ciano); opacity:.7; }
+  .hud{ position:absolute; left:16mm; right:16mm; bottom:9mm; display:flex; justify-content:space-between; align-items:center;
+        font-family:var(--mono); font-size:8pt; letter-spacing:.18em; color:var(--grigio); text-transform:uppercase; }
+  .hud .n{ color:var(--oro-scuro); font-family:var(--serif); font-size:10pt; letter-spacing:.2em; }
+  .hud .linea{ flex:1; height:.2mm; margin:0 4mm; background:linear-gradient(90deg,rgba(47,180,201,.55),rgba(47,180,201,0)); position:relative; }
+  .hud .linea::before{ content:""; position:absolute; left:0; top:-.8mm; width:1.8mm; height:1.8mm; border:.25mm solid var(--ciano); transform:rotate(45deg); background:var(--carta); }
+
+  .corpo{ position:absolute; left:16mm; right:16mm; top:24mm; bottom:18mm; display:flex; flex-direction:column; }
+  .kicker{ font-family:var(--mono); font-size:9.5pt; letter-spacing:.28em; text-transform:uppercase; color:var(--blu); font-weight:600; margin-bottom:2.5mm; display:flex; align-items:center; gap:2.5mm; }
+  .kicker::before{ content:""; width:2.2mm; height:2.2mm; border:.3mm solid var(--ciano); transform:rotate(45deg); }
+  h2{ font-family:var(--serif); font-weight:normal; text-transform:uppercase; letter-spacing:.1em;
+      font-size:24pt; line-height:1.15; color:var(--testo); margin-bottom:3mm; }
+  h2 em{ font-style:normal; color:var(--oro-scuro); }
+  .rule{ width:22mm; height:.8mm; background:var(--oro); margin:0 0 5mm; }
+  p.lead{ font-size:14.5pt; line-height:1.45; margin-bottom:4mm; }
+  p.lead b{ color:var(--blu); font-weight:600; }
+  ul.punti{ list-style:none; }
+  ul.punti li{ font-size:14pt; line-height:1.38; padding-left:8mm; position:relative; margin-bottom:2.6mm; }
+  ul.punti li::before{ content:""; position:absolute; left:0; top:.45em; width:3.2mm; height:3.2mm; border-radius:50%; border:.6mm solid var(--oro); }
+  ul.punti li b{ color:var(--blu); font-weight:600; }
+  .nota{ font-size:12pt; color:var(--grigio); line-height:1.4; border-left:.8mm solid var(--oro); padding-left:4mm; }
+
+  /* immagini con mirini HUD */
+  .shot{ position:relative; background:var(--bianco); border-radius:2mm; margin:0;
+         box-shadow:0 1.2mm 5mm rgba(40,30,20,.16), 0 0 0 .3mm rgba(0,0,0,.06); }
+  .shot img{ display:block; width:100%; height:100%; object-fit:cover; object-position:top center; border-radius:2mm; }
+  .shot.contain img{ object-fit:contain; }
+  .shot.scuro{ background:#1a1a1a; }
+  .shot::before, .shot::after{ content:""; position:absolute; width:5mm; height:5mm; pointer-events:none; }
+  .shot::before{ left:-1.6mm; top:-1.6mm; border-left:.35mm solid var(--ciano); border-top:.35mm solid var(--ciano); }
+  .shot::after{ right:-1.6mm; bottom:-1.6mm; border-right:.35mm solid var(--ciano); border-bottom:.35mm solid var(--ciano); }
+  .shot figcaption{ position:absolute; left:0; right:0; top:100%; margin-top:2mm; font-size:10pt; color:var(--grigio); letter-spacing:.04em; text-align:center; line-height:1.3; }
+  .tablet{ border:2mm solid #1b1b1b; background:#1b1b1b; border-radius:3.5mm; }
+  .phone{ border:1.4mm solid #1b1b1b; background:#1b1b1b; border-radius:4.5mm; }
+  .phone img{ border-radius:3mm; }
+
+  /* copertina e chiusura scure */
+  .dark{ background:var(--nero); color:#efe9df; }
+  .dark::before{ content:""; position:absolute; inset:9mm; border:.7mm solid var(--oro); pointer-events:none; z-index:2; }
+  .dark::after{ content:""; position:absolute; inset:12mm; border:.25mm solid rgba(212,163,115,.4); pointer-events:none; z-index:2; }
+  .griglia{ position:absolute; inset:12mm; opacity:.5;
+     background-image:linear-gradient(rgba(47,180,201,.07) .2mm, transparent .2mm), linear-gradient(90deg, rgba(47,180,201,.07) .2mm, transparent .2mm);
+     background-size:12mm 12mm; }
+  .mira{ position:absolute; width:7mm; height:7mm; border-color:var(--ciano); border-style:solid; border-width:0; opacity:.85; z-index:3; }
+  .mira.a{ left:16mm; top:16mm; border-left-width:.35mm; border-top-width:.35mm; }
+  .mira.b{ right:16mm; top:16mm; border-right-width:.35mm; border-top-width:.35mm; }
+  .mira.c{ left:16mm; bottom:16mm; border-left-width:.35mm; border-bottom-width:.35mm; }
+  .mira.d{ right:16mm; bottom:16mm; border-right-width:.35mm; border-bottom-width:.35mm; }
+  .cover{ position:absolute; inset:12mm; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:0 12mm; z-index:1; }
+  .logo{ font-family:var(--serif); font-size:36pt; letter-spacing:.3em; color:#f4efe6; margin-right:-.3em; white-space:nowrap; }
+  .logo i{ font-style:normal; color:var(--oro); letter-spacing:.12em; }
+  .claim{ margin-top:6mm; font-size:11pt; letter-spacing:.55em; color:var(--oro); margin-right:-.55em; }
+  .claim2{ margin-top:2.5mm; font-family:var(--serif); font-style:italic; font-size:12.5pt; letter-spacing:.2em; color:#bdb3a5; }
+  .per{ margin-top:26mm; font-family:var(--serif); font-size:13pt; letter-spacing:.4em; text-transform:uppercase; color:#cfc6b8; margin-right:-.4em; }
+  .cliente{ margin-top:3mm; font-family:var(--serif); font-size:34pt; letter-spacing:.12em; text-transform:uppercase; color:#fff; margin-right:-.12em; line-height:1.15; }
+  .etichetta{ margin-top:9mm; display:inline-block; border:.4mm solid var(--oro); padding:3mm 8mm; font-family:var(--serif);
+           font-size:14pt; letter-spacing:.34em; text-transform:uppercase; color:var(--oro); padding-right:calc(8mm - .34em); }
+  .data{ margin-top:5mm; font-family:var(--mono); font-size:11pt; letter-spacing:.3em; color:var(--ciano); text-transform:uppercase; }
+  .sep{ width:30mm; height:.4mm; background:var(--oro); margin:24mm auto 6mm; }
+  .meta{ font-size:10pt; letter-spacing:.26em; text-transform:uppercase; color:#a99f91; margin-right:-.26em; line-height:1.8; }
+
+  /* indice */
+  .indice{ display:flex; flex-direction:column; gap:6mm; margin-top:6mm; }
+  .voce{ display:flex; align-items:center; gap:6mm; background:var(--bianco); border-radius:3mm; padding:8mm 8mm 9mm;
+         box-shadow:0 1mm 4mm rgba(40,30,20,.08); border-left:1.6mm solid var(--oro); position:relative; }
+  .voce:nth-child(even){ border-left-color:var(--blu); }
+  .voce .n{ font-family:var(--serif); font-size:24pt; color:var(--oro); width:9mm; text-align:center; line-height:1; }
+  .voce svg{ flex:0 0 15mm; width:15mm; height:15mm; }
+  .voce h3{ font-family:var(--serif); font-weight:normal; text-transform:uppercase; letter-spacing:.06em; font-size:16pt; line-height:1.2; }
+  .voce p{ font-size:13.5pt; color:var(--grigio); margin-top:1.2mm; line-height:1.35; }
+  .voce .pg{ position:absolute; right:6mm; bottom:3.5mm; font-family:var(--mono); font-size:8.5pt; letter-spacing:.15em; color:var(--ciano); }
+
+  /* vetrina */
+  .righe-img{ display:flex; gap:5mm; justify-content:center; }
+  .righe-img .shot{ flex:1 1 0; min-width:0; }
+
+  /* preventivi */
+  table.prev{ width:100%; border-collapse:separate; border-spacing:0; background:var(--bianco); border-radius:3mm; overflow:hidden;
+              box-shadow:0 1mm 4mm rgba(40,30,20,.08); }
+  .prev th{ background:var(--blu); color:#fff; font-family:var(--mono); font-weight:normal; font-size:8.5pt; letter-spacing:.2em; text-transform:uppercase; text-align:left; padding:2.6mm 4mm; }
+  .prev th.r, .prev td.r{ text-align:right; }
+  .prev td{ padding:2.2mm 4mm; border-top:.3mm solid #ebe2d4; vertical-align:top; }
+  .prev td .nm{ font-family:var(--serif); font-size:12.5pt; letter-spacing:.03em; line-height:1.2; }
+  .prev td .cs{ font-size:10pt; color:var(--grigio); line-height:1.35; margin-top:.8mm; }
+  .prev td.t{ font-size:11pt; white-space:nowrap; color:var(--grigio); padding-top:3.3mm; }
+  .prev td.p{ font-family:var(--serif); font-size:14pt; white-space:nowrap; padding-top:3mm; }
+  .prev tr.somma td{ background:#f1ebe1; font-weight:600; }
+  .prev tr.somma td.p{ font-weight:normal; }
+
+  .sottotit{ font-family:var(--mono); font-size:9pt; letter-spacing:.24em; text-transform:uppercase; color:var(--oro-scuro); margin:4mm 0 2mm; font-weight:600; }
+  .scala{ display:flex; flex-direction:column; gap:1.4mm; }
+  .gradino{ display:flex; align-items:center; gap:3mm; font-size:11pt; }
+  .gradino .bar{ height:4.6mm; background:linear-gradient(90deg,var(--blu),#3b7fb5); border-radius:1mm; flex:0 0 auto; position:relative; }
+  .gradino .bar::after{ content:""; position:absolute; right:0; top:0; bottom:0; width:.5mm; background:var(--ciano); }
+  .gradino .lab{ flex:1; min-width:0; color:var(--testo); line-height:1.2; }
+  .gradino .eu{ font-family:var(--serif); font-size:12pt; white-space:nowrap; }
+
+  .totali{ display:flex; gap:4mm; margin-top:4mm; }
+  .tot{ flex:1; border-radius:3mm; padding:3.8mm 5mm; background:var(--bianco); box-shadow:0 1mm 4mm rgba(40,30,20,.08); }
+  .tot.blu{ background:var(--blu); color:#fff; box-shadow:0 2mm 6mm rgba(29,92,143,.3); }
+  .tot .lb{ font-family:var(--mono); font-size:8.5pt; letter-spacing:.2em; text-transform:uppercase; color:var(--grigio); }
+  .tot.blu .lb{ color:#cfe0ee; }
+  .tot .eur{ font-family:var(--serif); font-size:23pt; margin-top:1.5mm; white-space:nowrap; }
+  .tot .eur s{ color:#b3a99b; font-size:15pt; margin-right:2mm; }
+  .tot small{ display:block; font-size:10pt; color:var(--grigio); margin-top:1mm; line-height:1.35; }
+  .tot.blu small{ color:#e4edf5; }
+  .canone{ margin-top:3mm; display:flex; gap:3mm; align-items:baseline; font-size:12pt; line-height:1.4; background:#efe5d6; border-radius:2.5mm; padding:3.5mm 5mm; }
+  .canone b{ font-family:var(--mono); font-size:9pt; letter-spacing:.2em; text-transform:uppercase; color:var(--oro-scuro); white-space:nowrap; }
+  .validita{ margin-top:3mm; font-size:10pt; color:var(--grigio); letter-spacing:.03em; }
+
+  .fasce{ display:flex; gap:3.5mm; align-items:stretch; }
+  .fascia{ flex:1; background:var(--bianco); border-radius:2.5mm; padding:4mm 4mm 3.5mm; box-shadow:0 1mm 4mm rgba(40,30,20,.08);
+           border-top:1.1mm solid var(--oro); display:flex; flex-direction:column; }
+  .fascia.cons{ border-top-color:var(--blu); outline:.4mm solid var(--blu); }
+  .fascia .liv{ font-family:var(--mono); font-size:8pt; letter-spacing:.16em; text-transform:uppercase; color:var(--oro-scuro); font-weight:600; }
+  .fascia.cons .liv{ color:var(--blu); }
+  .fascia h3{ font-family:var(--serif); font-weight:normal; font-size:11.5pt; line-height:1.25; margin:1.6mm 0 1mm; }
+  .fascia p{ font-size:9.5pt; color:var(--grigio); line-height:1.3; flex:1; }
+  .fascia .eur{ font-family:var(--serif); font-size:15pt; margin-top:2mm; white-space:nowrap; }
+  .avviso{ margin-top:2.5mm; font-size:10pt; color:var(--grigio); display:flex; gap:3mm; align-items:center; }
+  .avviso .tag{ background:var(--carta2); color:var(--oro-scuro); font-family:var(--mono); font-size:8pt; letter-spacing:.18em; text-transform:uppercase; padding:1.2mm 2.6mm; border-radius:1mm; white-space:nowrap; }
+
+  /* confronto */
+  table.conf{ width:100%; border-collapse:separate; border-spacing:3mm 0; margin:0 -3mm; table-layout:fixed; width:calc(100% + 6mm); }
+  .conf th{ font-family:var(--serif); font-weight:normal; text-transform:uppercase; letter-spacing:.12em; font-size:15pt; padding:5mm 5mm 4mm; text-align:left; border-radius:3mm 3mm 0 0; line-height:1.2; }
+  .conf th small{ display:block; font-family:var(--sans); text-transform:none; letter-spacing:0; font-size:11pt; margin-top:1.5mm; line-height:1.35; }
+  .conf th.a{ background:var(--nero); color:#fff; } .conf th.a small{ color:#cfc6b8; }
+  .conf th.b{ background:var(--blu); color:#fff; } .conf th.b small{ color:#d6e3ef; }
+  .conf th.vuoto{ background:none; width:30mm; }
+  .conf td{ background:var(--bianco); padding:4mm 5mm; vertical-align:top; font-size:12pt; line-height:1.4; border-top:.3mm solid #ebe2d4; }
+  .conf td.dom{ background:none; border:none; font-family:var(--mono); font-size:8.5pt; letter-spacing:.16em; text-transform:uppercase; color:var(--oro-scuro); font-weight:600; padding:4.5mm 0 0; line-height:1.5; }
+  .conf tr:last-child td:not(.dom){ border-radius:0 0 3mm 3mm; }
+  .conf ul{ list-style:none; }
+  .conf li{ padding-left:5mm; position:relative; margin-bottom:1mm; }
+  .conf li::before{ content:""; position:absolute; left:0; top:.55em; width:2mm; height:2mm; border-radius:50%; background:var(--oro); }
+  .conf .big{ font-family:var(--serif); font-size:19pt; white-space:nowrap; }
+  .conf small{ display:block; color:var(--grigio); font-size:10pt; line-height:1.35; margin-top:1mm; }
+
+  .crescita{ margin-top:7mm; display:flex; align-items:center; gap:5mm; background:#efe5d6; border-radius:3mm; padding:6mm 7mm; }
+  .crescita svg{ flex:0 0 26mm; height:14mm; }
+  .crescita h3{ font-family:var(--serif); font-weight:normal; text-transform:uppercase; letter-spacing:.1em; font-size:15pt; color:var(--oro-scuro); margin-bottom:1.5mm; }
+  .crescita p{ font-size:12.5pt; line-height:1.45; }
+
+  /* cosa serve */
+  .serve{ display:grid; grid-template-columns:1fr 1fr; gap:5mm; margin-top:3mm; }
+  .cosa{ display:flex; gap:5mm; align-items:center; background:var(--bianco); border-radius:2.5mm; padding:8mm 6mm; box-shadow:0 .8mm 3mm rgba(40,30,20,.07); }
+  .cosa svg{ flex:0 0 14mm; width:14mm; height:14mm; }
+  .cosa b{ display:block; font-size:15pt; font-weight:600; }
+  .cosa span{ font-size:12pt; color:var(--grigio); line-height:1.3; display:block; margin-top:.5mm; }
+  .box{ background:var(--bianco); border-radius:3mm; padding:6mm 7mm; box-shadow:0 1mm 4mm rgba(40,30,20,.08); }
+  .box.oro{ background:#efe5d6; box-shadow:none; border-left:1.6mm solid var(--oro); }
+  .box h3{ font-family:var(--serif); font-weight:normal; text-transform:uppercase; letter-spacing:.12em; font-size:14pt; color:var(--oro-scuro); margin-bottom:2.5mm; }
+  .box p{ font-size:14.5pt; line-height:1.45; }
+
+  /* chiusura */
+  .passi{ display:flex; flex-direction:column; gap:0; width:100%; text-align:left; margin-top:8mm; }
+  .passo{ display:flex; gap:6mm; align-items:baseline; border-top:.4mm solid rgba(212,163,115,.45); padding:4.5mm 2mm; }
+  .passo .n{ font-family:var(--serif); font-size:26pt; color:var(--oro); line-height:1; width:10mm; }
+  .passo h3{ font-family:var(--serif); font-weight:normal; text-transform:uppercase; letter-spacing:.1em; font-size:15pt; color:#fff; }
+  .passo p{ font-size:12.5pt; line-height:1.4; color:#bdb3a5; margin-top:1mm; }
+  .grazie{ font-family:var(--serif); font-size:36pt; letter-spacing:.3em; text-transform:uppercase; color:#fff; margin-right:-.3em; }
+</style>
+</head>
+<body>
+
+<!-- 1 COPERTINA -->
+<section class="pag dark">
+  <div class="griglia"></div>
+  <span class="mira a"></span><span class="mira b"></span><span class="mira c"></span><span class="mira d"></span>
+  <div class="cover">
+    <div class="logo">STORE <i>//</i> CRAFT</div>
+    <div class="claim">COOL · EASY · SMART</div>
+    <div class="claim2">bello · utile · facile</div>
+    <div class="per">Il tuo negozio con</div>
+    <div class="cliente">Ottica Macrì</div>
+    <div class="etichetta">Riepilogo dell'incontro</div>
+    <div class="data" data-prezzi="data">5 novembre 2026</div>
+    <div class="sep"></div>
+    <div class="meta">Per il signor Aldo Macrì<br>Roma · Via Poggi D'Oro 23</div>
+  </div>
+</section>
+
+<!-- 2 INDICE -->
+<section class="pag">
+  <div class="top"><b>STORE <i>//</i> CRAFT</b><span>Ottica Macrì · Riepilogo</span></div>
+  <div class="corpo">
+    <div class="kicker">In breve</div>
+    <h2>Cosa abbiamo<br><em>visto insieme</em></h2>
+    <div class="rule"></div>
+    <div class="indice">
+      <div class="voce"><div class="n">1</div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="#a8784a" stroke-width="1.4"><path d="M3 9l9-5 9 5v11H3z"/><rect x="6" y="11" width="7" height="6"/><path d="M15.5 20v-7h3v7"/></svg>
+        <div><h3>La tua vetrina e il negozio in 3D</h3><p>Come può diventare la tua vetrina, con le grafiche e il tablet.</p></div><span class="pg">pag. 3</span></div>
+      <div class="voce"><div class="n">2</div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="#1d5c8f" stroke-width="1.4"><rect x="2.5" y="4" width="19" height="13" rx="1.5"/><path d="M8 21h8M12 17v4"/><path d="M6 8h5M6 11h8"/></svg>
+        <div><h3>L'app STORE // CRAFT</h3><p>Tutto il negozio in un posto, dal PC e dal telefono.</p></div><span class="pg">pag. 4</span></div>
+      <div class="voce"><div class="n">3</div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="#a8784a" stroke-width="1.4"><path d="M3 12.5V4h8.5L21 13.5 13.5 21z"/><circle cx="7.5" cy="8.5" r="1.5"/></svg>
+        <div><h3>Etichette e grafica</h3><p>Cartelli, cartellini ed etichette DYMO, pronti da stampare.</p></div><span class="pg">pag. 5</span></div>
+      <div class="voce"><div class="n">4</div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="#1d5c8f" stroke-width="1.4"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 9v6l5-3z" fill="#1d5c8f"/></svg>
+        <div><h3>La demo da provare</h3><p>L'app STORE // CRAFT vera, da provare sul PC o sul telefono.</p></div></div>
+      <div class="voce"><div class="n">5</div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="#a8784a" stroke-width="1.4"><rect x="3" y="4" width="8" height="16" rx="1"/><rect x="13" y="8" width="8" height="12" rx="1"/><path d="M5.5 8h3M15.5 12h3"/></svg>
+        <div><h3>I due piani e i preventivi</h3><p>Piano A completo e Piano B essenziale, a confronto.</p></div><span class="pg">pag. 6–8</span></div>
+    </div>
+  </div>
+  <div class="hud"><span>Indice</span><span class="linea"></span><span class="n">02</span></div>
+</section>
+
+<!-- 3 VETRINA -->
+<section class="pag">
+  <div class="top"><b>STORE <i>//</i> CRAFT</b><span>Ottica Macrì · Riepilogo</span></div>
+  <div class="corpo">
+    <div class="kicker">1 · La vetrina</div>
+    <h2>Una vetrina<br><em>che si muove</em></h2>
+    <div class="rule"></div>
+    <p class="lead">Un <b>tablet</b> in vetrina mostra le tue grafiche, una dopo l'altra. Tu scegli cosa far vedere <b>dal PC o dal telefono</b>.</p>
+    <figure class="shot tablet" data-k="negozio3d-1|bf-slide|vetrina-tablet" style="width:150mm; aspect-ratio:16/9; margin:2mm auto 0"><img alt=""><figcaption></figcaption></figure>
+    <div class="righe-img" id="riga-bf" style="height:80mm; margin-top:13mm">
+      <figure class="shot contain" data-auto data-k="bf-cartello-1" style="flex:0 0 auto; aspect-ratio:1240/1754"><img alt=""><figcaption></figcaption></figure>
+      <figure class="shot contain" data-auto data-k="bf-cartello-2" style="flex:0 0 auto; aspect-ratio:1240/1754"><img alt=""><figcaption></figcaption></figure>
+      <figure class="shot contain phone" data-auto data-k="bf-verticale|vetrina-tablet" style="flex:0 0 auto; aspect-ratio:1080/1920"><img alt=""><figcaption></figcaption></figure>
+    </div>
+  </div>
+  <div class="hud"><span>Vetrina digitale</span><span class="linea"></span><span class="n">03</span></div>
+</section>
+
+<!-- 4 APP -->
+<section class="pag">
+  <div class="top"><b>STORE <i>//</i> CRAFT</b><span>Ottica Macrì · Riepilogo</span></div>
+  <div class="corpo">
+    <div class="kicker">2 · L'app</div>
+    <h2>Tutto il negozio,<br><em>in un'unica app</em></h2>
+    <div class="rule"></div>
+    <p class="lead">Pulsanti <b>grandi e chiari</b>. Si tocca e si entra: vendite, magazzino, clienti, social e vetrina.</p>
+    <div style="position:relative; margin-top:1mm">
+      <figure class="shot" data-k="app-home" style="width:82%; aspect-ratio:16/10"><img alt=""><figcaption style="width:100%; text-align:left"></figcaption></figure>
+      <figure class="shot phone" data-k="app-clienti-tel" style="position:absolute; right:0; top:16mm; width:22%; aspect-ratio:390/844"><img alt=""><figcaption></figcaption></figure>
+    </div>
+    <div class="righe-img" style="margin-top:16mm">
+      <figure class="shot" data-k="app-vendo" style="aspect-ratio:16/10"><img alt=""><figcaption></figcaption></figure>
+      <figure class="shot" data-k="app-social" style="aspect-ratio:16/10"><img alt=""><figcaption></figcaption></figure>
+    </div>
+  </div>
+  <div class="hud"><span>Anteprima · dati di esempio</span><span class="linea"></span><span class="n">04</span></div>
+</section>
+
+<!-- 5 ETICHETTE E GRAFICA -->
+<section class="pag">
+  <div class="top"><b>STORE <i>//</i> CRAFT</b><span>Ottica Macrì · Riepilogo</span></div>
+  <div class="corpo">
+    <div class="kicker">3 · Etichette e grafica</div>
+    <h2>Un'etichetta per ogni<br><em>montatura</em></h2>
+    <div class="rule"></div>
+    <ul class="punti">
+      <li><b>Etichette</b> con la stampante DYMO LabelWriter 450: prezzo e codice sulla montatura.</li>
+      <li><b>Cartellini</b> e <b>cartelli</b> per vetrina e bancone, già pronti per l'ottica.</li>
+    </ul>
+    <div style="display:flex; gap:5mm; margin-top:3mm; align-items:flex-start">
+      <figure class="shot" data-k="etichette" style="flex:1.45; aspect-ratio:16/10"><img alt=""><figcaption></figcaption></figure>
+      <div style="flex:1; display:flex; flex-direction:column; gap:12mm">
+        <figure class="shot contain" data-k="dymo" style="aspect-ratio:912/512"><img alt=""><figcaption></figcaption></figure>
+      </div>
+    </div>
+    <div class="righe-img" style="height:76mm; margin-top:14mm">
+      <figure class="shot contain" data-k="cartello-saldi" style="flex:0 0 auto; aspect-ratio:1588/2246"><img alt=""><figcaption></figcaption></figure>
+      <figure class="shot contain" data-k="cartello-promo" style="flex:0 0 auto; aspect-ratio:1588/2246"><img alt=""><figcaption></figcaption></figure>
+      <figure class="shot contain" data-k="cartellino" style="flex:0 0 auto; aspect-ratio:2132/1484; height:38mm; align-self:center"><img alt=""><figcaption></figcaption></figure>
+    </div>
+    <p class="nota" style="margin-top:auto">Scegli un modello, scrivi due parole, stampa. Esempi veri, fatti con STORE // CRAFT.</p>
+  </div>
+  <div class="hud"><span>Grafica negozio</span><span class="linea"></span><span class="n">05</span></div>
+</section>
+
+<!-- 6 PIANO A -->
+<section class="pag">
+  <div class="top"><b>STORE <i>//</i> CRAFT</b><span>Ottica Macrì · Preventivo</span></div>
+  <div class="corpo">
+    <div class="kicker">Preventivo · Piano A</div>
+    <h2 style="font-size:22pt">Piano A <em>Completo</em></h2>
+    <p class="lead" style="font-size:12.5pt; margin-bottom:3.5mm" id="a-slogan"></p>
+    <table class="prev"><thead><tr><th>Blocco · cosa fa</th><th>Tempi</th><th class="r">Prezzo</th></tr></thead><tbody id="a-righe"></tbody></table>
+    <div class="sottotit">Si può partire da un blocco e aggiungere gli altri</div>
+    <div class="scala" id="a-scala"></div>
+    <div class="totali" id="a-totali"></div>
+    <div class="canone"><b>Canone</b><span id="a-canone"></span></div>
+    <div class="validita" data-prezzi="validita-testo"></div>
+  </div>
+  <div class="hud"><span>Preventivo A</span><span class="linea"></span><span class="n">06</span></div>
+</section>
+
+<!-- 7 PIANO B -->
+<section class="pag">
+  <div class="top"><b>STORE <i>//</i> CRAFT</b><span>Ottica Macrì · Preventivo</span></div>
+  <div class="corpo">
+    <div class="kicker">Preventivo · Piano B</div>
+    <h2 style="font-size:22pt">Piano B <em>Essenziale</em></h2>
+    <p class="lead" style="font-size:12.5pt; margin-bottom:3.5mm" id="b-slogan"></p>
+    <table class="prev"><thead><tr><th>Blocco · cosa fa</th><th>Tempi</th><th class="r">Prezzo</th></tr></thead><tbody id="b-righe"></tbody></table>
+    <div class="totali" id="b-totali"></div>
+    <div class="canone"><b>Canone</b><span id="b-canone"></span></div>
+    <div class="sottotit" style="margin-top:6mm">Lo schermo per la vetrina · a parte, lo acquisti tu</div>
+    <div class="fasce" id="schermi"></div>
+    <div class="avviso"><span class="tag">Nota</span>Prezzi indicativi, da verificare all'acquisto.</div>
+    <div class="validita" data-prezzi="validita-testo"></div>
+  </div>
+  <div class="hud"><span>Preventivo B</span><span class="linea"></span><span class="n">07</span></div>
+</section>
+
+<!-- 8 CONFRONTO -->
+<section class="pag">
+  <div class="top"><b>STORE <i>//</i> CRAFT</b><span>Ottica Macrì · Riepilogo</span></div>
+  <div class="corpo">
+    <div class="kicker">Per scegliere</div>
+    <h2>Piano A<br><em>o Piano B?</em></h2>
+    <div class="rule"></div>
+    <table class="conf">
+      <thead><tr><th class="vuoto"></th><th class="a">Piano A<small>Completo</small></th><th class="b">Piano B<small>Essenziale</small></th></tr></thead>
+      <tbody>
+        <tr><td class="dom">Cosa<br>ottiene</td><td id="c-a-cosa"></td><td id="c-b-cosa"></td></tr>
+        <tr><td class="dom">Quanto<br>spende</td><td id="c-a-costo"></td><td id="c-b-costo"></td></tr>
+        <tr><td class="dom">Quando<br>è pronto</td><td id="c-a-tempi"></td><td id="c-b-tempi"></td></tr>
+      </tbody>
+    </table>
+    <div class="crescita">
+      <svg viewBox="0 0 60 24"><path d="M2 12h50" stroke="#d4a373" stroke-width="2.4" fill="none"/><path d="M46 4l10 8-10 8" stroke="#d4a373" stroke-width="2.4" fill="none" stroke-linejoin="round"/></svg>
+      <div><h3>Si può partire dal B</h3><p>e crescere verso l'A quando vuoi. Il lavoro fatto non si butta: i blocchi nuovi si aggiungono sopra.</p></div>
+    </div>
+  </div>
+  <div class="hud"><span>Confronto</span><span class="linea"></span><span class="n">08</span></div>
+</section>
+
+<!-- 9 COSA SERVE -->
+<section class="pag">
+  <div class="top"><b>STORE <i>//</i> CRAFT</b><span>Ottica Macrì · Riepilogo</span></div>
+  <div class="corpo">
+    <div class="kicker">Cosa serve in negozio</div>
+    <h2>Poche cose,<br><em>quasi tutte già tue</em></h2>
+    <div class="rule"></div>
+    <div class="serve">
+      <div class="cosa"><svg viewBox="0 0 24 24" fill="none" stroke="#1d5c8f" stroke-width="1.5"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16v4"/></svg><div><b>Il PC</b><span>quello che hai già</span></div></div>
+      <div class="cosa"><svg viewBox="0 0 24 24" fill="none" stroke="#1d5c8f" stroke-width="1.5"><rect x="5" y="8" width="14" height="10" rx="1.5"/><path d="M8 8V4h8v4M8 18v2h8v-2"/></svg><div><b>Stampante DYMO</b><span>LabelWriter 450</span></div></div>
+      <div class="cosa"><svg viewBox="0 0 24 24" fill="none" stroke="#1d5c8f" stroke-width="1.5"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M11 18h2"/></svg><div><b>Lo schermo</b><span>per la vetrina (pagina 7)</span></div></div>
+      <div class="cosa"><svg viewBox="0 0 24 24" fill="none" stroke="#1d5c8f" stroke-width="1.5"><path d="M2 9a15 15 0 0 1 20 0M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0"/><circle cx="12" cy="19" r="1" fill="#1d5c8f"/></svg><div><b>Internet</b><span>la connessione del negozio</span></div></div>
+      <div class="cosa"><svg viewBox="0 0 24 24" fill="none" stroke="#1d5c8f" stroke-width="1.5"><rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18.5h2"/></svg><div><b>Il tuo telefono</b><span>per comandare la vetrina</span></div></div>
+      <div class="cosa"><svg viewBox="0 0 24 24" fill="none" stroke="#1d5c8f" stroke-width="1.5"><path d="M4 6v12M7 6v12M10 6v12M13 6v12M16 6v12M19 6v12" /></svg><div><b>Lettore di codici</b><span>per il magazzino (Piano A)</span></div></div>
+    </div>
+    <div class="box oro" style="margin-top:12mm"><h3>Come oggi</h3><p><b>Scontrini e Tessera Sanitaria restano come oggi</b>: con la tua cassa e il tuo commercialista. Non cambia niente.</p></div>
+    <div class="box" style="margin-top:7mm"><h3>Fabrice</h3><p>Installa tutto in negozio e ti insegna a usarlo, con calma.</p></div>
+  </div>
+  <div class="hud"><span>In negozio</span><span class="linea"></span><span class="n">09</span></div>
+</section>
+
+<!-- 10 PROSSIMI PASSI -->
+<section class="pag dark">
+  <div class="griglia"></div>
+  <span class="mira a"></span><span class="mira b"></span><span class="mira c"></span><span class="mira d"></span>
+  <div class="cover" style="padding:0 20mm">
+    <div class="claim" style="margin-top:0">PROSSIMI PASSI</div>
+    <div class="passi">
+      <div class="passo"><div class="n">1</div><div><h3>Legge con calma</h3><p>questo riepilogo, anche con la famiglia.</p></div></div>
+      <div class="passo"><div class="n">2</div><div><h3>Scegli</h3><p>Piano A, Piano B, o da quale blocco partire.</p></div></div>
+      <div class="passo"><div class="n">3</div><div><h3>Prepariamo e installiamo</h3><p>tutto in negozio, con le tue grafiche.</p></div></div>
+      <div class="passo" style="border-bottom:.4mm solid rgba(212,163,115,.45)"><div class="n">4</div><div><h3>Prova insieme</h3><p>con calma, finché non si sente sicuro.</p></div></div>
+    </div>
+    <div class="claim2" style="margin-top:8mm; font-size:11.5pt; letter-spacing:.06em" data-prezzi="validita-chiusura"></div>
+    <div class="sep" style="margin:14mm auto 9mm"></div>
+    <div class="grazie">Grazie</div>
+    <div class="claim2" style="margin-top:5mm; font-size:14pt; font-style:normal; color:#efe9df">Fabrice · STORE <span style="color:var(--oro)">//</span> CRAFT</div>
+  </div>
+</section>
+
+<script>
+(function(){
+  var P = window.PREZZI, IM = window.IMMAGINI || {};
+  function $(id){ return document.getElementById(id); }
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+
+  /* ---------- immagini: prima chiave disponibile, altrimenti la figura sparisce ---------- */
+  document.querySelectorAll('figure[data-k]').forEach(function(f){
+    var k = f.getAttribute('data-k').split('|').filter(function(x){ return IM[x]; })[0];
+    if(!k){ f.remove(); return; }
+    var img = f.querySelector('img'); img.src = IM[k].src;
+    var c = f.querySelector('figcaption'); if(c) c.textContent = IM[k].cap || '';
+    if(f.hasAttribute('data-auto') && IM[k].w){ f.style.aspectRatio = IM[k].w + '/' + IM[k].h; }
+    if(k.indexOf('negozio3d') === 0){ f.classList.remove('tablet','phone'); f.style.aspectRatio = IM[k].w + '/' + IM[k].h; }
+  });
+  // riga Black Friday: se c'e' una sola immagine larga, la lascio intera
+  var riga = $('riga-bf'); if(riga && riga.children.length === 0) riga.remove();
+  // nella riga BF le didascalie uguali si mostrano una volta sola
+  if(riga){ var caps = riga.querySelectorAll('figcaption'); for(var i=1;i<caps.length;i++){ if(caps[i].textContent===caps[0].textContent) caps[i].textContent=''; } }
+
+  if(!P){ document.body.insertAdjacentHTML('afterbegin','<p style="color:red;font-size:20pt">prezzi.js non trovato</p>'); return; }
+
+  /* ---------- testi comuni ---------- */
+  var valid = 'Prezzi ' + P.iva + ' · preventivo valido ' + P.validita + ' dal ' + P.data + '.';
+  document.querySelectorAll('[data-prezzi="validita-testo"]').forEach(function(e){ e.textContent = valid; });
+  document.querySelectorAll('[data-prezzi="data"]').forEach(function(e){ e.textContent = P.data; });
+  document.querySelectorAll('[data-prezzi="validita-chiusura"]').forEach(function(e){ e.textContent = 'I preventivi valgono ' + P.validita + ' dal ' + P.data + ' · ' + P.iva; });
+
+  function settimane(piano){
+    var a = 0, b = 0;
+    piano.blocchi.forEach(function(x){ var m = /(\d+)\s*[–-]\s*(\d+)/.exec(x.tempi); if(m){ a += +m[1]; b += +m[2]; } });
+    return { min:a, max:b };
+  }
+
+  function piano(P2, pre, conScala){
+    var t = P.totale(P2);
+    $(pre+'-slogan').textContent = P2.slogan;
+    $(pre+'-righe').innerHTML = P2.blocchi.map(function(b){
+      return '<tr><td><div class="nm">'+esc(b.nome)+'</div><div class="cs">'+esc(b.cosa)+'</div></td>'+
+             '<td class="t">'+esc(b.tempi)+'</td><td class="p r">'+P.euro(b.prezzo)+'</td></tr>';
+    }).join('') + '<tr class="somma"><td>Totale dei blocchi presi uno per uno</td><td></td><td class="p r">'+P.euro(t.pieno)+'</td></tr>';
+    if(conScala){
+      var cum = 0, nomi = [];
+      $(pre+'-scala').innerHTML = P2.blocchi.map(function(b, i){
+        cum += b.prezzo;
+        var w = Math.max(6, Math.round(cum / t.pieno * 62));
+        var nm = b.nome.split(' · ')[0];
+        return '<div class="gradino"><span class="bar" style="width:'+w+'mm"></span><span class="lab">'+
+               (i === 0 ? 'Si parte con <b>'+esc(nm)+'</b>' : '+ <b>'+esc(nm)+'</b>')+
+               '</span><span class="eu">'+P.euro(cum)+'</span></div>';
+      }).join('');
+    }
+    var s = settimane(P2);
+    $(pre+'-totali').innerHTML =
+      '<div class="tot"><div class="lb">Tutto, a prezzo pieno</div><div class="eur">'+P.euro(t.pieno)+'</div><small>sommando i blocchi uno per uno</small></div>'+
+      '<div class="tot blu"><div class="lb">Tutto insieme · −'+P2.scontoPacchetto+'%</div><div class="eur">'+P.euro(t.scontato)+'</div><small>'+P.iva+' · circa '+s.min+'–'+s.max+' settimane, un blocco dopo l\'altro</small></div>';
+    $(pre+'-canone').textContent = P2.canone;
+    return { t:t, s:s };
+  }
+  var ra = piano(P.pianoA, 'a', true);
+  var rb = piano(P.pianoB, 'b', false);
+
+  $('schermi').innerHTML = P.schermiVetrina.map(function(s){
+    var cons = /consigliat/i.test(s.fascia);
+    return '<div class="fascia'+(cons?' cons':'')+'"><div class="liv">'+esc(s.fascia)+'</div><h3>'+esc(s.prodotto)+'</h3><p>'+esc(s.nota)+'</p><div class="eur">'+esc(s.prezzo)+'</div></div>';
+  }).join('');
+
+  /* ---------- confronto ---------- */
+  function lista(p){ return '<ul>'+p.blocchi.map(function(b){ return '<li>'+esc(b.nome)+'</li>'; }).join('')+'</ul>'; }
+  function costo(p, r){ return '<div class="big">'+P.euro(r.t.scontato)+'</div><small>tutto insieme, '+P.iva+'<br>(a blocchi: '+P.euro(r.t.pieno)+')</small><small style="margin-top:2mm"><b style="color:var(--testo)">Canone:</b> '+esc(p.canone)+'</small>'; }
+  function tempi(r){ return '<div class="big">'+r.s.min+'–'+r.s.max+'</div><small>settimane, un blocco dopo l\'altro. Ogni blocco si usa appena è pronto.</small>'; }
+  $('c-a-cosa').innerHTML = lista(P.pianoA); $('c-b-cosa').innerHTML = lista(P.pianoB);
+  $('c-a-costo').innerHTML = costo(P.pianoA, ra); $('c-b-costo').innerHTML = costo(P.pianoB, rb);
+  $('c-a-tempi').innerHTML = tempi(ra); $('c-b-tempi').innerHTML = tempi(rb);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8">
+<link rel="icon" type="image/svg+xml" href="../logo/marchi6/06-ovale/06-ovale-icona-colori.svg">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Inserto modello A5</title>
+<style>
+:root{--bg:#f4ede2;--card:#fffaf3;--tx:#3a2e26;--tx2:#7c6a5a;--li:#d8c8b0;--acc:#b5462c;--blu:#1f4e79}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.5 "Segoe UI",system-ui,sans-serif}
+header{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--li);padding:10px 16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+header h1{font:400 20px "Bodoni MT",Georgia,serif;letter-spacing:.08em;margin:0;flex:1;min-width:220px;color:var(--blu)}
+a{color:var(--acc)}
+.btn{border:1px solid var(--li);background:var(--card);color:var(--tx);padding:6px 12px;cursor:pointer;font:inherit;text-decoration:none}
+.btn.on{background:var(--acc);border-color:var(--acc);color:#fff}
+main{max-width:1400px;margin:0 auto;padding:16px}
+.intro{color:var(--tx2);font-size:14px;margin:0 0 8px;max-width:900px}
+.avviso{border-left:4px solid var(--acc);background:var(--card);padding:10px 14px;margin:10px 0 20px;font-size:14px;max-width:900px}
+h2{font:400 22px "Bodoni MT",Georgia,serif;letter-spacing:.04em;color:var(--blu);margin:34px 0 4px;border-bottom:1px solid var(--li);padding-bottom:6px}
+h2 small{display:block;font:13px "Segoe UI",sans-serif;color:var(--tx2);letter-spacing:0;margin-top:4px}
+.tre{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:16px}
+@media (max-width:900px){.tre{grid-template-columns:1fr}}
+.var{background:var(--card);border:1px solid var(--li);padding:14px}
+.var a.im{display:block}
+.var img{width:100%;display:block;box-shadow:0 10px 30px rgba(40,25,10,.22),0 2px 6px rgba(0,0,0,.18)}
+.var b{display:block;margin-top:12px;font:400 19px "Bodoni MT",Georgia,serif;color:var(--blu)}
+.var .m{color:var(--tx2);font-size:13px}
+/* ---- simulazione in vetrina ---- */
+.scena{position:relative;width:100%;max-width:1100px;aspect-ratio:16/10;overflow:hidden;margin-top:16px;background:#2a2320;border:1px solid var(--li)}
+.scena .fondo{position:absolute;inset:-30px;background:url(../../foto-negozio/foto/IMG_9494.jpg) center 35%/cover;filter:blur(14px) brightness(.62) saturate(.8)}
+.scena .vetro{position:absolute;inset:0;background:linear-gradient(115deg,rgba(255,255,255,.10) 0 18%,transparent 30% 62%,rgba(255,255,255,.06) 70%,transparent 80%)}
+.scena .piano{position:absolute;left:0;right:0;bottom:0;height:24%;background:linear-gradient(180deg,#1b1513 0%,#0f0c0b 100%);border-top:1px solid rgba(255,235,200,.25)}
+.scena .luce{position:absolute;left:30%;right:30%;top:-10%;height:80%;background:radial-gradient(50% 50% at 50% 30%,rgba(255,236,200,.22),transparent 70%)}
+.plexi{position:absolute;left:50%;bottom:17%;width:27%;transform:translateX(-50%)}
+.plexi .lastra{position:relative;padding:3.2%;background:rgba(235,245,250,.10);border:1px solid rgba(255,255,255,.55);border-radius:2px;
+  box-shadow:0 0 0 1px rgba(0,0,0,.25),inset 0 0 0 1px rgba(255,255,255,.18),0 26px 40px rgba(0,0,0,.55)}
+.plexi .lastra img{display:block;width:100%}
+.plexi .lastra::after{content:"";position:absolute;inset:0;background:linear-gradient(122deg,rgba(255,255,255,.26) 0%,rgba(255,255,255,.06) 26%,transparent 40%,transparent 76%,rgba(255,255,255,.10) 88%,transparent 100%);pointer-events:none}
+.plexi .piede{position:absolute;left:-4%;right:-4%;bottom:-7%;height:7%;background:linear-gradient(180deg,rgba(255,255,255,.35),rgba(220,235,240,.08));clip-path:polygon(6% 0,94% 0,100% 100%,0 100%);border-bottom:1px solid rgba(255,255,255,.4)}
+.plexi .rifl{position:absolute;left:3.2%;right:3.2%;top:calc(100% + 7%);transform:scaleY(-1);opacity:.12;filter:blur(2px);
+  -webkit-mask-image:linear-gradient(to top,#000,transparent 30%);mask-image:linear-gradient(to top,#000,transparent 30%)}
+.plexi .rifl img{width:100%;display:block}
+.scelta{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.dettagli{max-width:900px;font-size:14px;color:var(--tx2)}
+.dettagli li{margin:4px 0}
+code{font-size:12.5px}
+</style></head>
+<body>
+<header>
+ <a class="btn" href="../../index.html">☰ Menu</a>
+ <h1>Inserto modello A5 · rifatto da zero</h1>
+</header>
+<main>
+ <p class="intro">Un esempio di cartello per il <b>porta-cartello in plexiglass A5</b> della vetrina sinistra (148×210 mm, 300 dpi), fatto con un <b>occhiale vero</b> ritagliato dalle foto del negozio. Tre versioni dello stesso esempio: scegli quella che regge meglio la vetrina. Clic sull'immagine = PNG pronto per la stampa.</p>
+ <div class="avviso nota">Prezzi <b>d'esempio</b> (stessi di <code>demo/v2/dati.js</code>: 109 € → 76 €, −30%): da confermare con Aldo. Nessun logo di marca: solo il marchio Ottica Macrì. L'occhiale è il cat-eye nero dell'espositore girevole (fotogramma IMG_9488_005), scontornato e ritoccato.</div>
+
+ <div class="tre">
+  <div class="var"><a class="im" href="inserto-a5-nero-oro.png"><img src="anteprime/inserto-a5-nero-oro.jpg" alt="Inserto A5 nero e oro"></a>
+   <b>1 · Black Friday nero e oro</b><div class="m">La più «da gioielleria»: fondo nero caldo, cifre oro, riflesso sotto l'occhiale. Spicca su vetrina chiara e di sera.</div></div>
+  <div class="var"><a class="im" href="inserto-a5-chiaro-elegante.png"><img src="anteprime/inserto-a5-chiaro-elegante.jpg" alt="Inserto A5 chiaro elegante"></a>
+   <b>2 · Chiaro elegante</b><div class="m">Carta avorio, un solo colore (rosso mattone), molto spazio: stile catalogo di marca. La più versatile, vale anche dopo il Black Friday.</div></div>
+  <div class="var"><a class="im" href="inserto-a5-audace.png"><img src="anteprime/inserto-a5-audace.jpg" alt="Inserto A5 audace"></a>
+   <b>3 · Audace grafico</b><div class="m">Rosso mattone pieno, cifra gigante, occhiale inclinato con ombra netta: si legge da lontano, dal marciapiede opposto.</div></div>
+ </div>
+
+ <h2>Come sta in vetrina<small>Simulazione semplice: plexiglass A5 a «L» sul ripiano della vetrina, negozio sfocato dietro.</small></h2>
+ <div class="scelta" id="scelta">
+  <button class="btn on" data-v="nero-oro">Nero e oro</button><button class="btn" data-v="chiaro-elegante">Chiaro elegante</button><button class="btn" data-v="audace">Audace</button>
+ </div>
+ <div class="scena">
+  <div class="fondo"></div><div class="luce"></div><div class="piano"></div>
+  <div class="plexi"><div class="lastra"><img id="mk" src="anteprime/inserto-a5-nero-oro.jpg" alt="Simulazione in plexiglass"></div><div class="piede"></div>
+   <div class="rifl"><img id="mkr" src="anteprime/inserto-a5-nero-oro.jpg" alt=""></div></div>
+  <div class="vetro"></div>
+ </div>
+
+ <h2>Cosa cambia rispetto alle grafiche vecchie<small>Per Fabrice (uso interno)</small></h2>
+ <ul class="dettagli">
+  <li><b>Foto vera</b> al posto dell'occhiale disegnato: ritaglio con il modello ISNet già sul disco, lenti ritoccate (sfumatura grigia da catalogo, riflesso da studio), montatura resa simmetrica e pulita.</li>
+  <li><b>Un'idea per cartello</b>: prodotto protagonista → sconto → frase → prezzo d'esempio → firma piccola. Niente moduli, niente elenchi.</li>
+  <li><b>Tipografia</b>: Bodoni MT (cifre e titoli) + Gill Sans MT spaziato (didascalie), font già nel PC.</li>
+  <li><b>Limite onesto</b>: la foto viene da un fotogramma video (occhiale largo ~600 px, ingrandito ×3). In A5 regge; per formati più grandi (A4/A3) serve una foto fatta apposta (occhiale su fondo chiaro, luce diffusa, telefono a 30–40 cm).</li>
+  <li>File: PNG 300 dpi qui accanto, sorgente <code>sorgenti/inserto.html</code>, script <code>_script/prepara_occhiale.py</code> (foto → occhiale scontornato) e <code>_script/rendi_inserti.py</code> (HTML → PNG).</li>
+ </ul>
+</main>
+<script src="../../nascondi-note.js"></script>
+<script>
+document.getElementById('scelta').addEventListener('click', function (e) {
+  var b = e.target.closest('button'); if (!b) return;
+  [].forEach.call(this.children, function (x) { x.classList.toggle('on', x === b); });
+  var s = 'anteprime/inserto-a5-' + b.dataset.v + '.jpg';
+  document.getElementById('mk').src = s; document.getElementById('mkr').src = s;
+});
+</script>
+</body>
+</html>

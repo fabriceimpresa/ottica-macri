@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<link rel="icon" type="image/svg+xml" href="../media/logo/marchi6/04-monocolo/04-monocolo-icona-colori.svg">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>STORE // CRAFT per Ottica Macrì</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  :root{
+    --nero:#121212; --carta:#f6f3ee; --carta2:#ece6dc; --oro:#d4a373; --oro-scuro:#a8784a;
+    --blu:#1d5c8f; --testo:#24221f; --grigio:#6b655d; --bianco:#fffdf9;
+    --serif: Georgia, "Times New Roman", serif;
+    --sans: system-ui, "Segoe UI", Arial, sans-serif;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ background:#8a857d; }
+  body{ font-family:var(--sans); color:var(--testo); -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .slide{ width:297mm; height:210mm; position:relative; overflow:hidden; background:var(--carta);
+          break-after:page; page-break-after:always; margin:0 auto; }
+  .slide:last-child{ break-after:auto; page-break-after:auto; }
+  @media screen{ .slide{ margin:8mm auto; box-shadow:0 4px 24px rgba(0,0,0,.25);} }
+  @media print{ html,body{ background:none; } }
+
+  /* ---------- intestazione e piede delle pagine chiare ---------- */
+  .top{ position:absolute; left:22mm; right:22mm; top:11mm; display:flex; justify-content:space-between;
+        align-items:center; font-size:9pt; letter-spacing:.28em; text-transform:uppercase; color:var(--grigio); }
+  .top b{ font-family:var(--serif); font-weight:normal; color:var(--testo); letter-spacing:.32em; }
+  .top b i{ font-style:normal; color:var(--oro); }
+  .top::after{ content:""; position:absolute; left:0; right:0; bottom:-3.5mm; height:.4mm; background:linear-gradient(90deg,var(--oro),rgba(212,163,115,.15)); }
+  .num{ position:absolute; right:22mm; bottom:10mm; font-family:var(--serif); font-size:10pt; color:var(--oro-scuro); letter-spacing:.2em; }
+  .foot{ position:absolute; left:22mm; bottom:10mm; font-size:9pt; color:var(--grigio); letter-spacing:.12em; }
+
+  .body{ position:absolute; left:22mm; right:22mm; top:26mm; bottom:20mm; display:flex; gap:12mm; }
+  .col{ flex:1; display:flex; flex-direction:column; justify-content:center; min-width:0; }
+  .col.text{ flex:0 0 46%; }
+
+  .kicker{ font-size:10.5pt; letter-spacing:.3em; text-transform:uppercase; color:var(--blu); font-weight:600; margin-bottom:4mm; }
+  h2{ font-family:var(--serif); font-weight:normal; text-transform:uppercase; letter-spacing:.12em;
+      font-size:27pt; line-height:1.15; color:var(--testo); margin-bottom:6mm; }
+  h2 em{ font-style:normal; color:var(--oro-scuro); }
+  .rule{ width:22mm; height:.8mm; background:var(--oro); margin:0 0 7mm; }
+  p.lead{ font-size:17pt; line-height:1.45; margin-bottom:5mm; }
+  ul.punti{ list-style:none; }
+  ul.punti li{ font-size:16pt; line-height:1.4; padding-left:9mm; position:relative; margin-bottom:3.6mm; }
+  ul.punti li::before{ content:""; position:absolute; left:0; top:.55em; width:3.6mm; height:3.6mm; border-radius:50%;
+                       border:.6mm solid var(--oro); }
+  ul.punti li b{ color:var(--blu); font-weight:600; }
+  .nota{ font-size:13.5pt; color:var(--grigio); line-height:1.4; margin-top:3mm; border-left:.8mm solid var(--oro); padding-left:4mm; }
+
+  /* ---------- immagini con segnaposto ---------- */
+  .shot{ position:relative; background:var(--bianco); border-radius:2.5mm; overflow:hidden;
+         box-shadow:0 1.5mm 6mm rgba(40,30,20,.16), 0 0 0 .3mm rgba(0,0,0,.06); }
+  .shot img{ display:block; width:100%; height:100%; object-fit:cover; object-position:top center; }
+  .shot.contain img{ object-fit:contain; background:var(--bianco); }
+  .shot .ph{ display:none; position:absolute; inset:0; align-items:center; justify-content:center; flex-direction:column;
+             text-align:center; padding:6mm; color:var(--oro-scuro); font-family:var(--serif); font-size:11pt;
+             letter-spacing:.18em; text-transform:uppercase; line-height:1.5;
+             background:repeating-linear-gradient(135deg, #f1ebe1 0 4mm, #f6f1e8 4mm 8mm); border:.5mm dashed rgba(168,120,74,.55); border-radius:2.5mm; }
+  .shot .ph small{ display:block; margin-top:2mm; font-family:var(--sans); font-size:8.5pt; letter-spacing:.1em; text-transform:none; color:var(--grigio); }
+  .shot.missing img{ visibility:hidden; }
+  .shot.missing .ph{ display:flex; }
+  .desk{ aspect-ratio:16/10; width:100%; }
+  .phone{ aspect-ratio:390/844; border-radius:5mm; border:1.6mm solid #1b1b1b; background:#1b1b1b; }
+  .phone .ph{ border-radius:3mm; font-size:8.5pt; letter-spacing:.12em; }
+  .phone img{ border-radius:3mm; }
+  .tablet{ aspect-ratio:1180/820; border-radius:4mm; border:2.2mm solid #1b1b1b; background:#1b1b1b; }
+  .tablet img{ border-radius:2mm; }
+  .cap{ font-size:10pt; color:var(--grigio); letter-spacing:.08em; margin-top:2.5mm; text-align:center; }
+
+  .duo{ position:relative; width:100%; }
+  .duo .desk{ width:88%; }
+  .duo .phone{ position:absolute; right:0; bottom:-8mm; width:24%; }
+
+  /* ---------- copertina e chiusura scure ---------- */
+  .dark{ background:var(--nero); color:#efe9df; }
+  .dark::before{ content:""; position:absolute; inset:9mm; border:.7mm solid var(--oro); pointer-events:none; }
+  .dark::after{ content:""; position:absolute; inset:12mm; border:.25mm solid rgba(212,163,115,.4); pointer-events:none; }
+  .cover{ position:absolute; inset:12mm; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; }
+  .logo{ font-family:var(--serif); font-size:44pt; letter-spacing:.32em; color:#f4efe6; margin-right:-.32em; }
+  .logo i{ font-style:normal; color:var(--oro); letter-spacing:.12em; }
+  .claim{ margin-top:6mm; font-size:11pt; letter-spacing:.55em; color:var(--oro); margin-right:-.55em; }
+  .claim2{ margin-top:2.5mm; font-family:var(--serif); font-style:italic; font-size:12.5pt; letter-spacing:.2em; color:#bdb3a5; }
+  .per{ margin-top:16mm; font-family:var(--serif); font-size:15pt; letter-spacing:.4em; text-transform:uppercase; color:#cfc6b8; margin-right:-.4em; }
+  .cliente{ margin-top:3mm; font-family:var(--serif); font-size:36pt; letter-spacing:.14em; text-transform:uppercase; color:#fff; margin-right:-.14em; }
+  .sotto{ margin-top:7mm; font-size:17pt; line-height:1.45; color:#e7dfd2; }
+  .sep{ width:30mm; height:.4mm; background:var(--oro); margin:10mm auto 6mm; }
+  .meta{ font-size:11pt; letter-spacing:.3em; text-transform:uppercase; color:#a99f91; margin-right:-.3em; }
+
+  /* ---------- tessere ---------- */
+  .tessere{ display:grid; grid-template-columns:repeat(4,1fr); gap:5mm; width:100%; }
+  .tessera{ background:var(--bianco); border-radius:3mm; padding:6mm 5mm 5.5mm; min-height:40mm;
+            box-shadow:0 1mm 4mm rgba(40,30,20,.08); border-top:1.2mm solid var(--oro); display:flex; flex-direction:column; }
+  .tessera.blu{ border-top-color:var(--blu); }
+  .tessera .ico{ width:11mm; height:11mm; margin-bottom:3.5mm; }
+  .tessera h3{ font-family:var(--serif); font-weight:normal; text-transform:uppercase; letter-spacing:.08em; font-size:13.5pt; line-height:1.2; margin-bottom:2mm; }
+  .tessera p{ font-size:12.5pt; line-height:1.35; color:var(--grigio); }
+  .tessera.intro{ background:var(--blu); border-top-color:var(--blu); color:#fff; justify-content:center; }
+  .tessera.intro p{ color:#e4edf5; font-size:13pt; line-height:1.4; }
+  .tessera.intro h3{ font-size:14pt; }
+
+  /* ---------- tre pulsanti ---------- */
+  .tasti{ display:flex; gap:5mm; margin:2mm 0 7mm; }
+  .tasto{ flex:1; text-align:center; padding:7mm 2mm; border-radius:3mm; color:#fff; font-family:var(--serif);
+          font-size:17pt; letter-spacing:.14em; text-transform:uppercase; box-shadow:0 1.2mm 0 rgba(0,0,0,.18); }
+  .tasto small{ display:block; font-family:var(--sans); font-size:10pt; letter-spacing:.05em; text-transform:none; margin-top:2mm; opacity:.9; }
+  .t1{ background:var(--blu); } .t2{ background:var(--oro-scuro); } .t3{ background:#2f2b27; }
+
+  /* ---------- tre cartelli ---------- */
+  .tris{ display:flex; gap:5mm; align-items:flex-end; width:100%; }
+  .tris .shot{ flex:1; }
+  .tris .shot img{ height:auto; }
+  .tris .shot.missing{ aspect-ratio:3/4; }
+  .tris .shot.big{ flex:1.25; }
+
+  /* ---------- newsletter finta ---------- */
+  .mail{ background:var(--bianco); border-radius:3mm; box-shadow:0 1.5mm 6mm rgba(40,30,20,.16); overflow:hidden; width:92%; margin:0 auto; }
+  .mail .bar{ background:#e9e3d8; padding:3mm 5mm; font-size:10pt; color:var(--grigio); display:flex; gap:2mm; align-items:center; }
+  .mail .bar span{ width:2.6mm; height:2.6mm; border-radius:50%; background:#cfc6b8; display:inline-block; }
+  .mail .hd{ padding:4mm 7mm; font-size:11pt; color:var(--grigio); border-bottom:.3mm solid #eee6da; line-height:1.6; }
+  .mail .hd b{ color:var(--testo); font-weight:600; }
+  .mail .banner{ background:var(--nero); color:#fff; text-align:center; padding:9mm 6mm; position:relative; }
+  .mail .banner::after{ content:""; position:absolute; inset:2.5mm; border:.3mm solid var(--oro); }
+  .mail .banner .a{ font-size:9pt; letter-spacing:.4em; color:var(--oro); }
+  .mail .banner .b{ font-family:var(--serif); font-size:22pt; letter-spacing:.14em; text-transform:uppercase; margin-top:2mm; }
+  .mail .tx{ padding:6mm 7mm 7mm; font-size:12.5pt; line-height:1.5; }
+  .mail .btn{ display:inline-block; margin-top:4mm; background:var(--blu); color:#fff; padding:2.5mm 7mm; border-radius:1.5mm; font-size:11pt; letter-spacing:.1em; }
+
+  /* ---------- blocchi ---------- */
+  .scala{ display:flex; align-items:flex-end; gap:3.5mm; width:100%; margin-top:2mm; }
+  .gradino{ flex:1 1 0; min-width:0; background:var(--bianco); border-radius:3mm 3mm 0 0; padding:5mm 4.5mm; position:relative;
+            box-shadow:0 1mm 4mm rgba(40,30,20,.08); border-top:1.2mm solid var(--oro); }
+  .gradino .n{ font-family:var(--serif); font-size:24pt; color:var(--oro); line-height:1; }
+  .gradino h3{ font-family:var(--serif); font-weight:normal; text-transform:uppercase; letter-spacing:.02em; font-size:11.5pt; margin:2.5mm 0 2mm; line-height:1.2; }
+  .gradino p{ font-size:12pt; line-height:1.35; color:var(--grigio); }
+  .gradino .tempo{ margin-top:3mm; font-size:11pt; letter-spacing:.06em; color:var(--blu); font-weight:600; }
+  .g1{ height:58mm; background:var(--blu); border-top-color:var(--blu); color:#fff; }
+  .g1 p{ color:#e4edf5; } .g1 .n{ color:#fff; } .g1 .tempo{ color:#fff; }
+  .g2{ height:66mm; } .g3{ height:74mm; } .g4{ height:82mm; }
+  .g5{ height:90mm; background:transparent; box-shadow:none; border:.5mm dashed var(--oro); border-bottom:none; }
+  .base-line{ height:.6mm; background:var(--testo); opacity:.25; width:100%; }
+  .prezzo{ margin-top:5mm; font-size:12.5pt; color:var(--testo); display:flex; gap:4mm; align-items:center; }
+  .prezzo .tag{ background:var(--oro); color:#fff; font-size:9.5pt; letter-spacing:.2em; text-transform:uppercase; padding:1.5mm 3.5mm; border-radius:1mm; white-space:nowrap; }
+
+  /* ---------- cosa serve ---------- */
+  .serve{ display:grid; grid-template-columns:1fr 1fr; gap:3.5mm 6mm; }
+  .cosa{ display:flex; gap:4mm; align-items:center; background:var(--bianco); border-radius:2.5mm; padding:5mm 5mm; box-shadow:0 .8mm 3mm rgba(40,30,20,.07); }
+  .cosa svg{ flex:0 0 10mm; width:10mm; height:10mm; }
+  .cosa b{ display:block; font-size:14.5pt; font-weight:600; }
+  .cosa span{ font-size:12pt; color:var(--grigio); line-height:1.3; display:block; }
+  .box{ background:var(--bianco); border-radius:3mm; padding:6mm 7mm; box-shadow:0 1mm 4mm rgba(40,30,20,.08); }
+  .box h3{ font-family:var(--serif); font-weight:normal; text-transform:uppercase; letter-spacing:.12em; font-size:14pt; color:var(--blu); margin-bottom:3.5mm; }
+  .box ul.punti li{ font-size:14.5pt; margin-bottom:2.5mm; }
+  .box.oro{ background:#efe5d6; box-shadow:none; }
+  .box.oro h3{ color:var(--oro-scuro); }
+  .box.oro p{ font-size:14pt; line-height:1.45; }
+
+  /* ---------- passi finali ---------- */
+  .passi{ display:flex; gap:6mm; width:100%; margin-top:9mm; }
+  .passo{ flex:1; border-top:.5mm solid rgba(212,163,115,.6); padding-top:5mm; text-align:left; }
+  .passo .n{ font-family:var(--serif); font-size:30pt; color:var(--oro); line-height:1; }
+  .passo h3{ font-family:var(--serif); font-weight:normal; text-transform:uppercase; letter-spacing:.1em; font-size:15pt; color:#fff; margin:3mm 0 2mm; }
+  .passo p{ font-size:13.5pt; line-height:1.4; color:#bdb3a5; }
+  .grazie{ font-family:var(--serif); font-size:40pt; letter-spacing:.3em; text-transform:uppercase; color:#fff; margin-right:-.3em; }
+
+  .chip{ display:inline-block; font-size:9pt; letter-spacing:.2em; text-transform:uppercase; background:var(--blu); color:#fff; padding:1.3mm 3.2mm; border-radius:1mm; margin-bottom:4mm; }
+  .negozi{ display:flex; gap:4mm; margin-top:4mm; flex-wrap:wrap; }
+  .negozi span{ font-family:var(--serif); font-size:12.5pt; letter-spacing:.2em; text-transform:uppercase; border:.4mm solid var(--oro); padding:2.2mm 5mm; border-radius:1mm; color:var(--testo); }
+</style>
+</head>
+<body>
+
+<!-- 1 COPERTINA -->
+<section class="slide dark">
+  <div class="cover">
+    <div class="logo">STORE <i>//</i> CRAFT</div>
+    <div class="claim">COOL · EASY · SMART</div>
+    <div class="claim2">bello · utile · facile</div>
+    <div class="per">per</div>
+    <div class="cliente">Ottica Macrì</div>
+    <div class="sotto">Il suo negozio, più semplice.<br>Dalla vetrina ai social.</div>
+    <div class="sep"></div>
+    <div class="meta">Roma · novembre 2026 · a cura di Fabrice</div>
+  </div>
+</section>
+
+<!-- 2 COS'E' -->
+<section class="slide">
+  <div class="top"><b>STORE <i>//</i> CRAFT</b><span>Ottica Macrì · Via Poggi D'Oro 23</span></div>
+  <div class="body">
+    <div class="col text">
+      <div class="kicker">Che cos'è</div>
+      <h2>Un aiuto,<br><em>non un problema</em></h2>
+      <div class="rule"></div>
+      <p class="lead">STORE // CRAFT è un programma pensato da un grafico per i negozi.</p>
+      <p class="lead">Con lui potrà fare da solo cartelli, cartellini ed etichette belli come quelli di un grafico.</p>
+      <p class="nota">Lo usano già alcuni negozi di Roma:</p>
+      <div class="negozi"><span>Luxury Outlet</span><span>TEBE</span><span>OPHILYA</span></div>
+    </div>
+    <div class="col">
+      <figure class="shot desk"><img src="../media/storecraft/dashboard.png" alt="" onerror="this.parentNode.classList.add('missing')"><span class="ph">STORE // CRAFT<small>schermata principale (immagine in arrivo)</small></span></figure>
+      <div class="cap">La schermata principale di STORE // CRAFT</div>
+    </div>
+  </div>
+  <div class="num">02</div>
+</section>
+
+<!-- 3 TESSERE -->
+<section class="slide">
+  <div class="top"><b>STORE <i>//</i> CRAFT</b><span>Ottica Macrì</span></div>
+  <div class="body" style="flex-direction:column; gap:0; justify-content:center;">
+    <div class="kicker">Tutto in un posto</div>
+    <h2 style="margin-bottom:7mm">Un'unica app, <em>tutto il negozio</em></h2>
+    <div class="tessere">
+      <div class="tessera intro"><h3>Come sul telefono</h3><p>Ogni cosa ha la sua tessera. Si tocca e si entra. Niente menu complicati.</p></div>
+      <div class="tessera"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="#a8784a" stroke-width="1.5"><rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><h3>Grafica negozio</h3><p>Cartelli, cartellini, promozioni.</p></div>
+      <div class="tessera blu"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="#1d5c8f" stroke-width="1.5"><path d="M3 8l9-5 9 5v10l-9 5-9-5z"/><path d="M3 8l9 5 9-5M12 13v10"/></svg><h3>Magazzino ed etichette</h3><p>Cosa c'è, cosa arriva, cosa si vende.</p></div>
+      <div class="tessera"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="#a8784a" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.5 4.5-6.5 8-6.5s7 2 8 6.5"/></svg><h3>Clienti</h3><p>La scheda di ogni cliente.</p></div>
+      <div class="tessera blu"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="#1d5c8f" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r=".8" fill="#1d5c8f"/></svg><h3>Social</h3><p>Instagram e Facebook.</p></div>
+      <div class="tessera"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="#a8784a" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="1.5"/><path d="M3 6l9 7 9-7"/></svg><h3>Newsletter</h3><p>Auguri e promozioni via email.</p></div>
+      <div class="tessera blu"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="#1d5c8f" stroke-width="1.5"><rect x="3" y="4" width="18" height="13" rx="1.5"/><path d="M8 21h8M12 17v4"/><path d="M8 13l3-3 2 2 3-3"/></svg><h3>Vetrina digitale</h3><p>Cartelli animati in vetrina.</p></div>
+      <div class="tessera"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="#a8784a" stroke-width="1.5"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><h3>Amministrazione</h3><p>I numeri del negozio, chiari.</p></div>
+    </div>
+  </div>
+  <div class="num">03</div>
+</section>
+
+<!-- 4 FACILE -->
+<section class="slide">
+  <div class="top"><b>STORE <i>//</i> CRAFT</b><span>Ottica Macrì</span></div>
+  <div class="body">
+    <div class="col text">
+      <div class="kicker">Facile davvero</div>
+      <h2>Tre pulsanti,<br><em>grandi e chiari</em></h2>
+      <div class="tasti">
+        <div class="tasto t1">Vendo</div>
+        <div class="tasto t2">Arriva merce</div>
+        <div class="tasto t3">Cerco</div>
+      </div>
+      <ul class="punti">
+        <li>Il <b>lettore di codici</b> fa il resto: si avvicina all'occhiale e basta.</li>
+        <li>Si impara <b>in un pomeriggio</b>.</li>
+        <li><b>Fabrice</b> lo installa e la segue di persona, in negozio.</li>
+      </ul>
+    </div>
+    <div class="col">
+      <div class="duo">
+        <figure class="shot desk"><img src="../media/demo/home-desktop.png" alt="" onerror="this.parentNode.classList.add('missing')"><span class="ph">Schermata iniziale<small>immagine in arrivo</small></span></figure>
+        <figure class="shot phone"><img src="../media/demo/vendo-telefono.png" alt="" onerror="this.parentNode.classList.add('missing')"><span class="ph">Vendo<small>dal telefono</small></span></figure>
+      </div>
+    </div>
+  </div>
+  <div class="num">04</div>
+</section>
+
+<!-- 5 GRAFICA -->
+<section class="slide">
+  <div class="top"><b>STORE <i>//</i> CRAFT</b><span>Ottica Macrì</span></div>
+  <div class="body">
+    <div class="col text" style="flex-basis:42%">
+      <div class="kicker">Grafica negozio</div>
+      <h2>Cartelli belli,<br><em>fatti da lei</em></h2>
+      <div class="rule"></div>
+      <ul class="punti">
+        <li><b>Cartelli</b> per la vetrina e il bancone.</li>
+        <li><b>Cartellini</b> con il prezzo.</li>
+        <li><b>Promozioni</b> e saldi di stagione.</li>
+        <li>Si stampano con <b>la stampante che ha già</b>.</li>
+      </ul>
+      <p class="nota">Sceglie un modello, scrive due parole, stampa.</p>
+    </div>
+    <div class="col">
+      <div class="tris">
+        <figure class="shot contain"><img src="../media/storecraft/cartello-saldi.png" alt="" onerror="this.parentNode.classList.add('missing')"><span class="ph">Cartello<br>saldi</span></figure>
+        <figure class="shot contain big"><img src="../media/storecraft/cartello-promo.png" alt="" onerror="this.parentNode.classList.add('missing')"><span class="ph">Cartello<br>promo</span></figure>
+        <figure class="shot contain"><img src="../media/storecraft/cartellino.png" alt="" onerror="this.parentNode.classList.add('missing')"><span class="ph">Cartellino<br>prezzo</span></figure>
+      </div>
+      <div class="cap">Esempi fatti con STORE // CRAFT</div>
+    </div>
+  </div>
+  <div class="num">05</div>
+</section>
+
+<!-- 6 MAGAZZINO -->
+<section class="slide">
+  <div class="top"><b>STORE <i>//</i> CRAFT</b><span>Ottica Macrì</span></div>
+  <div class="body">
+    <div class="col text">
+      <div class="kicker">Magazzino</div>
+      <h2>Sempre sapere<br><em>cosa c'è</em></h2>
+      <div class="rule"></div>
+      <ul class="punti">
+        <li><b>Cosa ho</b> in negozio, montatura per montatura.</li>
+        <li><b>Cosa arriva</b> dai fornitori.</li>
+        <li><b>Cosa vendo</b> di più, e cosa resta fermo.</li>
+        <li><b>Inventario</b> senza fogli di carta.</li>
+        <li><b>Statistiche</b> chiare, a colpo d'occhio.</li>
+      </ul>
+    </div>
+    <div class="col">
+      <div class="duo">
+        <figure class="shot desk"><img src="../media/demo/magazzino-desktop.png" alt="" onerror="this.parentNode.classList.add('missing')"><span class="ph">Magazzino<small>immagine in arrivo</small></span></figure>
+        <figure class="shot phone"><img src="../media/demo/magazzino-telefono.png" alt="" onerror="this.parentNode.classList.add('missing')"><span class="ph">Magazzino<small>dal telefono</small></span></figure>
+      </div>
+    </div>
+  </div>
+  <div class="num">06</div>
+</section>
+
+<!-- 7 DYMO -->
+<section class="slide">
+  <div class="top"><b>STORE <i>//</i> CRAFT</b><span>Ottica Macrì</span></div>
+  <div class="body">
+    <div class="col text">
+      <div class="kicker">Etichette</div>
+      <h2>Un'etichetta<br><em>per ogni montatura</em></h2>
+      <div class="rule"></div>
+      <p class="lead">Con la stampante <b>DYMO LabelWriter 450</b>.</p>
+      <ul class="punti">
+        <li>Su ogni etichetta: <b>codice a barre</b> e <b>prezzo</b>.</li>
+        <li>Si stampa <b>con un clic</b>, direttamente dall'articolo.</li>
+        <li>Alla vendita basta leggere il codice.</li>
+      </ul>
+    </div>
+    <div class="col" style="gap:5mm">
+      <figure class="shot contain" style="aspect-ratio:16/9"><img src="../media/storecraft/dymo.png" alt="" onerror="this.parentNode.classList.add('missing')"><span class="ph">Etichetta DYMO<small>immagine in arrivo</small></span></figure>
+      <figure class="shot desk" style="width:70%; align-self:flex-end"><img src="../media/demo/etichette-desktop.png" alt="" onerror="this.parentNode.classList.add('missing')"><span class="ph">Stampa etichette<small>immagine in arrivo</small></span></figure>
+    </div>
+  </div>
+  <div class="num">07</div>
+</section>
+
+<!-- 8 CLIENTI -->
+<section class="slide">
+  <div class="top"><b>STORE <i>//</i> CRAFT</b><span>Ottica Macrì</span></div>
+  <div class="body">
+    <div class="col text">
+      <div class="kicker">Clienti</div>
+      <h2>Ogni cliente,<br><em>ricordato bene</em></h2>
+      <div class="rule"></div>
+      <ul class="punti">
+        <li>La <b>scheda</b> di ogni cliente.</li>
+        <li>I suoi <b>acquisti</b>, sempre a portata di mano.</li>
+        <li>I <b>compleanni</b>, per fare gli auguri.</li>
+        <li>Un messaggio <b>WhatsApp</b>: «I suoi occhiali sono pronti».</li>
+        <li><b>Privacy in regola</b>.</li>
+      </ul>
+    </div>
+    <div class="col">
+      <div class="duo">
+        <figure class="shot desk"><img src="../media/demo/clienti-desktop.png" alt="" onerror="this.parentNode.classList.add('missing')"><span class="ph">Clienti<small>immagine in arrivo</small></span></figure>
+        <figure class="shot phone"><img src="../media/demo/clienti-telefono.png" alt="" onerror="this.parentNode.classList.add('missing')"><span class="ph">Clienti<small>dal telefono</small></span></figure>
+      </div>
+    </div>
+  </div>
+  <div class="num">08</div>
+</section>
+
+<!-- 9 SOCIAL -->
+<section class="slide">
+  <div class="top"><b>STORE <i>//</i> CRAFT</b><span>Ottica Macrì</span></div>
+  <div class="body">
+    <div class="col text">
+      <div class="kicker">Social</div>
+      <h2>Instagram e Facebook,<br><em>senza fatica</em></h2>
+      <div class="rule"></div>
+      <p class="lead">L'app pubblica per lei.</p>
+      <ul class="punti">
+        <li><b>Scrive due righe</b> o sceglie un modello.</li>
+        <li>L'app prepara <b>immagine e testo</b>.</li>
+        <li>Lei guarda e <b>approva con un tasto</b>.</li>
+      </ul>
+    </div>
+    <div class="col" style="flex-direction:row; align-items:center; gap:7mm; justify-content:center">
+      <figure class="shot phone" style="width:36%"><img src="../media/demo/social-telefono.png" alt="" onerror="this.parentNode.classList.add('missing')"><span class="ph">Social<small>dal telefono</small></span></figure>
+      <figure class="shot desk" style="width:58%"><img src="../media/demo/social-desktop.png" alt="" onerror="this.parentNode.classList.add('missing')"><span class="ph">Social<small>immagine in arrivo</small></span></figure>
+    </div>
+  </div>
+  <div class="num">09</div>
+</section>
+
+<!-- 10 NEWSLETTER -->
+<section class="slide">
+  <div class="top"><b>STORE <i>//</i> CRAFT</b><span>Ottica Macrì</span></div>
+  <div class="body">
+    <div class="col text">
+      <div class="kicker">Newsletter</div>
+      <h2>Una lettera<br><em>ai suoi clienti</em></h2>
+      <div class="rule"></div>
+      <ul class="punti">
+        <li><b>Promozioni</b> e novità del negozio.</li>
+        <li><b>Auguri</b> di compleanno e per le feste.</li>
+        <li>Solo a chi ha <b>dato il consenso</b>.</li>
+      </ul>
+      <p class="nota">Si prepara come un cartello: modello, due righe, invia.</p>
+    </div>
+    <div class="col">
+      <div class="mail">
+        <div class="bar"><span></span><span></span><span></span>&nbsp; Posta in arrivo</div>
+        <div class="hd"><b>Da:</b> Ottica Macrì<br><b>Oggetto:</b> Tanti auguri dalla sua ottica</div>
+        <div class="banner"><div class="a">OTTICA MACRÌ · ROMA</div><div class="b">Buon compleanno</div></div>
+        <div class="tx">Gentile cliente, in negozio la aspetta un piccolo pensiero per il suo compleanno.<br><span class="btn">Ci vediamo in negozio</span></div>
+      </div>
+      <div class="cap">Esempio di newsletter (testo di prova)</div>
+    </div>
+  </div>
+  <div class="num">10</div>
+</section>
+
+<!-- 11 VETRINA -->
+<section class="slide">
+  <div class="top"><b>STORE <i>//</i> CRAFT</b><span>Ottica Macrì</span></div>
+  <div class="body">
+    <div class="col text">
+      <span class="chip" style="align-self:flex-start">Novità</span>
+      <div class="kicker">Vetrina digitale</div>
+      <h2>Una vetrina<br><em>che si muove</em></h2>
+      <div class="rule"></div>
+      <ul class="punti">
+        <li>Un <b>tablet in vetrina</b> mostra cartelli animati.</li>
+        <li>Si cambiano dal <b>PC del negozio</b>…</li>
+        <li>…oppure dal <b>telefono</b>, anche da casa.</li>
+      </ul>
+      <p class="nota">Chi passa per strada vede le novità e le promozioni.</p>
+    </div>
+    <div class="col">
+      <div class="duo">
+        <figure class="shot tablet" style="width:86%"><img src="../media/demo/vetrina-tablet.png" alt="" onerror="this.parentNode.classList.add('missing')"><span class="ph">Tablet in vetrina<small>immagine in arrivo</small></span></figure>
+        <figure class="shot phone"><img src="../media/demo/vetrina-telefono.png" alt="" onerror="this.parentNode.classList.add('missing')"><span class="ph">Comando<small>dal telefono</small></span></figure>
+      </div>
+    </div>
+  </div>
+  <div class="num">11</div>
+</section>
+
+<!-- 12 BLOCCHI -->
+<section class="slide">
+  <div class="top"><b>STORE <i>//</i> CRAFT</b><span>Ottica Macrì</span></div>
+  <div class="body" style="flex-direction:column; gap:0; justify-content:center">
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:10mm">
+      <div>
+        <div class="kicker">Si costruisce a blocchi</div>
+        <h2 style="margin-bottom:3mm; font-size:24pt; white-space:nowrap">Lei sceglie <em>da dove partire</em></h2>
+      </div>
+      <p style="font-size:13.5pt; line-height:1.4; max-width:80mm; color:var(--grigio); padding-bottom:5mm; text-align:right">Si comincia dalla BASE.<br>Gli altri blocchi si aggiungono quando vuole.</p>
+    </div>
+    <div class="scala">
+      <div class="gradino g1"><div class="n">1</div><h3>Base</h3><p>La grafica di STORE // CRAFT.</p><div class="tempo">Pronta in pochi giorni</div></div>
+      <div class="gradino g2"><div class="n">+2</div><h3>Gestione</h3><p>Magazzino ed etichette.</p><div class="tempo">Alcune settimane</div></div>
+      <div class="gradino g3"><div class="n">+3</div><h3>Amministrazione</h3><p>Clienti e dati del negozio.</p><div class="tempo">Alcune settimane</div></div>
+      <div class="gradino g4"><div class="n">+4</div><h3>Social e newsletter</h3><p>Instagram, Facebook, email.</p><div class="tempo">Alcune settimane</div></div>
+      <div class="gradino g5"><div class="n">+</div><h3>Vetrina digitale</h3><p>Facoltativa: il tablet in vetrina.</p><div class="tempo">Quando vuole</div></div>
+    </div>
+    <div class="base-line"></div>
+    <div class="prezzo"><span class="tag">Prezzi</span>Il prezzo di ogni blocco è nel preventivo che le consegniamo a parte. I tempi sono indicativi.</div>
+  </div>
+  <div class="num">12</div>
+</section>
+
+<!-- 13 COSA SERVE -->
+<section class="slide">
+  <div class="top"><b>STORE <i>//</i> CRAFT</b><span>Ottica Macrì</span></div>
+  <div class="body" style="flex-direction:column; gap:0; justify-content:center">
+    <div class="kicker">Cosa serve in negozio</div>
+    <h2 style="margin-bottom:6mm">Poche cose, <em>quasi tutte già sue</em></h2>
+    <div style="display:flex; gap:9mm">
+      <div style="flex:1.15">
+        <div class="serve">
+          <div class="cosa"><svg viewBox="0 0 24 24" fill="none" stroke="#1d5c8f" stroke-width="1.5"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16v4"/></svg><div><b>Il PC</b><span>quello che ha già</span></div></div>
+          <div class="cosa"><svg viewBox="0 0 24 24" fill="none" stroke="#1d5c8f" stroke-width="1.5"><rect x="5" y="8" width="14" height="10" rx="1.5"/><path d="M8 8V4h8v4M8 18v2h8v-2"/></svg><div><b>Stampante DYMO</b><span>LabelWriter 450</span></div></div>
+          <div class="cosa"><svg viewBox="0 0 24 24" fill="none" stroke="#1d5c8f" stroke-width="1.5"><path d="M4 6v12M7 6v12M10 6v12M14 6v12M16 6v12M20 6v12"/></svg><div><b>Lettore di codici</b><span>economico</span></div></div>
+          <div class="cosa"><svg viewBox="0 0 24 24" fill="none" stroke="#1d5c8f" stroke-width="1.5"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M11 18h2"/></svg><div><b>Un tablet</b><span>solo per la vetrina digitale</span></div></div>
+          <div class="cosa" style="grid-column:1 / -1"><svg viewBox="0 0 24 24" fill="none" stroke="#1d5c8f" stroke-width="1.5"><path d="M2 9a15 15 0 0 1 20 0M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0"/><circle cx="12" cy="19" r="1" fill="#1d5c8f"/></svg><div><b>Internet</b><span>la connessione del negozio</span></div></div>
+        </div>
+      </div>
+      <div style="flex:1; display:flex; flex-direction:column; gap:4mm">
+        <div class="box"><h3>Dati al sicuro</h3>
+          <ul class="punti"><li>Server in <b>Europa</b>.</li><li>Una <b>copia di sicurezza</b> ogni giorno.</li><li>Accesso <b>solo suo</b>.</li></ul></div>
+        <div class="box oro"><h3>Come oggi</h3><p>Scontrini e Tessera Sanitaria restano come adesso: con la sua cassa e il suo commercialista.</p></div>
+      </div>
+    </div>
+  </div>
+  <div class="num">13</div>
+</section>
+
+<!-- 14 PROSSIMI PASSI -->
+<section class="slide dark">
+  <div class="cover" style="padding:0 18mm">
+    <div class="claim" style="margin-top:0">PROSSIMI PASSI</div>
+    <div class="passi">
+      <div class="passo"><div class="n">1</div><h3>Sceglie</h3><p>il blocco da cui partire.</p></div>
+      <div class="passo"><div class="n">2</div><h3>Installiamo</h3><p>la BASE in negozio.</p></div>
+      <div class="passo"><div class="n">3</div><h3>Prova</h3><p>in negozio, con calma, insieme.</p></div>
+      <div class="passo"><div class="n">4</div><h3>Aggiungiamo</h3><p>gli altri blocchi, quando vuole.</p></div>
+    </div>
+    <div class="sep" style="margin:14mm auto 9mm"></div>
+    <div class="grazie">Grazie</div>
+    <div class="claim2" style="margin-top:4mm">Fabrice · STORE // CRAFT</div>
+  </div>
+</section>
+
+</body>
+</html>
