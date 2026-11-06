@@ -60,18 +60,18 @@ window.PREZZI = {
     totaleScontato: 1800,         // deciso da Fabrice 6/11 sera (sconto risultante: −700 € · −28%)
     blocchi: [                    // ripartizione decisa da Fabrice 6/11 (somma 2.500)
       { id: 'base',    nome: 'STAMPE · Grafica STORE // CRAFT', cosa: 'Cartelli in vari formati, cartellini, etichette adesive DYMO e set di stampe pronte per il punto vendita: promozioni e operazioni in pochi clic, Lista di stampa e Cronologia, utilità di Cassa.', prezzo: 1175 },
-      { id: 'vetrina', nome: 'VIDEO VETRINA', cosa: 'Grafiche animate, loop e video in vetrina su cornice digitale o tablet.', prezzo: 1025 },
+      { id: 'vetrina', nome: 'VETRINA DIGITALE completa · video vetrina', cosa: 'Grafiche animate, loop e video in vetrina su tablet, schermo o cornice digitale. Tutte le funzioni comprese: comandi dal PC del negozio o dal telefono, «Manda in vetrina», playlist e orari programmati.', prezzo: 1025 },
       { id: 'clienti', nome: 'ARCHIVIO CLIENTI · Amministrazione inclusa', cosa: 'Schede clienti con note e storico in ordine di data, semplice come una rubrica; dati del negozio e impostazioni: l’amministrazione che serve ogni giorno è già compresa.', prezzo: 300 }
     ],
     canone: 'Nessun canone obbligatorio (i dati restano sul PC del negozio con copia di sicurezza)'
   },
 
-  /* ===== 6/11 · ESTENSIONI acquistabili come SINGOLI MODULI EXTRA (cifre e tempi = blocchi del pianoA, nessuna cifra nuova) ===== */
+  /* ===== 6/11 · ESTENSIONI acquistabili come SINGOLI MODULI EXTRA. 6/11 mattina Fabrice: tolta «Vetrina digitale completa» (è già inclusa nel pacchetto);
+     Gestione 2.200 / 4–5 sett., Social 2.500 / 5–6 sett. (decisi da Fabrice); Amministrazione invariata + «corrispettivi». Copia: prezzi.prima-moduli.js ===== */
   moduliExtra: [
-    { id: 'vetrina-plus', nome: 'VETRINA DIGITALE completa', cosa: 'Il passo dopo il video vetrina: schermo o tablet comandato dal PC del negozio o dal telefono, «Manda in vetrina», playlist e orari programmati.', prezzo: 950, tempi: '3–5 settimane', da: 'pianoA.vetrina' },
-    { id: 'gestione', nome: 'GESTIONE · Magazzino', cosa: 'Arriva merce, vendo, cerco, inventario e statistiche con il lettore di codici e le etichette DYMO.', prezzo: 2200, tempi: '6–10 settimane', da: 'pianoA.gestione' },
-    { id: 'social', nome: 'SOCIAL + NEWSLETTER', cosa: 'L’app prepara grafica e testo e pubblica per te su Instagram e Facebook; newsletter e avviso WhatsApp «occhiali pronti».', prezzo: 2400, tempi: '6–11 settimane', da: 'pianoA.social' },
-    { id: 'admin-plus', nome: 'AMMINISTRAZIONE completa', cosa: 'Oltre all’archivio clienti già incluso: acquisti collegati alle schede, privacy in regola, utenti e permessi.', prezzo: null, tempi: 'da definire', da: 'prezzo da definire (Fabrice)' }
+    { id: 'gestione', nome: 'GESTIONE · Magazzino', cosa: 'Arriva merce, vendo, cerco, inventario e statistiche con il lettore di codici e le etichette DYMO.', prezzo: 2200, tempi: '4–5 settimane', da: 'Fabrice 6/11' },
+    { id: 'social', nome: 'SOCIAL + NEWSLETTER', cosa: 'L’app prepara grafica e testo e pubblica per te su Instagram e Facebook; newsletter e avviso WhatsApp «occhiali pronti».', prezzo: 2500, tempi: '5–6 settimane', da: 'Fabrice 6/11' },
+    { id: 'admin-plus', nome: 'AMMINISTRAZIONE completa', cosa: 'Oltre all’archivio clienti già incluso: acquisti collegati alle schede, privacy in regola, utenti e permessi, corrispettivi.', prezzo: null, tempi: 'da definire', da: 'prezzo da definire (Fabrice)' }
   ],
 
   /* ===== 6/11 · HARDWARE per il video vetrina: SPESE EXTRA DA VERIFICARE, non comprese nel prezzo del software.
